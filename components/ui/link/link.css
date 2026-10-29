@@ -1,0 +1,64 @@
+.bcp-link,
+.bcp-link:link,
+.bcp-link:visited {
+	color: var(--bcp-colour-link);
+	text-decoration: underline;
+	text-decoration-thickness: max(1px, 0.0625rem);
+	text-underline-offset: 0.15em;
+}
+
+.bcp-link:hover {
+	color: var(--bcp-colour-link-hover);
+	text-decoration-thickness: max(3px, 0.1875rem);
+}
+
+.bcp-link:focus-visible {
+	outline: 3px solid transparent;
+	color: var(--bcp-colour-focus-text);
+	background-color: var(--bcp-colour-focus);
+	box-shadow:
+		0 -2px var(--bcp-colour-focus),
+		0 4px var(--bcp-colour-focus-text);
+	text-decoration: none;
+}
+
+.bcp-link--inverse,
+.bcp-link--inverse:link,
+.bcp-link--inverse:visited,
+.bcp-link--inverse:hover {
+	color: var(--bcp-colour-white);
+}
+
+.bcp-link--no-underline:not(:hover):not(:focus-visible) {
+	text-decoration: none;
+}
+
+/* Back link */
+
+.bcp-back-link,
+.bcp-back-link:link,
+.bcp-back-link:visited {
+	position: relative;
+	display: inline-block;
+	margin-bottom: var(--bcp-space-7xl);
+	padding-left: 14px;
+	font-size: var(--bcp-font-size-xs);
+	color: var(--bcp-text-colour);
+}
+
+.bcp-back-link::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 3px;
+	width: 7px;
+	height: 7px;
+	margin-top: -4px;
+	border: solid currentColor;
+	border-width: 1px 0 0 1px;
+	transform: rotate(-45deg);
+}
+
+.bcp-back-link:hover {
+	color: var(--bcp-text-colour);
+}

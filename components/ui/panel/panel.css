@@ -1,0 +1,21 @@
+.bcp-panel {
+	margin: 20px 0 40px 0;
+	padding: 34px;
+	background-color: var(--bcp-colour-green);
+	color: var(--bcp-colour-white);
+	text-align: center;
+}
+
+.bcp-panel-title {
+	margin: 0 0 12px 0;
+	color: var(--bcp-colour-white);
+	font-size: 2.5rem;
+}
+
+.bcp-panel-body {
+	font-size: var(--bcp-font-size-md);
+}
+
+.bcp-panel-body > :last-child {
+	margin-bottom: 0;
+}

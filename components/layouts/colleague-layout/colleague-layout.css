@@ -1,0 +1,8 @@
+.bcp-colleague-layout-user {
+	margin: 0;
+}
+
+.bcp-colleague-layout-email {
+	color: var(--bcp-secondary-text-colour);
+	overflow-wrap: anywhere;
+}

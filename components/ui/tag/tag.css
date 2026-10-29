@@ -1,0 +1,80 @@
+/* Solid tints rather than Harbour's 10% overlay, so each tag has a fixed,
+   checked contrast ratio (all 4.5:1 or better). */
+
+.bcp-tag {
+	display: inline-block;
+	padding: 5px 12px;
+	font-size: var(--bcp-font-size-xs);
+	font-weight: var(--bcp-text-weight-bold);
+	line-height: 1.25;
+	white-space: nowrap;
+	background-color: #f0f0f0;
+	color: #383f43;
+}
+
+.bcp-tag--grey {
+	background-color: #f0f0f0;
+	color: #383f43;
+}
+
+.bcp-tag--green {
+	background-color: #e8f0ec;
+	color: #00703c;
+}
+
+.bcp-tag--red {
+	background-color: #faebea;
+	/* Mockup #ca3535 is 4.45:1 on this tint, under AA; #c03030 is 4.89:1. */
+	color: #c03030;
+}
+
+.bcp-tag--yellow {
+	background-color: #fff7bf;
+	color: #594d00;
+}
+
+.bcp-tag--orange {
+	background-color: #fcd6c3;
+	color: #6e3619;
+}
+
+.bcp-tag--turquoise {
+	background-color: #d4ecea;
+	color: #10403c;
+}
+
+.bcp-tag--blue {
+	background-color: #bbd4ea;
+	color: #0c2d4a;
+}
+
+/* Collection */
+.bcp-tag--light-blue {
+	background-color: #e8f1f8;
+	color: #144e81;
+}
+
+/* Session */
+.bcp-tag--purple {
+	background-color: #ebe9ee;
+	color: #361e54;
+}
+
+.bcp-tag--pink {
+	background-color: #f7d7e6;
+	color: #6b1c3d;
+}
+
+.bcp-tag-group {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: var(--bcp-space-xs);
+	vertical-align: middle;
+}
+
+@media print {
+	.bcp-tag {
+		border: 1px solid currentColor;
+		background: none;
+	}
+}

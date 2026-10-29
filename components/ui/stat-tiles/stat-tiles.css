@@ -1,0 +1,51 @@
+.bcp-stat-tiles {
+	display: grid;
+	gap: 24px;
+	margin: 0 0 60px 0;
+}
+
+.bcp-stat-tiles--3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bcp-stat-tiles--4 {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.bcp-stat-tile {
+	padding-top: 18px;
+	border-top: var(--bcp-border-width-lg) solid var(--bcp-colour-purple);
+}
+
+.bcp-stat-tile-label {
+	margin-bottom: 6px;
+	font-size: var(--bcp-font-size-sm);
+	font-weight: var(--bcp-text-weight-bold);
+}
+
+.bcp-stat-tile-value {
+	margin: 0 0 8px 0;
+	font-size: 3.3125rem;
+	font-weight: var(--bcp-text-weight-heading);
+	line-height: 1;
+}
+
+.bcp-stat-tile-description {
+	margin: 0;
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-xs);
+}
+
+@media (max-width: 900px) {
+	.bcp-stat-tiles--3,
+	.bcp-stat-tiles--4 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 640px) {
+	.bcp-stat-tiles--3,
+	.bcp-stat-tiles--4 {
+		grid-template-columns: 1fr;
+	}
+}

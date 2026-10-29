@@ -1,0 +1,46 @@
+.bcp-add-another {
+	margin-bottom: 30px;
+}
+
+.bcp-add-another-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 10px 20px;
+	margin-bottom: 16px;
+}
+
+.bcp-add-another-field {
+	flex: 1 1 320px;
+	max-width: 480px;
+}
+
+/* A button that looks like a link: it acts on the page rather than going somewhere */
+.bcp-add-another-remove {
+	padding: 0 0 10px 0;
+	border: 0;
+	background: none;
+	color: var(--bcp-colour-link);
+	font-family: inherit;
+	font-size: inherit;
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+	cursor: pointer;
+}
+
+.bcp-add-another-remove:hover {
+	color: var(--bcp-colour-link-hover);
+	text-decoration-thickness: 3px;
+}
+
+.bcp-add-another-remove:focus-visible {
+	outline: 3px solid transparent;
+	background-color: var(--bcp-colour-focus);
+	box-shadow: 0 4px var(--bcp-colour-focus-text);
+	color: var(--bcp-colour-focus-text);
+	text-decoration: none;
+}
+
+.bcp-add-another .bcp-add-another-add {
+	margin-top: 10px;
+}

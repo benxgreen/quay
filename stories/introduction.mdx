@@ -1,0 +1,18 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# Quay – Device portal components
+
+The shared components for the Device portal, in vanilla CSS with `bcp-` class names.
+
+- **Components** are generic UI pieces under `components/ui/`, such as buttons, the accordion and the step list. One folder each with an `index.tsx` and its own CSS file, as in Harbour (`bcp-fms`).
+- **Patterns** combine components into something with a job to do, such as search with filters, the journal or a lookup field. They live under `components/patterns/`.
+- **Service** components are specific to one service and grouped by it, such as `components/service/replacements/type-tag`.
+- **Layouts** frame whole pages: the team frame (header with Menu, breadcrumb band, service navigation) and the colleague frame.
+
+Stories live in `stories/` rather than beside each component, so each component folder keeps exactly two files.
+
+Every story is checked with axe in the Accessibility panel, and violations count as failures.
+
+Where a component differs from Harbour's version, the reason is in `docs/design-differences.md`.

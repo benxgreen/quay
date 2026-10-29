@@ -1,0 +1,23 @@
+.bcp-group-heading {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 16px;
+	padding: 14px 0;
+	border-bottom: var(--bcp-border-width-md) solid var(--bcp-colour-purple);
+}
+
+.bcp-group-heading-title {
+	margin: 0;
+	font-size: var(--bcp-font-size-md);
+	line-height: 1.25;
+}
+
+.bcp-group-heading-meta {
+	font-size: var(--bcp-font-size-sm);
+}
+
+.bcp-group-heading-action {
+	margin-left: auto;
+	font-size: var(--bcp-font-size-sm);
+}

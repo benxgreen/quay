@@ -1,0 +1,6 @@
+.bcp-error-message {
+	display: block;
+	margin: 0 0 var(--bcp-space-md) 0;
+	color: var(--bcp-colour-red);
+	font-weight: var(--bcp-text-weight-heading);
+}

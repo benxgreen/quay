@@ -1,0 +1,25 @@
+.bcp-warning-text {
+	display: flex;
+	align-items: flex-start;
+	gap: 15px;
+	margin: 0 0 20px 0;
+}
+
+.bcp-warning-text-icon {
+	flex: none;
+	width: 35px;
+	height: 35px;
+	border-radius: 50%;
+	background: var(--bcp-text-colour);
+	color: var(--bcp-colour-white);
+	font-size: 26px;
+	font-weight: var(--bcp-text-weight-heading);
+	line-height: 35px;
+	text-align: center;
+	forced-color-adjust: none;
+}
+
+.bcp-warning-text-content {
+	margin: 0;
+	font-weight: var(--bcp-text-weight-bold);
+}

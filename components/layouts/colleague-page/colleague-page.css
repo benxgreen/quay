@@ -1,0 +1,18 @@
+/* Doubled classes so the mockups' padding wins over Container's default spacing. */
+.bcp-colleague-page.bcp-colleague-page {
+	flex: 1 0 auto;
+	padding-top: 50px;
+	padding-bottom: 70px;
+}
+
+.bcp-colleague-page--question.bcp-colleague-page--question {
+	padding-top: 30px;
+}
+
+.bcp-colleague-page-column {
+	max-width: 760px;
+}
+
+.bcp-colleague-page-question {
+	max-width: 680px;
+}

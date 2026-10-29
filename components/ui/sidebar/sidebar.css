@@ -1,0 +1,12 @@
+.bcp-sidebar {
+	padding: 30px;
+	background-color: var(--bcp-colour-grey);
+}
+
+.bcp-sidebar > :last-child {
+	margin-bottom: 0;
+}
+
+.bcp-sidebar h2 {
+	font-size: var(--bcp-font-size-md);
+}

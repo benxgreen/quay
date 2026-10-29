@@ -1,0 +1,29 @@
+.bcp-action-list-title {
+	font-size: var(--bcp-font-size-md);
+}
+
+.bcp-action-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.bcp-action-list-item {
+	margin-bottom: 16px;
+}
+
+.bcp-action-list-item:last-child {
+	margin-bottom: 0;
+}
+
+.bcp-action-list-link--destructive,
+.bcp-action-list-link--destructive:link,
+.bcp-action-list-link--destructive:visited {
+	color: var(--bcp-colour-red);
+}
+
+.bcp-action-list-description {
+	display: block;
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-xs);
+}

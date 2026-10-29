@@ -1,0 +1,37 @@
+.bcp-sidebar-layout {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 40px 60px;
+}
+
+.bcp-sidebar-layout-main {
+	flex: 999 1 560px;
+	min-width: 0;
+}
+
+.bcp-sidebar-layout-aside {
+	flex: 1 1 260px;
+	max-width: var(--bcp-width-sidebar);
+}
+
+/* Visual order only: the sidebar stays after the main content in the DOM. */
+.bcp-sidebar-layout--start .bcp-sidebar-layout-aside {
+	order: -1;
+}
+
+@media (max-width: 640px) {
+	.bcp-sidebar-layout-aside {
+		max-width: none;
+	}
+
+	.bcp-sidebar-layout--start .bcp-sidebar-layout-aside {
+		order: 0;
+	}
+}
+
+@media print {
+	.bcp-sidebar-layout-aside {
+		display: none;
+	}
+}

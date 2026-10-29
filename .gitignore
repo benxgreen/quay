@@ -34,3 +34,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# storybook
+/storybook-static
+*storybook.log
+
+# claude
+.claude/launch.json

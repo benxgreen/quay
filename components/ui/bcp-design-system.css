@@ -1,0 +1,331 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: .sr-only must win over any component style */
+
+/*
+   ==========================================================================
+   BCP Council Design System
+   --------------------------------------------------------------------------
+
+   Foundational design tokens and global styles.
+
+   Started from Harbour's components/ui/bcp-design-system.css (design system
+   version 4). Values come from the Device Portal Mockups canvas; where they
+   differ from Harbour the difference is listed in docs/design-differences.md
+   so the two libraries can be reconciled.
+
+   Tokens are generic (sizes, colours, spacing), never named after a page or
+   service. Global styles only: component styles live beside each component.
+
+   Breakpoint: 640px (phones). CSS custom properties cannot be used in media
+   queries, so the value is written out as (max-width: 640px) where needed.
+   ========================================================================== */
+
+:root {
+	--bcp-design-version: 4;
+
+	/* Colour palette (Harbour) */
+	--bcp-colour-black: #000000;
+	--bcp-colour-white: #ffffff;
+	--bcp-colour-grey: #f5f4f2;
+	--bcp-colour-dark-grey: #b5b5b3;
+
+	--bcp-colour-purple: #361e54;
+	--bcp-colour-dark-purple: #24133a;
+
+	--primary-brand-colour: var(--bcp-colour-purple);
+
+	--bcp-colour-cyan: #01a7e1;
+	--bcp-colour-blue: #015aa7;
+	--bcp-colour-dark-blue: #2071b8;
+
+	--bcp-colour-lime: #95c11f;
+	--bcp-colour-green: #00703c;
+	--bcp-colour-dark-green: #093d29;
+
+	--bcp-colour-red: #ca3535;
+	--bcp-colour-dark-red: #902525;
+
+	--bcp-colour-pink: #d83089;
+	--bcp-colour-orange: #ee7202;
+
+	--bcp-colour-yellow: #ffdd00;
+	--bcp-colour-dark-yellow: #e1c72f;
+
+	/* Colour palette (added from the mockups) */
+	--bcp-colour-bright-blue: #1d70b8;
+	--bcp-colour-navy: #003078;
+	--bcp-colour-bright-red: #d4351c;
+	--bcp-colour-mid-grey: #b1b4b6;
+	--bcp-colour-light-grey: #f3f2f1;
+	--bcp-colour-light-purple: #f5f4f6;
+	--bcp-colour-off-white: #fafafa;
+	--bcp-colour-pale-yellow: #fff7bf;
+	--bcp-colour-pale-purple: #f8f7fa;
+
+	/* Links and focus */
+	--bcp-colour-link: var(--bcp-colour-bright-blue);
+	--bcp-colour-link-hover: var(--bcp-colour-navy);
+	--bcp-colour-focus: var(--bcp-colour-yellow);
+	--bcp-colour-focus-text: #0b0c0c;
+
+	/* Text colours */
+	--bcp-text-colour: #0b0c0c;
+	--bcp-secondary-text-colour: #505a5f;
+
+	/* Line heights */
+	--bcp-text-line-height-body: 1.32;
+	--bcp-text-line-height-heading: 1.2;
+
+	/* Font weights */
+	--bcp-text-weight-regular: 400;
+	--bcp-text-weight-bold: 500;
+	--bcp-text-weight-heading: 700;
+
+	/* Font family. Load Roboto with next/font and expose it as --bcp-font-roboto. */
+	--bcp-font-family:
+		var(--bcp-font-roboto, "Roboto"), Helvetica, Arial, sans-serif, system-ui, -apple-system;
+	--bcp-font-family-mono: ui-monospace, Menlo, Consolas, monospace;
+
+	/* Font sizes */
+	--bcp-font-size-xl: 3rem; /* 48px */
+	--bcp-font-size-lg: 1.875rem; /* 30px */
+	--bcp-font-size-ml: 1.6875rem; /* 27px */
+	--bcp-font-size-md: 1.5rem; /* 24px */
+	--bcp-font-size-ms: 1.3125rem; /* 21px */
+	--bcp-font-size-body: 1.1875rem; /* 19px */
+	--bcp-font-size-sm: 1.0625rem; /* 17px */
+	--bcp-font-size-xs: 1rem; /* 16px */
+
+	/* Container widths (Harbour's tiers; full and large take the mockups'
+	   1260px and 1100px in place of Harbour's 1440px and 1020px) */
+	--bcp-width-container-full: 1260px;
+	--bcp-width-container-large: 1100px;
+	--bcp-width-container-half: 820px;
+	--bcp-width-container-third: 540px;
+	--bcp-width-input-max: 720px;
+	--bcp-width-sidebar: 320px;
+
+	/* Spacing scale (Harbour) */
+	--bcp-space-xxs: 4px;
+	--bcp-space-xs: 6px;
+	--bcp-space-sm: 8px;
+	--bcp-space-md: 10px;
+	--bcp-space-lg: 12px;
+	--bcp-space-xl: 16px;
+	--bcp-space-2xl: 20px;
+	--bcp-space-3xl: 24px;
+	--bcp-space-4xl: 28px;
+	--bcp-space-5xl: 32px;
+	--bcp-space-6xl: 36px;
+	--bcp-space-7xl: 40px;
+	--bcp-space-8xl: 56px;
+	--bcp-space-9xl: 72px;
+	--bcp-space-10xl: 88px;
+
+	/* Page gutters */
+	--bcp-wrapper-horizontal: 60px;
+
+	/* Borders */
+	--bcp-border-width-sm: 1px;
+	--bcp-border-width-md: 2px;
+	--bcp-border-width-lg: 5px;
+	--bcp-border-width-xl: 10px;
+}
+
+@media (max-width: 640px) {
+	:root {
+		--bcp-wrapper-horizontal: 20px;
+		--bcp-font-size-xl: 2rem;
+		--bcp-font-size-ml: 1.5rem;
+	}
+}
+
+/* Screen reader only text */
+.sr-only {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+}
+
+/* Base resets */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	background-color: var(--bcp-colour-off-white);
+	overflow-y: scroll;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	background: var(--bcp-colour-white);
+	font-family: var(--bcp-font-family);
+	font-size: var(--bcp-font-size-body);
+	line-height: var(--bcp-text-line-height-body);
+	color: var(--bcp-text-colour);
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Typography */
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--bcp-font-family);
+	font-weight: var(--bcp-text-weight-heading);
+	line-height: var(--bcp-text-line-height-heading);
+	color: var(--bcp-text-colour);
+}
+
+h1,
+.bcp-heading-xl {
+	margin: 0 0 30px 0;
+	font-size: var(--bcp-font-size-xl);
+	line-height: 1.04;
+}
+
+h2,
+.bcp-heading-ml {
+	margin: 0 0 18px 0;
+	font-size: var(--bcp-font-size-ml);
+	line-height: 1.2;
+}
+
+h3,
+.bcp-heading-ms {
+	margin: 0 0 10px 0;
+	font-size: var(--bcp-font-size-ms);
+	font-weight: var(--bcp-text-weight-bold);
+	line-height: 1.25;
+}
+
+h4 {
+	margin: 0 0 10px 0;
+	font-size: var(--bcp-font-size-body);
+}
+
+.bcp-heading-lg {
+	font-size: var(--bcp-font-size-lg);
+	line-height: 1.2;
+}
+
+.bcp-heading-md {
+	font-size: var(--bcp-font-size-md);
+	line-height: 1.25;
+}
+
+p {
+	margin: 0 0 20px 0;
+}
+
+.bcp-body-lead {
+	font-size: var(--bcp-font-size-md);
+	line-height: 1.25;
+}
+
+.bcp-body-small {
+	font-size: var(--bcp-font-size-sm);
+}
+
+.bcp-secondary-text {
+	color: var(--bcp-secondary-text-colour);
+}
+
+ul,
+ol {
+	margin: 0 0 20px 0;
+	padding-inline-start: 20px;
+}
+
+.bcp-list--plain {
+	list-style: none;
+	padding-inline-start: 0;
+}
+
+strong,
+b {
+	font-weight: var(--bcp-text-weight-heading);
+}
+
+fieldset {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	min-width: 0;
+}
+
+legend {
+	padding: 0;
+}
+
+/* Bare links get link styling so Markdown and plain content look right
+   without a component. */
+a {
+	color: var(--bcp-colour-link);
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+a:hover {
+	color: var(--bcp-colour-link-hover);
+	text-decoration-thickness: 3px;
+}
+
+a:focus-visible {
+	outline: 3px solid transparent;
+	color: var(--bcp-colour-focus-text);
+	background-color: var(--bcp-colour-focus);
+	box-shadow:
+		0 -2px var(--bcp-colour-focus),
+		0 4px var(--bcp-colour-focus-text);
+	text-decoration: none;
+}
+
+/* Section break */
+.bcp-section-break {
+	margin: var(--bcp-space-7xl) 0;
+	border: 0;
+	border-bottom: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+}
+
+/* Columns (Harbour) */
+.bcp-columns-halves {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--bcp-space-5xl);
+}
+
+@media (max-width: 640px) {
+	.bcp-columns-halves {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media print {
+	html,
+	body {
+		background: var(--bcp-colour-white);
+	}
+
+	a {
+		color: var(--bcp-text-colour);
+	}
+}

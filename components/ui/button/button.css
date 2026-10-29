@@ -1,0 +1,150 @@
+.bcp-button,
+.bcp-button:link,
+.bcp-button:visited {
+	display: inline-block;
+	position: relative;
+	margin: 0;
+	padding: 10px 16px 9px;
+	border: 2px solid transparent;
+	border-radius: 0;
+	background-color: var(--bcp-colour-green);
+	box-shadow: 0 3px 0 #083d2a;
+	color: var(--bcp-colour-white);
+	font-family: inherit;
+	font-size: var(--bcp-font-size-body);
+	font-weight: var(--bcp-text-weight-regular);
+	line-height: 1.19;
+	text-align: center;
+	text-decoration: none;
+	vertical-align: top;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	touch-action: manipulation;
+}
+
+.bcp-button:hover {
+	background-color: #005a30;
+	color: var(--bcp-colour-white);
+}
+
+.bcp-button:active {
+	top: 2px;
+}
+
+.bcp-button:focus-visible {
+	outline: 3px solid transparent;
+	border-color: var(--bcp-colour-focus);
+	background-color: var(--bcp-colour-focus);
+	box-shadow: 0 3px 0 var(--bcp-colour-focus-text);
+	color: var(--bcp-colour-focus-text);
+}
+
+.bcp-button:disabled,
+.bcp-button[aria-disabled="true"] {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.bcp-button:disabled:hover {
+	background-color: var(--bcp-colour-green);
+}
+
+.bcp-button:disabled:active {
+	top: 0;
+}
+
+/* Secondary */
+
+.bcp-button--secondary,
+.bcp-button--secondary:link,
+.bcp-button--secondary:visited {
+	background-color: var(--bcp-colour-light-grey);
+	box-shadow: 0 3px 0 #929191;
+	color: var(--bcp-text-colour);
+}
+
+.bcp-button--secondary:hover {
+	background-color: #dbdad9;
+	color: var(--bcp-text-colour);
+}
+
+.bcp-button--secondary:disabled:hover {
+	background-color: var(--bcp-colour-light-grey);
+}
+
+/* Warning */
+
+.bcp-button--warning,
+.bcp-button--warning:link,
+.bcp-button--warning:visited {
+	background-color: var(--bcp-colour-red);
+	box-shadow: 0 3px 0 #6e1c1c;
+	color: var(--bcp-colour-white);
+}
+
+/* The mockups give no hover for the warning button; this darkens it like the others. */
+.bcp-button--warning:hover {
+	background-color: var(--bcp-colour-dark-red);
+	color: var(--bcp-colour-white);
+}
+
+.bcp-button--warning:disabled:hover {
+	background-color: var(--bcp-colour-red);
+}
+
+/* Small, for filter panels */
+
+.bcp-button--small {
+	padding: 8px 14px 7px;
+	font-size: var(--bcp-font-size-sm);
+}
+
+/* Button group: main button first, then secondary buttons or a link */
+
+.bcp-button-group {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 16px 30px;
+}
+
+/* Information button */
+
+.bcp-button-info {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: var(--bcp-colour-link);
+	cursor: pointer;
+}
+
+.bcp-button-info:hover {
+	background: var(--bcp-colour-light-grey);
+	color: var(--bcp-colour-link-hover);
+}
+
+.bcp-button-info[aria-expanded="true"] {
+	background: var(--bcp-colour-purple);
+	color: var(--bcp-colour-white);
+}
+
+.bcp-button-info:focus-visible {
+	outline: 3px solid transparent;
+	background: var(--bcp-colour-focus);
+	box-shadow: 0 4px var(--bcp-colour-focus-text);
+	color: var(--bcp-colour-focus-text);
+}
+
+@media print {
+	.bcp-button,
+	.bcp-button-info {
+		display: none;
+	}
+}

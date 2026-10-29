@@ -1,0 +1,32 @@
+.bcp-timeline {
+	margin: 0 0 30px 0;
+	padding: 0;
+	border-top: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+	list-style: none;
+}
+
+.bcp-timeline-item {
+	display: grid;
+	grid-template-columns: 190px 1fr;
+	gap: 4px 20px;
+	margin: 0;
+	padding: 14px 0;
+	border-bottom: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+	font-size: var(--bcp-font-size-sm);
+}
+
+.bcp-timeline-when {
+	color: var(--bcp-secondary-text-colour);
+}
+
+.bcp-timeline-who {
+	display: block;
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-xs);
+}
+
+@media (max-width: 640px) {
+	.bcp-timeline-item {
+		grid-template-columns: 1fr;
+	}
+}

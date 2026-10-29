@@ -1,0 +1,45 @@
+.bcp-page-heading {
+	margin-bottom: 30px;
+}
+
+.bcp-page-heading--tags {
+	margin-bottom: 40px;
+}
+
+.bcp-page-heading--spaced {
+	margin-bottom: 50px;
+}
+
+.bcp-caption {
+	display: block;
+	margin-bottom: 12px;
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-md);
+	font-weight: var(--bcp-text-weight-regular);
+	line-height: 1.25;
+}
+
+.bcp-page-heading-title {
+	margin: 0;
+}
+
+.bcp-page-heading-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 16px;
+}
+
+.bcp-page-heading-lede {
+	margin: 15px 0 0 0;
+	font-size: var(--bcp-font-size-md);
+	line-height: 1.25;
+}
+
+.bcp-page-heading-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 16px 30px;
+	margin-top: 30px;
+}

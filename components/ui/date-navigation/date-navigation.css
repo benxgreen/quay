@@ -1,0 +1,40 @@
+.bcp-date-navigation {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px 24px;
+	margin-bottom: 14px;
+}
+
+.bcp-date-navigation-heading {
+	margin: 0;
+	font-size: var(--bcp-font-size-ml);
+}
+
+.bcp-date-navigation-links {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	font-size: var(--bcp-font-size-sm);
+}
+
+.bcp-date-navigation-links a {
+	padding: 4px 14px;
+	border-left: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+}
+
+.bcp-date-navigation-links a:first-child {
+	padding-left: 0;
+	border-left: 0;
+}
+
+.bcp-date-navigation-links a:last-child {
+	padding-right: 0;
+}
+
+@media print {
+	.bcp-date-navigation-links {
+		display: none;
+	}
+}

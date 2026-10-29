@@ -1,0 +1,168 @@
+.bcp-form-group {
+	margin-bottom: 30px;
+}
+
+.bcp-form-group > :last-child {
+	margin-bottom: 0;
+}
+
+.bcp-form-group--error {
+	padding-left: 15px;
+	border-left: var(--bcp-border-width-lg) solid var(--bcp-colour-red);
+}
+
+/* Labels and legends */
+
+.bcp-label,
+.bcp-fieldset-legend {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: var(--bcp-text-weight-bold);
+	color: var(--bcp-text-colour);
+}
+
+.bcp-fieldset-legend {
+	max-width: 100%;
+	white-space: normal;
+}
+
+.bcp-label--s,
+.bcp-fieldset-legend--s {
+	font-size: var(--bcp-font-size-body);
+}
+
+.bcp-label--m,
+.bcp-fieldset-legend--m {
+	margin-bottom: 8px;
+	font-size: var(--bcp-font-size-md);
+	font-weight: var(--bcp-text-weight-heading);
+	line-height: 1.25;
+}
+
+.bcp-fieldset-legend--m {
+	margin-bottom: 12px;
+}
+
+.bcp-label--l,
+.bcp-fieldset-legend--l {
+	margin-bottom: 12px;
+	font-size: var(--bcp-font-size-lg);
+	font-weight: var(--bcp-text-weight-heading);
+	line-height: 1.2;
+}
+
+.bcp-label--xl,
+.bcp-fieldset-legend--xl {
+	margin-bottom: 20px;
+	font-size: var(--bcp-font-size-xl);
+	font-weight: var(--bcp-text-weight-heading);
+	line-height: 1.04;
+}
+
+.bcp-fieldset-heading,
+.bcp-label-wrapper {
+	margin: 0;
+	font-size: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+}
+
+/* Hint */
+
+.bcp-hint {
+	margin: 0 0 12px 0;
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-sm);
+}
+
+/* Text inputs, selects and textareas share these */
+
+.bcp-input,
+.bcp-select,
+.bcp-textarea {
+	display: block;
+	width: 100%;
+	margin: 0;
+	padding: 6px 10px;
+	border: var(--bcp-border-width-md) solid var(--bcp-text-colour);
+	border-radius: 0;
+	background-color: var(--bcp-colour-white);
+	color: var(--bcp-text-colour);
+	font-family: inherit;
+	font-size: var(--bcp-font-size-body);
+	box-shadow: none;
+}
+
+.bcp-input,
+.bcp-textarea {
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.bcp-input,
+.bcp-select {
+	height: 46px;
+}
+
+.bcp-textarea {
+	min-height: 110px;
+	padding: 8px 10px;
+	line-height: var(--bcp-text-line-height-body);
+	resize: vertical;
+}
+
+.bcp-input:focus,
+.bcp-select:focus,
+.bcp-textarea:focus {
+	outline: 3px solid var(--bcp-colour-focus);
+	outline-offset: 0;
+	box-shadow: inset 0 0 0 2px var(--bcp-text-colour);
+}
+
+.bcp-input:disabled,
+.bcp-select:disabled,
+.bcp-textarea:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.bcp-input--error,
+.bcp-select--error,
+.bcp-textarea--error {
+	border-color: var(--bcp-colour-red);
+}
+
+.bcp-input--error:focus,
+.bcp-select--error:focus,
+.bcp-textarea--error:focus {
+	border-color: var(--bcp-text-colour);
+}
+
+/* Fixed widths, sized to the expected answer (number of characters) */
+.bcp-input--width-2 {
+	width: 64px;
+}
+
+.bcp-input--width-3 {
+	width: 80px;
+}
+
+.bcp-input--width-4 {
+	width: 96px;
+}
+
+.bcp-input--width-5 {
+	max-width: 10.8ex;
+}
+
+.bcp-input--width-10 {
+	max-width: 23ex;
+}
+
+.bcp-input--width-20 {
+	max-width: 41ex;
+}
+
+.bcp-input--width-30 {
+	max-width: 59ex;
+}

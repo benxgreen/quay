@@ -1,0 +1,69 @@
+/* Success and Important (mockups: .nb / .ib) */
+
+.bcp-notification-banner {
+	margin: 0 0 40px 0;
+	border: var(--bcp-border-width-lg) solid var(--bcp-colour-bright-blue);
+	background-color: var(--bcp-colour-bright-blue);
+}
+
+.bcp-notification-banner--success {
+	border-color: var(--bcp-colour-green);
+	background-color: var(--bcp-colour-green);
+}
+
+.bcp-notification-banner-title {
+	margin: 0;
+	padding: 2px 15px 5px;
+	color: var(--bcp-colour-white);
+	font-size: var(--bcp-font-size-body);
+	font-weight: var(--bcp-text-weight-heading);
+	line-height: 1.32;
+}
+
+.bcp-notification-banner-content {
+	padding: 20px 15px;
+	background-color: var(--bcp-colour-white);
+}
+
+.bcp-notification-banner-heading {
+	margin: 0 0 15px 0;
+	font-size: var(--bcp-font-size-md);
+	font-weight: var(--bcp-text-weight-heading);
+	line-height: 1.25;
+}
+
+.bcp-notification-banner-content > :last-child {
+	margin-bottom: 0;
+}
+
+/* Failed (mockups: .fb): a smaller title bar and heading */
+
+.bcp-notification-banner--failed {
+	border-color: var(--bcp-colour-bright-red);
+	background-color: var(--bcp-colour-bright-red);
+}
+
+.bcp-notification-banner--failed .bcp-notification-banner-title {
+	padding: 4px 20px 6px;
+	font-size: var(--bcp-font-size-sm);
+	font-weight: var(--bcp-text-weight-bold);
+}
+
+.bcp-notification-banner--failed .bcp-notification-banner-content {
+	padding: 18px 20px;
+}
+
+.bcp-notification-banner--failed .bcp-notification-banner-heading {
+	margin-bottom: 10px;
+	font-size: var(--bcp-font-size-ms);
+}
+
+.bcp-notification-banner--failed .bcp-notification-banner-content p {
+	margin-bottom: 10px;
+}
+
+/* The error detail line in a Failed banner, such as "Halo returned 503 …" */
+.bcp-notification-banner-detail {
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-sm);
+}

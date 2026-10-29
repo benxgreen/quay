@@ -1,0 +1,13 @@
+.bcp-select {
+	width: auto;
+	min-width: 220px;
+	max-width: 100%;
+	padding: 6px 14px;
+}
+
+@media (max-width: 640px) {
+	.bcp-select {
+		width: 100%;
+		min-width: 0;
+	}
+}

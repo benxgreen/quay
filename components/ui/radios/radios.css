@@ -1,0 +1,160 @@
+/* biome-ignore-all lint/style/noDescendingSpecificity: the small variant overrides sizes only, not the checked or focus states it follows */
+
+/* GOV.UK-style 40px radios: the real input sits invisibly over a drawn
+   circle so it keeps a 44px touch target and native keyboard behaviour. */
+
+.bcp-radios-item {
+	position: relative;
+	display: block;
+	min-height: 40px;
+	margin-bottom: var(--bcp-space-md);
+	padding-left: 40px;
+}
+
+.bcp-radios-item-wrapper:last-child > .bcp-radios-item:last-child {
+	margin-bottom: 0;
+}
+
+.bcp-radios-input {
+	position: absolute;
+	z-index: 1;
+	top: -2px;
+	left: -2px;
+	width: 44px;
+	height: 44px;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.bcp-radios-label {
+	display: inline-block;
+	margin-bottom: 0;
+	padding: 8px 15px 5px;
+	cursor: pointer;
+	touch-action: manipulation;
+}
+
+.bcp-radios-label::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 40px;
+	height: 40px;
+	border: var(--bcp-border-width-md) solid currentColor;
+	border-radius: 50%;
+	background: var(--bcp-colour-white);
+}
+
+.bcp-radios-label::after {
+	content: "";
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	width: 0;
+	height: 0;
+	border: 10px solid currentColor;
+	border-radius: 50%;
+	background: currentColor;
+	opacity: 0;
+}
+
+.bcp-radios-input:checked + .bcp-radios-label::after {
+	opacity: 1;
+}
+
+.bcp-radios-input:focus-visible + .bcp-radios-label::before {
+	border-width: 4px;
+	outline: 3px solid transparent;
+	outline-offset: 1px;
+	box-shadow: 0 0 0 4px var(--bcp-colour-focus);
+}
+
+.bcp-radios-input:disabled,
+.bcp-radios-input:disabled + .bcp-radios-label {
+	cursor: not-allowed;
+}
+
+.bcp-radios-input:disabled + .bcp-radios-label {
+	opacity: 0.5;
+}
+
+.bcp-radios-hint {
+	display: block;
+	padding-left: 15px;
+	padding-right: 15px;
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-xs);
+}
+
+.bcp-radios-divider {
+	width: 40px;
+	margin-bottom: var(--bcp-space-md);
+	text-align: center;
+}
+
+/* Conditional reveal */
+
+.bcp-radios-conditional {
+	display: none;
+	margin: 4px 0 14px 18px;
+	padding: 6px 0 4px 32px;
+	border-left: 4px solid var(--bcp-colour-dark-grey);
+}
+
+.bcp-radios-item:has(.bcp-radios-input:checked) + .bcp-radios-conditional {
+	display: block;
+}
+
+.bcp-radios-conditional > :last-child {
+	margin-bottom: 0;
+}
+
+/* Inline */
+
+.bcp-radios--inline {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 var(--bcp-space-2xl);
+}
+
+.bcp-radios--inline .bcp-radios-item {
+	margin-bottom: 0;
+}
+
+/* Small (24px), for filters and tables */
+
+.bcp-radios--small .bcp-radios-item {
+	min-height: 24px;
+	padding-left: 24px;
+}
+
+.bcp-radios--small .bcp-radios-input {
+	top: -10px;
+	left: -10px;
+}
+
+.bcp-radios--small .bcp-radios-label {
+	padding: 0 15px 0 10px;
+	font-size: var(--bcp-font-size-sm);
+}
+
+.bcp-radios--small .bcp-radios-label::before {
+	width: 24px;
+	height: 24px;
+}
+
+.bcp-radios--small .bcp-radios-label::after {
+	top: 6px;
+	left: 6px;
+	border-width: 6px;
+}
+
+.bcp-radios--small .bcp-radios-input:focus-visible + .bcp-radios-label::before {
+	border-width: 2px;
+}
+
+.bcp-radios--small .bcp-radios-hint {
+	padding-left: 10px;
+}

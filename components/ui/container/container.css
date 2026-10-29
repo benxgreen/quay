@@ -1,0 +1,40 @@
+/* Shared width primitive behind <Container> - horizontal sizing only.
+   Vertical spacing is layered on separately (see .bcp-container-space and
+   the `space` prop) so header/footer can use the same width tiers without
+   inheriting the page body's vertical rhythm. */
+.bcp-container-width {
+	width: 100%;
+	max-width: var(--bcp-width-container-full);
+	padding-inline: var(--bcp-wrapper-horizontal);
+	margin: 0 auto;
+}
+
+.bcp-container-width:focus {
+	outline: none;
+}
+
+.bcp-container-width--large {
+	max-width: var(--bcp-width-container-large);
+}
+
+.bcp-container-width--medium {
+	max-width: var(--bcp-width-container-half);
+}
+
+.bcp-container-space {
+	padding-block: var(--bcp-space-8xl);
+}
+
+@media (max-width: 640px) {
+	.bcp-container-space {
+		padding-block: var(--bcp-space-6xl);
+	}
+}
+
+.bcp-content-width--half {
+	max-width: var(--bcp-width-container-half);
+}
+
+.bcp-content-width--third {
+	max-width: var(--bcp-width-container-third);
+}

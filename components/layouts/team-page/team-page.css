@@ -1,0 +1,10 @@
+/* Doubled class so the mockups' padding wins over Container's default spacing. */
+.bcp-team-page.bcp-team-page {
+	flex: 1 0 auto;
+	padding-top: 56px;
+	padding-bottom: 70px;
+}
+
+.bcp-team-page-narrow {
+	max-width: var(--bcp-width-input-max);
+}

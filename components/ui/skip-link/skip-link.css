@@ -1,0 +1,26 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: the hidden state must win over any component style */
+
+.bcp-skip-link:not(:focus):not(:active) {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	overflow: hidden !important;
+	clip: rect(0 0 0 0) !important;
+	clip-path: inset(50%) !important;
+	white-space: nowrap !important;
+}
+
+.bcp-skip-link:focus,
+.bcp-skip-link:active {
+	display: block;
+	padding: var(--bcp-space-md) var(--bcp-wrapper-horizontal);
+	outline: 3px solid var(--bcp-colour-focus);
+	outline-offset: 0;
+	background-color: var(--bcp-colour-focus);
+	color: var(--bcp-colour-focus-text);
+	text-decoration: underline;
+	text-decoration-thickness: max(3px, 0.1875rem);
+	box-shadow: none;
+}

@@ -1,0 +1,16 @@
+.bcp-date-input {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+}
+
+.bcp-date-input-item {
+	display: flex;
+	flex-direction: column;
+}
+
+.bcp-date-input-label {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: var(--bcp-text-weight-regular);
+}

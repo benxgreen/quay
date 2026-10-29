@@ -1,0 +1,86 @@
+.bcp-header-menu-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-left: auto;
+	padding: 6px 4px 4px;
+	border: 0;
+	border-bottom: 3px solid transparent;
+	background: none;
+	color: var(--bcp-text-colour);
+	font-family: inherit;
+	font-size: 1rem;
+	font-weight: var(--bcp-text-weight-heading);
+	text-decoration: none;
+	cursor: pointer;
+}
+
+/* No underline at rest. On hover a line runs under the whole button,
+   chevron included, a few pixels below the text. */
+.bcp-header-menu-button:hover {
+	border-bottom-color: currentColor;
+	color: var(--bcp-text-colour);
+}
+
+.bcp-header-menu-button:focus-visible {
+	outline: 3px solid transparent;
+	background-color: var(--bcp-colour-focus);
+	box-shadow:
+		0 -2px var(--bcp-colour-focus),
+		0 4px var(--bcp-colour-focus-text);
+	border-bottom-color: transparent;
+	color: var(--bcp-colour-focus-text);
+}
+
+.bcp-header-menu-chevron {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border: solid currentColor;
+	border-width: 0 2px 2px 0;
+	transform: translateY(-3px) rotate(45deg);
+}
+
+.bcp-header-menu-button[aria-expanded="true"] .bcp-header-menu-chevron {
+	transform: translateY(2px) rotate(-135deg);
+}
+
+.bcp-header-menu {
+	padding: 30px 0 40px;
+	border-bottom: var(--bcp-border-width-sm) solid var(--bcp-colour-mid-grey);
+	background: var(--bcp-colour-light-grey);
+}
+
+.bcp-header-menu[hidden] {
+	display: none;
+}
+
+.bcp-header-menu-columns {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 30px 40px;
+}
+
+.bcp-header-menu-title {
+	margin: 0 0 14px 0;
+	font-size: var(--bcp-font-size-ms);
+	font-weight: var(--bcp-text-weight-heading);
+}
+
+.bcp-header-menu-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.bcp-header-menu-list li {
+	margin: 0 0 12px 0;
+	font-size: var(--bcp-font-size-sm);
+}
+
+@media print {
+	.bcp-header-menu-button,
+	.bcp-header-menu {
+		display: none;
+	}
+}

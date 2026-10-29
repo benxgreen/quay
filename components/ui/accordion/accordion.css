@@ -1,0 +1,120 @@
+.bcp-accordion {
+	margin-bottom: 30px;
+}
+
+.bcp-accordion-controls {
+	margin-bottom: 6px;
+	text-align: right;
+}
+
+.bcp-accordion-show-all {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	padding: 6px 0;
+	border: 0;
+	background: none;
+	color: var(--bcp-colour-link);
+	font-family: inherit;
+	font-size: var(--bcp-font-size-body);
+	cursor: pointer;
+}
+
+.bcp-accordion-section {
+	border-top: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+}
+
+.bcp-accordion-section:last-child {
+	border-bottom: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+}
+
+.bcp-accordion-heading {
+	margin: 0;
+}
+
+.bcp-accordion-button {
+	width: 100%;
+	padding: 16px 0 18px;
+	border: 0;
+	background: none;
+	color: var(--bcp-text-colour);
+	font-family: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.bcp-accordion-heading-text {
+	display: block;
+	margin-bottom: 6px;
+	font-size: var(--bcp-font-size-md);
+	font-weight: var(--bcp-text-weight-heading);
+	line-height: 1.25;
+}
+
+.bcp-accordion-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	color: var(--bcp-colour-link);
+	font-size: var(--bcp-font-size-sm);
+	font-weight: var(--bcp-text-weight-regular);
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+.bcp-accordion-button:hover .bcp-accordion-toggle,
+.bcp-accordion-show-all:hover {
+	color: var(--bcp-colour-link-hover);
+}
+
+.bcp-accordion-button:hover .bcp-accordion-toggle {
+	text-decoration-thickness: 3px;
+}
+
+.bcp-accordion-button:focus-visible,
+.bcp-accordion-show-all:focus-visible {
+	outline: 3px solid transparent;
+	background-color: var(--bcp-colour-focus);
+	box-shadow: 0 4px var(--bcp-colour-focus-text);
+}
+
+.bcp-accordion-button:focus-visible .bcp-accordion-toggle,
+.bcp-accordion-show-all:focus-visible {
+	color: var(--bcp-colour-focus-text);
+}
+
+/* Chevron in a circle, pointing up (open) or down (closed) */
+.bcp-accordion-chevron {
+	position: relative;
+	display: inline-block;
+	flex: none;
+	width: 20px;
+	height: 20px;
+	border: 1px solid currentColor;
+	border-radius: 50%;
+}
+
+.bcp-accordion-chevron::after {
+	content: "";
+	position: absolute;
+	top: 7px;
+	left: 6px;
+	width: 6px;
+	height: 6px;
+	border: solid currentColor;
+	border-width: 2px 2px 0 0;
+	transform: rotate(-45deg);
+}
+
+.bcp-accordion-chevron--down::after {
+	top: 4px;
+	transform: rotate(135deg);
+}
+
+.bcp-accordion-content {
+	padding: 0 0 26px;
+}
+
+.bcp-accordion-content > :last-child {
+	margin-bottom: 0;
+}
