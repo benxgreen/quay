@@ -37,6 +37,19 @@ type Story = StoryObj<typeof meta>;
 /** Key facts about one thing, with Change links where the team can edit. */
 export const SummaryListStory: Story = { name: "Summary list" };
 
+/** Key above value with no rules, for a narrow panel such as the "Portal user" sidebar. */
+export const SummaryListStacked: Story = {
+	name: "Summary list, stacked",
+	args: {
+		stacked: true,
+		rows: [
+			{ key: "Created", value: "3 Sep 2026, when given a role by Ben Green" },
+			{ key: "Last signed in", value: "Today, 9:02am" },
+			{ key: "Cases", value: "None for John" },
+		],
+	},
+};
+
 /** Bold-weight headings, a rule under each row, second lines in grey. Numbers right-aligned. */
 export const TableStory: Story = {
 	name: "Table",

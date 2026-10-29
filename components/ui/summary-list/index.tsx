@@ -35,11 +35,17 @@ export function SummaryList({
 	rows,
 	noBorder,
 	compact,
+	stacked,
 }: {
 	rows: SummaryListRow[];
 	noBorder?: boolean;
 	/** Smaller text and tighter rows, for use inside a box such as a LookupResult. */
 	compact?: boolean;
+	/**
+	 * Each key above its value, with no rules, for a narrow panel such as a
+	 * sidebar (mockups: the "Portal user" panel on a user's page).
+	 */
+	stacked?: boolean;
 }) {
 	const anyActions = rows.some((row) => row.actions?.length);
 
@@ -50,6 +56,7 @@ export function SummaryList({
 				!anyActions && "bcp-summary-list--no-actions",
 				noBorder && "bcp-summary-list--no-border",
 				compact && "bcp-summary-list--compact",
+				stacked && "bcp-summary-list--stacked",
 			)}
 		>
 			{rows.map((row, index) => (

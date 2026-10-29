@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { AppliedFilters } from "@/components/patterns/applied-filters";
+import { FilterBar } from "@/components/patterns/filter-bar";
 import {
 	ColumnChooser,
 	FilterGrid,
@@ -13,6 +14,7 @@ import { Link } from "@/components/ui/link";
 import { Select } from "@/components/ui/select";
 import { Table } from "@/components/ui/table";
 import { Tag } from "@/components/ui/tag";
+import { TextInput } from "@/components/ui/text-input";
 
 const meta = {
 	title: "Patterns/Finding things in lists",
@@ -21,6 +23,39 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+/**
+ * A search with a few filters in one grey row, as on Users. For a longer
+ * list of filters, use the filter panel.
+ */
+export const FilterBarStory: Story = {
+	args: { search: { label: "" }, clearHref: "#", children: null },
+	name: "Filter bar",
+	render: () => (
+		<FilterBar label="Users">
+			<TextInput id="q" name="q" label="Search by name, email or username" type="search" />
+			<Select
+				id="role"
+				name="role"
+				label="Role"
+				options={[
+					{ value: "", label: "All roles" },
+					{ value: "administrator", label: "Administrator" },
+					{ value: "none", label: "Colleague (no role)" },
+				]}
+			/>
+			<Select
+				id="show"
+				name="show"
+				label="Show"
+				options={[
+					{ value: "directory", label: "Everyone in the directory" },
+					{ value: "portal", label: "Portal users only" },
+				]}
+			/>
+		</FilterBar>
+	),
+};
 
 /** Search with a "Show filters" button; filters open in a panel underneath. */
 export const SearchWithFilters: Story = {

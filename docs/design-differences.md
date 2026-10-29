@@ -38,11 +38,17 @@ The rule used: **the Components page defines each component, unless the Laptop r
 
 ### Changed from the mockups on request
 
+- **User page:** "These details come from Halo", not "from Entra ID": staff details come from Halo, and Entra ID is only for sign-in.
+- **"We could not sign you in":** 20px between "Try again" and the reference (the paragraph spacing) rather than the mockup's 40px, as Quay's buttons have no margin of their own.
+
 - **Header logo:** 28px tall, not 36px (the footer logo stays 36px).
 - **Menu button:** black, bold and 1rem (16px), with the chevron on the left and no underline. On hover a 3px line runs under the whole button, chevron included, 4px below the text. The menu closes on any route change. The mockups show a blue, underlined 19px link-style button with the chevron on the right.
 - **Logo:** Harbour's BCP Council logo SVG (`components/icons/organisations/bcp-logo.tsx`), not the mockups' "BCP Council Device portal" image. The link's accessible name is "BCP Council Device portal".
 
 ### Where the mockups say nothing
+
+- **Development sign-in:** `/auth/dev`, until the Entra app registration exists, lists the mock Halo users as radios. It is not a real screen.
+- **Smartphone role tags:** the Users mockups show Administrator (purple), laptop roles (blue) and New starters (green); smartphone roles use turquoise.
 
 - **Warning button hover:** there isn't one in the mockups, so it darkens to `--bcp-colour-dark-red` like the other buttons.
 - **Buttons at phone width:** not shown in the mockups. Harbour makes them full width; Quay leaves them at their natural width, as drawn.

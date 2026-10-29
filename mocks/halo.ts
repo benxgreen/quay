@@ -149,9 +149,23 @@ export const MOCK_STOCK: HaloStockDevice[] = [
  * is disabled (Import's Needs attention).
  */
 export const MOCK_HALO_USERS: HaloUser[] = [
-	person(1, "John Smith", "Desktop Infrastructure Engineer", "IT & Programmes"),
-	person(2, "Priya Hart", "Planning Officer", "Planning"),
-	person(3, "Alex Morgan", "Desktop Infrastructure Engineer", "IT & Programmes"),
+	person(
+		1,
+		"John Smith",
+		"Desktop Infrastructure Engineer",
+		"IT & Programmes",
+		true,
+		"Karen Doyle",
+	),
+	person(2, "Priya Hart", "Planning Officer", "Planning", true, "Amira Shah"),
+	person(
+		3,
+		"Alex Morgan",
+		"Desktop Infrastructure Engineer",
+		"IT & Programmes",
+		true,
+		"John Smith",
+	),
 	person(4, "Amira Shah", "GIS Analyst", "Planning"),
 	person(5, "Owen Price", "Housing Officer", "Housing"),
 	person(6, "Marcus Hale", "Data Analyst", "Finance"),
@@ -202,6 +216,7 @@ function person(
 	jobTitle: string,
 	department: string,
 	active = true,
+	manager: string | null = null,
 ): HaloUser {
 	const username = displayName.toLowerCase().replace(" ", ".");
 	return {
@@ -214,6 +229,7 @@ function person(
 		jobTitle,
 		department,
 		active,
+		manager,
 	};
 }
 

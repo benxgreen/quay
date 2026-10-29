@@ -12,12 +12,7 @@ export function TeamLayout({ menu, children }: { menu: HeaderMenuGroup[]; childr
 	return (
 		<>
 			<SkipLink />
-			<HeaderMenu
-				homeHref="/manage"
-				homeLabel="BCP Council Device portal"
-				width="full"
-				groups={menu}
-			/>
+			<HeaderMenu homeHref="/manage" width="full" groups={menu} />
 			{children}
 			<Footer width="full" />
 		</>

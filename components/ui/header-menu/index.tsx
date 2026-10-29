@@ -63,7 +63,7 @@ export function HeaderMenu({ homeHref, homeLabel, width = "large", groups }: Hea
 
 	return (
 		<>
-			<Header homeHref={homeHref} homeLabel={homeLabel} width={width}>
+			<Header homeHref={homeHref} homeLabel={homeLabel} width={width} bordered>
 				<button
 					ref={buttonRef}
 					type="button"

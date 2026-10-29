@@ -14,7 +14,7 @@ describe("HeaderMenu", () => {
 
 	it("closes when the route changes", async () => {
 		const user = userEvent.setup();
-		const groups = menuGroups(["administrator"]);
+		const groups = menuGroups(["administrator", "laptops_team"]);
 		const { rerender } = render(<HeaderMenu homeHref="/manage" groups={groups} />);
 
 		await user.click(screen.getByRole("button", { name: "Menu" }));
@@ -39,7 +39,7 @@ describe("HeaderMenu", () => {
 			<HeaderMenu
 				homeHref="/manage"
 				homeLabel="BCP Council Device portal"
-				groups={menuGroups(["administrator"])}
+				groups={menuGroups(["administrator", "laptops_team"])}
 			/>,
 		);
 
@@ -62,7 +62,7 @@ describe("HeaderMenu", () => {
 			<HeaderMenu
 				homeHref="/manage"
 				homeLabel="BCP Council Device portal"
-				groups={menuGroups(["administrator"])}
+				groups={menuGroups(["administrator", "laptops_team"])}
 			/>,
 		);
 
@@ -107,7 +107,7 @@ describe("HeaderMenu", () => {
 			<HeaderMenu
 				homeHref="/manage"
 				homeLabel="BCP Council Device portal"
-				groups={menuGroups(["administrator"])}
+				groups={menuGroups(["administrator", "laptops_team"])}
 			/>,
 		);
 		await user.click(screen.getByRole("button", { name: "Menu" }));

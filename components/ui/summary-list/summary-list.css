@@ -66,6 +66,22 @@
 	border-bottom: 0;
 }
 
+/* Stacked, in a narrow panel: key above value */
+.bcp-summary-list--stacked {
+	border-top: 0;
+	font-size: var(--bcp-font-size-sm);
+}
+
+.bcp-summary-list.bcp-summary-list--stacked .bcp-summary-list-row {
+	display: block;
+	padding: 0 0 12px 0;
+	border: 0;
+}
+
+.bcp-summary-list--stacked .bcp-summary-list-key {
+	font-weight: var(--bcp-text-weight-bold);
+}
+
 @media (max-width: 640px) {
 	.bcp-summary-list-row,
 	.bcp-summary-list--no-actions .bcp-summary-list-row {

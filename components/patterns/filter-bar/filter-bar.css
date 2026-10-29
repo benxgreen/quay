@@ -1,0 +1,26 @@
+.bcp-filter-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 16px 24px;
+	margin: 0 0 30px 0;
+	padding: 20px 24px;
+	background: var(--bcp-colour-grey);
+}
+
+.bcp-filter-bar .bcp-form-group {
+	margin: 0;
+}
+
+/* The first field (the search) takes the spare width. */
+.bcp-filter-bar > .bcp-form-group:first-child {
+	flex: 1 1 320px;
+}
+
+.bcp-filter-bar > .bcp-form-group:first-child .bcp-input {
+	max-width: 100%;
+}
+
+.bcp-filter-bar .bcp-filter-bar-button {
+	margin-bottom: 3px;
+}

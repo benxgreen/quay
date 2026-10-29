@@ -260,6 +260,17 @@ ol {
 	padding-inline-start: 0;
 }
 
+/* A plain list with a rule above each item, such as a role history */
+.bcp-list--divided {
+	list-style: none;
+	padding-inline-start: 0;
+}
+
+.bcp-list--divided > li {
+	padding: 8px 0;
+	border-top: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+}
+
 strong,
 b {
 	font-weight: var(--bcp-text-weight-heading);

@@ -16,6 +16,7 @@ Both assets and users carry a lot of BCP custom fields. With API access, search 
 - [ ] Confirm `advanced_search` on `azureoid` works for finding a user by Entra object ID
 - [ ] Which field holds the BCP username: `login`, `samaccountname` or a custom field
 - [ ] Whether `title` is the job title, and "Department" vs "Service area"
+- [ ] Which field holds the manager (`manager_email`?) for the user page's Manager row; `HaloUser.manager` is null from the real API until then
 
 ## Laptop replacements
 

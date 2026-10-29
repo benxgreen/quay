@@ -75,3 +75,20 @@ describe("Journal", () => {
 		expect(screen.queryByLabelText("Add a note")).not.toBeInTheDocument();
 	});
 });
+
+describe("FilterBar", () => {
+	it("is a named search that submits a GET", async () => {
+		const { FilterBar } = await import("@/components/patterns/filter-bar");
+		const { TextInput } = await import("@/components/ui/text-input");
+		const { container } = render(
+			<FilterBar label="Users">
+				<TextInput id="q" name="q" label="Search by name, email or username" />
+			</FilterBar>,
+		);
+
+		const form = screen.getByRole("search", { name: "Users" });
+		expect(form).toHaveAttribute("method", "get");
+		expect(screen.getByRole("button", { name: "Search" })).toHaveAttribute("type", "submit");
+		expect(await axeViolations(container)).toEqual([]);
+	});
+});

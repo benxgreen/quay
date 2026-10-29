@@ -127,6 +127,7 @@ describe("Halo users over HTTP", () => {
 			jobTitle: "Planning Officer",
 			department: "Planning",
 			active: true,
+			manager: null,
 		});
 		const search = new URL(fetchFn.mock.calls[1][0]).searchParams;
 		expect(JSON.parse(search.get("advanced_search") ?? "")).toEqual([

@@ -6,7 +6,8 @@ import { Header } from "@/components/ui/header";
 import { SkipLink } from "@/components/ui/skip-link";
 
 type ColleagueLayoutProps = {
-	user: { firstName: string; email: string };
+	/** The signed-in person; leave out on pages anyone can see, such as sign-in. */
+	user?: { firstName: string; email: string } | null;
 	children: ReactNode;
 };
 
@@ -20,11 +21,13 @@ export function ColleagueLayout({ user, children }: ColleagueLayoutProps) {
 	return (
 		<>
 			<SkipLink />
-			<Header homeHref="/my" homeLabel="BCP Council Device portal" width="large" bordered>
-				<p className="bcp-colleague-layout-user">
-					Hi {user.firstName}{" "}
-					<span className="bcp-colleague-layout-email">({user.email})</span>
-				</p>
+			<Header homeHref="/my" width="large" bordered>
+				{user ? (
+					<p className="bcp-colleague-layout-user">
+						Hi {user.firstName}{" "}
+						<span className="bcp-colleague-layout-email">({user.email})</span>
+					</p>
+				) : null}
 			</Header>
 			{children}
 			<Footer width="large" />
