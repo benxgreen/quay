@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { CallContext, CallResult } from "@/lib/clients/connection-log";
-import { assertHaloMock } from "@/lib/clients/halo";
+import { haloMode } from "@/lib/clients/halo";
 import { createMockLaptopHaloClient } from "./mock";
 
 /** A laptop on the Halo end-of-life report. */
@@ -41,6 +41,19 @@ export type HaloAssignedDevice = {
  * reading devices, putting the new device In Service when a replacement is
  * completed, and decommissioning the old one. Staff details come from
  * lib/clients/halo/users.ts. Every call is logged.
+ *
+ * How each maps onto the Halo API (lib/clients/halo/http.ts) once the open
+ * questions are answered:
+ *
+ *   listEndOfLifeDevices   GET /ReportData/{published report id}, or GET /Report/{id}?loadreport=true
+ *   findDeviceBySerial     GET /Asset?search={serial}, then GET /Asset/{id}
+ *   devicesAssignedTo      GET /Asset?user_id={Halo user id}
+ *   listStock              a published report, or GET /Asset filtered by status and stock bin
+ *   issueDevice            GET /Asset/{id}, then POST /Asset [{ id, status_id: In Service, … }]
+ *   markOldDeviceReturned  POST /Asset [{ id, … }] (what changes is an open question)
+ *   decommissionDevice     POST /Asset [{ id, … }] or another endpoint (open question)
+ *
+ * Halo updates with POST (an array; a record with an id is updated), never PUT.
  */
 export type LaptopHaloClient = {
 	/** The end-of-life report for the Import screen. */
@@ -86,7 +99,11 @@ export const HALO_COMMENT = "Issued through the Device portal laptop replacement
 let client: LaptopHaloClient | undefined;
 
 export function getLaptopHaloClient(): LaptopHaloClient {
-	assertHaloMock();
+	if (haloMode() === "http") {
+		throw new Error(
+			"Laptop replacements' Halo calls are not built yet: the report IDs, stock criteria and status IDs are open questions.",
+		);
+	}
 	client ??= createMockLaptopHaloClient();
 	return client;
 }

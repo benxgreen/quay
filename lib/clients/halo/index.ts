@@ -6,28 +6,52 @@ import {
 	callExternal,
 	HttpStatusError,
 } from "@/lib/clients/connection-log";
-import { clientMode, mockShouldFail } from "@/lib/clients/connections";
+import { clientMode, getConnectionUrl, mockShouldFail } from "@/lib/clients/connections";
+import { createHaloHttp, type HaloHttp, haloCredentialsFromEnv } from "./http";
 
 /**
  * HaloITSM, the asset register and staff directory. The portal has one Halo
- * connection, the API base URL in portal.connections; each part of the
- * portal declares the Halo calls it needs on top of it:
+ * connection, the Halo site in portal.connections (secrets in .env); each
+ * part of the portal declares the Halo requests it needs on top of it:
  *
  *   lib/clients/halo/users.ts                      staff details (portal-wide)
  *   services/replacements/laptops/lib/halo         laptop replacements
  *
- * OPEN QUESTIONS (CLAUDE.md): the reports, stock criteria, API details and
- * the decommission call are still to come from Ben, so only mocks exist.
+ * HALO_CLIENT=http uses the real API (lib/clients/halo/http.ts); anything
+ * else uses the mocks.
  */
 export const HALO_CONNECTION = "halo";
 
-/** HALO_CLIENT=http is refused until the real API details arrive. */
-export function assertHaloMock(): void {
-	if (clientMode("HALO_CLIENT") === "http") {
-		throw new Error(
-			"The real Halo client is not built yet: the API details are an open question.",
-		);
-	}
+export function haloMode(): "mock" | "http" {
+	return clientMode("HALO_CLIENT");
+}
+
+/**
+ * One logged Halo call: signs in, runs the requests `work` makes and writes
+ * one connection log entry, whose summary lists the requests, such as
+ * "Staff details: found Priya Hart (GET /Users, GET /Users/1002)".
+ */
+export async function callHalo<T>(
+	context: CallContext,
+	work: (halo: HaloHttp) => Promise<{ value: T; summary?: string }>,
+	{ fetchFn }: { fetchFn?: typeof fetch } = {},
+): Promise<CallResult<T>> {
+	const siteUrl = await getConnectionUrl(HALO_CONNECTION);
+	return callExternal(HALO_CONNECTION, context, async (signal) => {
+		const halo = createHaloHttp({
+			siteUrl,
+			credentials: haloCredentialsFromEnv(),
+			signal,
+			fetchFn,
+		});
+		const { value, summary } = await work(halo);
+		const requests = halo.requests.join(", ");
+		return {
+			value,
+			statusCode: halo.lastStatus,
+			summary: summary ? `${summary} (${requests})` : requests,
+		};
+	});
 }
 
 /**
