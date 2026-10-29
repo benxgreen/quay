@@ -4,6 +4,7 @@ import { Accordion } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkboxes";
 import { Details } from "@/components/ui/details";
 import { Link } from "@/components/ui/link";
+import { Markdown } from "@/components/ui/markdown";
 import { StatTiles } from "@/components/ui/stat-tiles";
 import { SummaryList } from "@/components/ui/summary-list";
 import { Table, TableSecondary } from "@/components/ui/table";
@@ -168,6 +169,36 @@ export const DetailsStory: Story = {
 		<Details summary="See 22 hidden laptops">
 			<p>This laptop was already replaced in March 2025, recorded in the old workbook.</p>
 		</Details>
+	),
+};
+
+/**
+ * Content the team writes in Markdown, such as the portal content under a
+ * colleague's booking. Also supports Harbour's `^inset^`, `%warning%` and
+ * `~summary` details blocks.
+ */
+export const MarkdownStory: Story = {
+	name: "Markdown",
+	render: () => (
+		<Markdown>
+			{[
+				"## Before your session",
+				"",
+				"We will email you a reminder 3 working days before your session. Before then:",
+				"",
+				"- move anything you need to keep from your Downloads folder into your Documents folder, which is synced with OneDrive",
+				"- make a note of your username, **bcp-cs\\john.smith** – you will need it to sign in to your new laptop",
+				"",
+				"## On the day",
+				"",
+				"You will need to bring your current laptop and its charger.",
+				"",
+				"^Your software choices are locked 3 working days before your session.^",
+				"",
+				"~What if I cannot come?",
+				"[Choose a new date](/my/replacements/laptop) before the session.~",
+			].join("\n")}
+		</Markdown>
 	),
 };
 

@@ -10,6 +10,8 @@ export type TimelineItem = {
 	text: ReactNode;
 	/** Who did it. Automated entries name the job, such as "System · Send invitations". */
 	who?: ReactNode;
+	/** A tag after the entry, such as a red "Failed" tag when the action's external call failed. */
+	tag?: ReactNode;
 };
 
 /**
@@ -27,6 +29,7 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
 					<span className="bcp-timeline-when">{item.when}</span>
 					<span>
 						{item.text}
+						{item.tag ? <span className="bcp-timeline-tag">{item.tag}</span> : null}
 						{item.who ? <span className="bcp-timeline-who">{item.who}</span> : null}
 					</span>
 				</li>

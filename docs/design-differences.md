@@ -64,6 +64,7 @@ The rule used: **the Components page defines each component, unless the Laptop r
 | `Sidebar` | Grey panel with a phone-only toggle | Grey panel (30px padding), no toggle, rendered as a named `aside`; `SidebarLayout` places it | Mockups show it open at every width |
 | `Footer` | Fixed links | Same links by default; `links` prop to change them | Reuse across sites |
 | External links | Open in a new tab automatically | Same tab unless `newTab`, which says "(opens in new tab)" to screen readers | GOV.UK guidance |
+| `Markdown` | Parses straight to React; every line is its own paragraph; links kept whatever the address; `^` inset, `%` warning, `~` details and `\|` call-to-action blocks | One parser (`lib/markdown/parse.ts`) with three outputs: the `Markdown` component, inline-styled email HTML and plain text. Lines join into one paragraph and two trailing spaces make a line break (standard Markdown); only web, email, phone and in-portal links are kept, others become text; numbered lists keep their start number; `^`, `%` and `~` blocks kept, `\|` dropped | Emails need the same Markdown as HTML and text, and the mockup's "Thank you,<br>Desktop Infrastructure" needs line breaks; Quay has no call-to-action component |
 
 ### Widths
 

@@ -1,0 +1,18 @@
+/* Markdown uses the base typography; this only spaces sections apart. */
+
+.bcp-markdown > * + h2 {
+	margin-top: 40px;
+}
+
+.bcp-markdown > :last-child {
+	margin-bottom: 0;
+}
+
+.bcp-markdown-code {
+	margin: 0 0 20px 0;
+	padding: 15px;
+	overflow-x: auto;
+	background: var(--bcp-colour-light-grey);
+	font-family: var(--bcp-font-family-mono);
+	font-size: var(--bcp-font-size-xs);
+}

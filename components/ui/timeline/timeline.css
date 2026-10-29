@@ -19,6 +19,10 @@
 	color: var(--bcp-secondary-text-colour);
 }
 
+.bcp-timeline-tag {
+	margin-left: 10px;
+}
+
 .bcp-timeline-who {
 	display: block;
 	color: var(--bcp-secondary-text-colour);

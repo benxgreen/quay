@@ -75,3 +75,24 @@ describe("Hidden text on links", () => {
 		expect(screen.getByRole("link", { name: "Change booking" })).toBeInTheDocument();
 	});
 });
+
+describe("Markdown", () => {
+	it("renders the team's content as accessible elements", async () => {
+		const { Markdown } = await import("@/components/ui/markdown");
+		const { container } = render(
+			<Markdown>
+				{
+					"## On the day\n\nBring your **charger**.\n\n- [Choose a new date](/my/replacements/laptop)\n- Keep using your laptop\n\n%Do not wipe your laptop yourself.%"
+				}
+			</Markdown>,
+		);
+
+		expect(screen.getByRole("heading", { level: 2, name: "On the day" })).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: "Choose a new date" })).toHaveAttribute(
+			"href",
+			"/my/replacements/laptop",
+		);
+		expect(screen.getByText("Warning:", { exact: false })).toBeInTheDocument();
+		expect(await axeViolations(container)).toEqual([]);
+	});
+});

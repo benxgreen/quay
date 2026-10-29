@@ -63,6 +63,19 @@ INSERT INTO portal.users (email, display_name, username, job_title, department, 
   ('adam.kerr@bcpcouncil.test',      'Adam Kerr',      'adam.kerr',      'Team Leader',               'Waste Services',      'case', '00000000-0000-4000-8000-000000000001'),
   ('sam.taylor@bcpcouncil.test',     'Sam Taylor',     'sam.taylor',     'Waste Services Officer',    'Waste Services',      'case', '00000000-0000-4000-8000-000000000001');
 
+-- Everyone is matched to their Halo user (mocks/halo.ts MOCK_HALO_USERS),
+-- which is where staff details come from.
+UPDATE portal.users u
+SET halo_user_id = 1000 + h.n,
+    entra_object_id = ('10000000-0000-4000-8000-' || lpad(h.n::text, 12, '0'))::uuid
+FROM (VALUES
+  ('john.smith', 1), ('priya.hart', 2), ('alex.morgan', 3), ('amira.shah', 4), ('owen.price', 5),
+  ('marcus.hale', 6), ('ravi.menon', 7), ('dan.hughes', 8), ('chloe.barnes', 9), ('ellie.ward', 10),
+  ('nadia.kowalski', 11), ('kate.morris', 12), ('tom.fielding', 13), ('leah.turner', 14),
+  ('ben.whitaker', 15), ('ruth.collins', 16), ('aisha.begum', 17), ('adam.kerr', 18), ('sam.taylor', 19)
+) AS h(username, n)
+WHERE u.email = h.username || '@bcpcouncil.test';
+
 UPDATE portal.users SET last_signed_in_at = now() - interval '2 hours'
 WHERE email IN ('john.smith@bcpcouncil.test', 'priya.hart@bcpcouncil.test');
 
@@ -300,6 +313,12 @@ FROM (VALUES
   ('31940', now() - interval '3 days', pg_temp.u('john.smith@bcpcouncil.test'), NULL, 'import', 'Added to the invitation queue from the Halo report (Session)', NULL)
 ) AS j(asset, at, actor, system, kind, body, data);
 
+-- A completion that failed because Halo was down: journaled with a Failed tag, nothing else changed.
+INSERT INTO lr.journal_entries (case_id, occurred_at, actor_user_id, kind, body, data, outcome) VALUES
+  (pg_temp.c('31818'), now() - interval '50 minutes', pg_temp.u('john.smith@bcpcouncil.test'), 'status',
+   'Complete replacement failed: Halo returned 503 Service Unavailable',
+   '{"connection": "halo", "status_code": 503}', 'failed');
+
 INSERT INTO lr.device_journal (box_number, occurred_at, actor_user_id, kind, case_id, body)
 SELECT box_number, now() - interval '5 days', pg_temp.u('john.smith@bcpcouncil.test'), 'allocation', id,
        'Allocated to ' || reference
@@ -309,10 +328,10 @@ FROM lr.cases WHERE box_number IS NOT NULL;
 -- Connection log and email counts ------------------------------------
 
 INSERT INTO lr.connection_log (occurred_at, connection, trigger_kind, trigger_label, actor_user_id, case_id, outcome, status_code, summary, error, duration_ms) VALUES
-  (now() - interval '3 hours', 'halo_import',   'user',     'Refresh from Halo',  pg_temp.u('john.smith@bcpcouncil.test'), NULL, 'success', 200, '64 laptops', NULL, 1840),
-  (now() - interval '2 hours', 'halo_stock',    'system',   'Stock list',         NULL, NULL, 'success', 200, '46 devices', NULL, 920),
+  (now() - interval '3 hours', 'halo',          'user',     'Refresh from Halo',  pg_temp.u('john.smith@bcpcouncil.test'), NULL, 'success', 200, 'End-of-life report: 64 laptops', NULL, 1840),
+  (now() - interval '2 hours', 'halo',          'system',   'Stock list',         NULL, NULL, 'success', 200, 'Stock: 46 devices', NULL, 920),
   (now() - interval '1 hour',  'email_webhook', 'schedule', 'Daily invitations',  NULL, NULL, 'success', 202, '15 sent', NULL, 3100),
-  (now() - interval '50 minutes', 'halo_import', 'user',    'Complete replacement', pg_temp.u('john.smith@bcpcouncil.test'), pg_temp.c('31818'), 'failed', 503, NULL, 'Halo returned 503 Service Unavailable', 10000);
+  (now() - interval '50 minutes', 'halo',        'user',    'Complete replacement', pg_temp.u('john.smith@bcpcouncil.test'), pg_temp.c('31818'), 'failed', 503, NULL, 'Halo returned 503 Service Unavailable', 10000);
 
 INSERT INTO lr.email_sends (email_key, case_id, to_address, scheduled, outcome, sent_at)
 SELECT key, pg_temp.c(asset), email, scheduled, 'sent', at

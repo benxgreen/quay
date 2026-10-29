@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Journal } from "@/components/patterns/journal";
+import { Tag } from "@/components/ui/tag";
 
 const meta = {
 	title: "Patterns/Journal",
@@ -7,6 +8,13 @@ const meta = {
 	args: {
 		noteAction: "#journal",
 		items: [
+			{
+				id: "5",
+				when: "12 Nov 2026, 10:42am",
+				text: "Complete replacement failed: Halo returned 503 Service Unavailable",
+				who: "John Smith",
+				tag: <Tag colour="red">Failed</Tag>,
+			},
 			{
 				id: "4",
 				when: "9 Nov 2026, 11:05am",
@@ -38,7 +46,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The heading, "Add a note" and every entry, newest first, as on the case page. */
+/**
+ * The heading, "Add a note" and every entry, newest first, as on the case
+ * page. An action whose external call failed is still journaled, with a red
+ * Failed tag.
+ */
 export const Default: Story = {};
 
 /** Read-only, such as on an archived case: no note form. */
