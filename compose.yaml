@@ -1,0 +1,57 @@
+# Local database for development: PostgreSQL 16 with PgBouncer in front, in
+# transaction mode, like Azure Database for PostgreSQL Flexible Server.
+#
+#   npm run db:up        start both containers
+#   npm run db:setup     create the roles and the quay database (once)
+#   npm run db:migrate   run db/migrations as portal_migrator on 5432
+#
+# The app connects as portal_app through PgBouncer on 6432, so anything that
+# needs a session (SET, LISTEN, advisory locks, temp tables) fails here as it
+# would in Azure. Passwords come from .env (see .env.example).
+
+name: quay
+
+services:
+    postgres:
+        image: postgres:16.15-alpine
+        command:
+            - postgres
+            - -c
+            - timezone=Europe/London
+            - -c
+            - log_timezone=Europe/London
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+            POSTGRES_DB: postgres
+        ports:
+            - "127.0.0.1:5432:5432"
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+            interval: 2s
+            timeout: 3s
+            retries: 30
+
+    pgbouncer:
+        image: edoburu/pgbouncer:v1.26.1-p0
+        depends_on:
+            postgres:
+                condition: service_healthy
+        environment:
+            DB_HOST: postgres
+            DB_PORT: "5432"
+            DB_NAME: quay
+            DB_USER: portal_app
+            DB_PASSWORD: ${PORTAL_APP_PASSWORD:?Set PORTAL_APP_PASSWORD in .env}
+            AUTH_TYPE: scram-sha-256
+            POOL_MODE: transaction
+            LISTEN_PORT: "6432"
+            MAX_CLIENT_CONN: "100"
+            DEFAULT_POOL_SIZE: "10"
+        ports:
+            - "127.0.0.1:6432:6432"
+
+volumes:
+    postgres-data:
