@@ -13,8 +13,8 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
 	title: {
-		template: "%s – Device portal – BCP Council",
-		default: "Device portal – BCP Council",
+		template: "%s – Quay | BCP Council",
+		default: "- Quay | BCP Council",
 	},
 	robots: { index: false, follow: false },
 };

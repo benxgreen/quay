@@ -21,7 +21,7 @@ import { moveCaseToFront } from "../actions";
 import { IMPORT_BASE, ImportHeader } from "../import-header";
 import { loadImport } from "../load";
 
-export const metadata: Metadata = { title: "Invitation queue – Import – Laptop replacements" };
+export const metadata: Metadata = { title: "Invitation queue – Import" };
 
 const QUEUE = `${IMPORT_BASE}/queue`;
 

@@ -10,7 +10,7 @@ import { getQueuedCase } from "@/services/replacements/laptops/lib/queue";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { removeCaseFromQueue } from "../../../actions";
 
-export const metadata: Metadata = { title: "Remove from queue – Laptop replacements" };
+export const metadata: Metadata = { title: "Remove from queue" };
 
 const QUEUE = `${LAPTOPS_SECTIONS.import.href}/queue`;
 

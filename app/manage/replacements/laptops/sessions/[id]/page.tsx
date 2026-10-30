@@ -20,7 +20,7 @@ import { getSession, type SessionDetail } from "@/services/replacements/laptops/
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { sessionCrumb, sessionTitle } from "../session-text";
 
-export const metadata: Metadata = { title: "Session – Laptop replacements" };
+export const metadata: Metadata = { title: "Session" };
 
 type SessionPageProps = {
 	params: Promise<{ id: string }>;

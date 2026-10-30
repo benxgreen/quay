@@ -3,11 +3,12 @@ import "./colleague-layout.css";
 import type { ReactNode } from "react";
 import { Footer } from "@/components/ui/footer";
 import { Header } from "@/components/ui/header";
+import { PhaseBanner } from "@/components/ui/phase-banner";
 import { SkipLink } from "@/components/ui/skip-link";
 
 type ColleagueLayoutProps = {
 	/** The signed-in person; leave out on pages anyone can see, such as sign-in. */
-	user?: { firstName: string; email: string } | null;
+	user?: { displayName: string; email: string } | null;
 	children: ReactNode;
 };
 
@@ -21,14 +22,14 @@ export function ColleagueLayout({ user, children }: ColleagueLayoutProps) {
 	return (
 		<>
 			<SkipLink />
-			<Header homeHref="/my" width="large" bordered>
+			<Header homeHref="/my" width="large" bordered />
+			<PhaseBanner>
 				{user ? (
-					<p className="bcp-colleague-layout-user">
-						Hi {user.firstName}{" "}
-						<span className="bcp-colleague-layout-email">({user.email})</span>
+					<p className="bcp-colleague-layout-user" title={user.email}>
+						Hello, {user.displayName}{" "}
 					</p>
 				) : null}
-			</Header>
+			</PhaseBanner>
 			{children}
 			<Footer width="large" />
 		</>

@@ -21,7 +21,7 @@ import { EligibleList, type EligibleRow } from "./eligible-list";
 import { IMPORT_BASE, ImportHeader } from "./import-header";
 import { loadImport } from "./load";
 
-export const metadata: Metadata = { title: "Import – Laptop replacements" };
+export const metadata: Metadata = { title: "Import" };
 
 const SORTS = {
 	oldest: "Purchase date (oldest first)",

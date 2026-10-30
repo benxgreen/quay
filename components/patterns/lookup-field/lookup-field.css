@@ -2,13 +2,21 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: flex-start;
-	gap: 16px;
 	margin-bottom: 22px;
 }
 
 .bcp-lookup-field-input {
 	flex: 1 1 320px;
 	max-width: 460px;
+}
+
+.bcp-lookup-field .bcp-button {
+	height: 46px;
+}
+
+.bcp-lookup-field input:focus,
+.bcp-lookup-field :focus-visible {
+	z-index: 1;
 }
 
 .bcp-lookup-result {

@@ -1,0 +1,30 @@
+.bcp-phase-banner {
+	border-bottom: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+	position: relative;
+}
+
+.bcp-phase-banner::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: var(--primary-brand-colour);
+	opacity: 0.05;
+	z-index: 0;
+}
+
+.bcp-phase-banner-content {
+	display: flex;
+	align-items: center;
+	gap: var(--bcp-space-lg);
+	cursor: default;
+	z-index: 1;
+	position: relative;
+}
+
+.bcp-phase-banner p {
+	margin: unset;
+	font-size: var(--bcp-font-size-sm);
+}

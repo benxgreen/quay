@@ -12,7 +12,7 @@ import {
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { ConfirmAction } from "./confirm-action";
 
-export const metadata: Metadata = { title: "Case action – Laptop replacements" };
+export const metadata: Metadata = { title: "Case action" };
 
 const ACTIONS: readonly CaseAction[] = [
 	"resend-booking",

@@ -12,7 +12,7 @@ import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { confirmCancelSession } from "../../actions";
 import { sessionCrumb, sessionTitle } from "../../session-text";
 
-export const metadata: Metadata = { title: "Cancel session – Laptop replacements" };
+export const metadata: Metadata = { title: "Cancel session" };
 
 /** Mockups: AdminSessionCancel. */
 export default async function CancelSessionPage({ params }: { params: Promise<{ id: string }> }) {

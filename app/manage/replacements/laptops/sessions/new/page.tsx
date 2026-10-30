@@ -7,7 +7,7 @@ import { getSessionDefaults } from "@/services/replacements/laptops/lib/sessions
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { SessionForm } from "../session-form";
 
-export const metadata: Metadata = { title: "Add a session – Laptop replacements" };
+export const metadata: Metadata = { title: "Add a session" };
 
 export default async function AddSessionPage() {
 	await requireRole(ACCESS.laptops);

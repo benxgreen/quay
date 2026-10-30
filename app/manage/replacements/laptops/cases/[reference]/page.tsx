@@ -34,8 +34,6 @@ import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { addCaseNote } from "../actions";
 import { CaseSteps } from "./case-steps";
 
-export const metadata: Metadata = { title: "Case – Laptop replacements" };
-
 const BASE = LAPTOPS_SECTIONS.cases.href;
 
 type CasePageProps = {
@@ -50,6 +48,15 @@ type CasePageProps = {
 		at?: string;
 	}>;
 };
+
+export async function generateMetadata({ params }: CasePageProps): Promise<Metadata> {
+	const { reference } = await params;
+	const detail = await getCase(reference);
+
+	return {
+		title: detail ? `Case ${detail.reference} – ${detail.person.name}` : `Case ${reference}`,
+	};
+}
 
 /** Mockups: AdminCase and its stages, AdminCaseArchived. */
 export default async function CasePage({ params, searchParams }: CasePageProps) {

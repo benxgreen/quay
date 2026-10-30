@@ -22,7 +22,7 @@ import {
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { refreshStockAction } from "./actions";
 
-export const metadata: Metadata = { title: "Stock – Laptop replacements" };
+export const metadata: Metadata = { title: "Stock" };
 
 const BASE = LAPTOPS_SECTIONS.stock.href;
 
@@ -55,16 +55,20 @@ export default async function StockPage({ searchParams }: StockPageProps) {
 				</NotificationBanner>
 			) : null}
 			<PageHeading title="Stock">
-				<form action={refreshStockAction}>
-					<Button type="submit" variant="secondary">
-						Refresh from Halo
-					</Button>
-				</form>
+				<div>
+					<p className="bcp-secondary-text">
+						Replacement laptops matching the Halo stock criteria.
+						{snapshot
+							? ` Updated from Halo at ${formatUpdatedAt(snapshot.fetchedAt)}.`
+							: ""}
+					</p>
+					<form action={refreshStockAction}>
+						<Button type="submit" variant="secondary">
+							Refresh from Halo
+						</Button>
+					</form>
+				</div>
 			</PageHeading>
-			<p className="bcp-secondary-text">
-				Replacement laptops matching the Halo stock criteria.
-				{snapshot ? ` Updated from Halo at ${formatUpdatedAt(snapshot.fetchedAt)}.` : ""}
-			</p>
 			<FilterPanel
 				search={{
 					label: "Search stock",

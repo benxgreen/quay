@@ -8,6 +8,8 @@ type SidebarLayoutProps = {
 	sidebar?: ReactNode;
 	/** Which side the sidebar sits on at desktop widths. It always follows the main content on phones. */
 	position?: "start" | "end";
+	/** Content shown above both the main content and sidebar. */
+	header?: ReactNode;
 	children: ReactNode;
 };
 
@@ -19,9 +21,14 @@ type SidebarLayoutProps = {
  * @example
  * <SidebarLayout sidebar={<Sidebar label="Case actions">…</Sidebar>}>…</SidebarLayout>
  */
-export function SidebarLayout({ sidebar, position = "end", children }: SidebarLayoutProps) {
+export function SidebarLayout({ sidebar, position = "end", header, children }: SidebarLayoutProps) {
 	if (!sidebar) {
-		return <>{children}</>;
+		return (
+			<>
+				{header}
+				{children}
+			</>
+		);
 	}
 
 	return (
@@ -31,6 +38,7 @@ export function SidebarLayout({ sidebar, position = "end", children }: SidebarLa
 				position === "start" && "bcp-sidebar-layout--start",
 			)}
 		>
+			{header ? <div className="bcp-sidebar-layout-header">{header}</div> : null}
 			<div className="bcp-sidebar-layout-main">{children}</div>
 			<div className="bcp-sidebar-layout-aside">{sidebar}</div>
 		</div>

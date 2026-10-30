@@ -19,11 +19,11 @@ export type ConstraintProblem =
 const CONSTRAINTS: Record<string, { problem: ConstraintProblem; message: string }> = {
 	sessions_not_overbooked: {
 		problem: "session_unavailable",
-		message: "That date has just filled up. Choose another.",
+		message: "This date is no longer available. Please choose another date.",
 	},
 	bookings_session_open: {
 		problem: "session_unavailable",
-		message: "That date has just filled up. Choose another.",
+		message: "This date is no longer available. Please choose another date.",
 	},
 	bookings_one_active_per_case: {
 		problem: "already_booked",

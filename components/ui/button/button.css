@@ -5,39 +5,43 @@
 	position: relative;
 	margin: 0;
 	padding: 10px 16px 9px;
-	border: 2px solid transparent;
+	border: none;
 	border-radius: 0;
-	background-color: var(--bcp-colour-green);
-	box-shadow: 0 3px 0 #083d2a;
-	color: var(--bcp-colour-white);
 	font-family: inherit;
 	font-size: var(--bcp-font-size-body);
 	font-weight: var(--bcp-text-weight-regular);
 	line-height: 1.19;
 	text-align: center;
+	color: var(--bcp-colour-white);
 	text-decoration: none;
 	vertical-align: top;
 	cursor: pointer;
 	-webkit-appearance: none;
 	appearance: none;
 	touch-action: manipulation;
+
+	background-color: var(--bcp-colour-green);
+	box-shadow: inset 0 -3px 0 var(--bcp-colour-dark-green);
 }
 
 .bcp-button:hover {
-	background-color: #005a30;
-	color: var(--bcp-colour-white);
+	filter: brightness(0.8);
 }
 
-.bcp-button:active {
-	top: 2px;
-}
-
+.bcp-button:focus-within,
 .bcp-button:focus-visible {
-	outline: 3px solid transparent;
-	border-color: var(--bcp-colour-focus);
-	background-color: var(--bcp-colour-focus);
-	box-shadow: 0 3px 0 var(--bcp-colour-focus-text);
-	color: var(--bcp-colour-focus-text);
+	background-color: var(--bcp-colour-green);
+	box-shadow: inset 0 0 0 1px var(--bcp-colour-yellow);
+	outline: 2px solid var(--bcp-colour-yellow);
+	filter: unset;
+}
+
+.bcp-button:focus:not(:active):not(:hover) {
+	outline: 2px solid transparent;
+	background-color: var(--bcp-colour-yellow);
+	box-shadow: inset 0 -3px 0 var(--bcp-colour-dark-yellow);
+	color: var(--bcp-colour-black);
+	filter: unset;
 }
 
 .bcp-button:disabled,
@@ -48,10 +52,7 @@
 
 .bcp-button:disabled:hover {
 	background-color: var(--bcp-colour-green);
-}
-
-.bcp-button:disabled:active {
-	top: 0;
+	filter: unset;
 }
 
 /* Secondary */
@@ -59,18 +60,25 @@
 .bcp-button--secondary,
 .bcp-button--secondary:link,
 .bcp-button--secondary:visited {
-	background-color: var(--bcp-colour-light-grey);
-	box-shadow: 0 3px 0 #929191;
+	background-color: var(--bcp-colour-grey);
+	box-shadow: inset 0 -3px 0 var(--bcp-colour-dark-grey);
 	color: var(--bcp-text-colour);
 }
 
 .bcp-button--secondary:hover {
-	background-color: #dbdad9;
-	color: var(--bcp-text-colour);
+	filter: brightness(0.9);
 }
 
 .bcp-button--secondary:disabled:hover {
-	background-color: var(--bcp-colour-light-grey);
+	background-color: var(--bcp-colour-grey);
+}
+
+.bcp-button--secondary:focus-within,
+.bcp-button--secondary:focus-visible {
+	background-color: var(--bcp-colour-grey);
+	box-shadow: inset 0 0 0 2px var(--bcp-colour-yellow);
+	outline: 2px solid var(--bcp-colour-yellow);
+	filter: unset;
 }
 
 /* Warning */
@@ -79,14 +87,12 @@
 .bcp-button--warning:link,
 .bcp-button--warning:visited {
 	background-color: var(--bcp-colour-red);
-	box-shadow: 0 3px 0 #6e1c1c;
+	box-shadow: inset 0 -3px 0 var(--bcp-colour-dark-red);
 	color: var(--bcp-colour-white);
 }
 
-/* The mockups give no hover for the warning button; this darkens it like the others. */
 .bcp-button--warning:hover {
-	background-color: var(--bcp-colour-dark-red);
-	color: var(--bcp-colour-white);
+	filter: brightness(0.8);
 }
 
 .bcp-button--warning:disabled:hover {
@@ -146,5 +152,11 @@
 	.bcp-button,
 	.bcp-button-info {
 		display: none;
+	}
+}
+
+@media (max-width: 699px) {
+	.bcp-button {
+		width: 100%;
 	}
 }

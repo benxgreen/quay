@@ -9,7 +9,7 @@ import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { SessionForm } from "../../session-form";
 import { sessionCrumb } from "../../session-text";
 
-export const metadata: Metadata = { title: "Edit session – Laptop replacements" };
+export const metadata: Metadata = { title: "Edit session" };
 
 export default async function EditSessionPage({ params }: { params: Promise<{ id: string }> }) {
 	await requireRole(ACCESS.laptops);

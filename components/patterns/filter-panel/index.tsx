@@ -3,6 +3,7 @@
 import "@/components/ui/button/button.css";
 import "@/components/ui/form-group/form-group.css";
 import "@/components/ui/search-box/search-box.css";
+import "@/components/ui/link/link.css";
 import "./filter-panel.css";
 
 import NextLink from "next/link";
@@ -108,7 +109,9 @@ export function FilterPanel({
 					<button type="submit" className="bcp-button bcp-button--small">
 						Apply filters
 					</button>
-					<NextLink href={clearHref}>Clear filters</NextLink>
+					<NextLink className="bcp-link" href={clearHref}>
+						Clear filters
+					</NextLink>
 				</div>
 			</div>
 		</form>

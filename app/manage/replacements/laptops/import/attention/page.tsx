@@ -11,7 +11,7 @@ import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { ImportHeader } from "../import-header";
 import { loadImport } from "../load";
 
-export const metadata: Metadata = { title: "Needs attention – Import – Laptop replacements" };
+export const metadata: Metadata = { title: "Needs attention – Import" };
 
 type AttentionPageProps = { searchParams: Promise<{ refreshFailed?: string }> };
 

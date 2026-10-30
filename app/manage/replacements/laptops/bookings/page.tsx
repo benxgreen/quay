@@ -3,7 +3,7 @@ import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { InsetText } from "@/components/ui/inset-text";
 import { PageHeading } from "@/components/ui/page-heading";
 
-export const metadata: Metadata = { title: "Bookings – Laptop replacements" };
+export const metadata: Metadata = { title: "Bookings" };
 
 export default function BookingsPage() {
 	return (

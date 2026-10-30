@@ -21,7 +21,7 @@ import {
 } from "@/services/replacements/laptops/lib/sessions";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 
-export const metadata: Metadata = { title: "Sessions – Laptop replacements" };
+export const metadata: Metadata = { title: "Sessions" };
 
 const BASE = LAPTOPS_SECTIONS.sessions.href;
 
@@ -37,12 +37,16 @@ export default async function SessionsPage({ searchParams }: SessionsPageProps) 
 		<LaptopsPage
 			section="sessions"
 			sidebarPosition="start"
+			sidebarHeader={
+				<>
+					<PageHeading title="Sessions">
+						<Button href={`${BASE}/new`}>Add a session</Button>
+					</PageHeading>
+					<p>{describeList(filters, sessions)}</p>
+				</>
+			}
 			sidebar={<SessionFiltersPanel filters={filters} months={months} />}
 		>
-			<PageHeading title="Sessions">
-				<Button href={`${BASE}/new`}>Add a session</Button>
-			</PageHeading>
-			<p>{describeList(filters, sessions)}</p>
 			<Table
 				caption="Sessions"
 				captionHidden

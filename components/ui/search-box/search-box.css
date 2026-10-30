@@ -39,17 +39,21 @@
 }
 
 .bcp-search-box .bcp-search-box-button {
+	box-shadow: none;
 	width: auto;
 	margin: 0;
-	border: var(--bcp-border-width-md) solid var(--bcp-colour-green);
-	box-shadow: none;
 }
 
-.bcp-search-box .bcp-search-box-button:focus-visible {
-	border-color: var(--bcp-colour-focus);
-	box-shadow: inset 0 0 0 2px var(--bcp-colour-focus-text);
+.bcp-search-box .bcp-search-box-button,
+.bcp-search-box-aside .bcp-button {
+	height: 46px;
 }
 
 .bcp-search-box-aside .bcp-button {
 	margin-bottom: 0;
+}
+
+.bcp-search-box input:focus,
+.bcp-search-box :focus-visible {
+	z-index: 1;
 }

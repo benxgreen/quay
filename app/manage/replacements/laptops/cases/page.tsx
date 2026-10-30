@@ -32,7 +32,7 @@ import {
 } from "@/services/replacements/laptops/lib/cases";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 
-export const metadata: Metadata = { title: "Cases – Laptop replacements" };
+export const metadata: Metadata = { title: "Cases" };
 
 const BASE = LAPTOPS_SECTIONS.cases.href;
 

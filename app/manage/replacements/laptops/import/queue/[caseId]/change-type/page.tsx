@@ -7,7 +7,7 @@ import { getQueuedCase } from "@/services/replacements/laptops/lib/queue";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { ChangeTypeForm } from "./change-type-form";
 
-export const metadata: Metadata = { title: "Change type – Invitation queue – Laptop replacements" };
+export const metadata: Metadata = { title: "Change type – Invitation queue" };
 
 const QUEUE = `${LAPTOPS_SECTIONS.import.href}/queue`;
 

@@ -5,6 +5,14 @@
 	gap: 40px 60px;
 }
 
+.bcp-sidebar-layout-header {
+	flex: 0 0 100%;
+}
+
+.bcp-sidebar-layout--start .bcp-sidebar-layout-header {
+	order: -2;
+}
+
 .bcp-sidebar-layout-main {
 	flex: 999 1 560px;
 	min-width: 0;

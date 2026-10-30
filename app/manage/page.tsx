@@ -5,7 +5,7 @@ import { PageHeading } from "@/components/ui/page-heading";
 import { requireUser } from "@/lib/auth/guards";
 import { menuGroups } from "@/lib/portal/navigation";
 
-export const metadata: Metadata = { title: "Manage" };
+export const metadata: Metadata = { title: "Management" };
 
 export default async function ManagePage() {
 	const user = await requireUser();

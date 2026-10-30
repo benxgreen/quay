@@ -21,7 +21,7 @@ import { getDevice, loadStock } from "@/services/replacements/laptops/lib/stock"
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { addDeviceNoteAction } from "../actions";
 
-export const metadata: Metadata = { title: "Device – Stock – Laptop replacements" };
+export const metadata: Metadata = { title: "Device – Stock" };
 
 const OUTCOMES = {
 	issued: "Issued",

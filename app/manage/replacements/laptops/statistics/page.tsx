@@ -3,7 +3,7 @@ import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { InsetText } from "@/components/ui/inset-text";
 import { PageHeading } from "@/components/ui/page-heading";
 
-export const metadata: Metadata = { title: "Statistics – Laptop replacements" };
+export const metadata: Metadata = { title: "Statistics" };
 
 export default function StatisticsPage() {
 	return (
