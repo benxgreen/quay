@@ -13,8 +13,10 @@ export type CallTrigger = {
 
 export type CallContext = {
 	trigger: CallTrigger;
-	/** The case the call is for, if any. */
+	/** The case the call is for, if any, in `service`'s schema. */
 	caseId?: number | string;
+	/** The service making the call, such as "laptop_replacements"; left out for portal-wide calls. */
+	service?: string;
 };
 
 /** What a call returns to callExternal: its value, plus what to write in the log. */
@@ -29,7 +31,7 @@ export type CallResult<T> = {
 	value: T;
 	/** The connection that was called, such as "halo". */
 	connection: string;
-	/** The lr.connection_log row, or undefined if the log could not be written. */
+	/** The portal.connection_log row, or undefined if the log could not be written. */
 	logId?: number;
 };
 
@@ -74,7 +76,7 @@ export class HttpStatusError extends Error {
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 /**
- * Makes one call to an external system and writes it to lr.connection_log,
+ * Makes one call to an external system and writes it to portal.connection_log,
  * successful or not. Each client names its own connection (halo,
  * email_webhook). On failure or timeout it throws ExternalCallError, which
  * the page turns into a red Failed banner; nothing has been saved by then,
@@ -146,10 +148,10 @@ async function writeLog(entry: {
 }): Promise<number | undefined> {
 	try {
 		const row = await queryOne<{ id: string }>(
-			`INSERT INTO lr.connection_log
+			`INSERT INTO portal.connection_log
 			   (connection, trigger_kind, trigger_label, actor_user_id, case_id,
-			    outcome, status_code, summary, error, duration_ms)
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+			    outcome, status_code, summary, error, duration_ms, service)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 			 RETURNING id`,
 			[
 				entry.connection,
@@ -162,12 +164,13 @@ async function writeLog(entry: {
 				entry.summary ?? null,
 				entry.error ?? null,
 				entry.durationMs,
+				entry.context.service ?? null,
 			],
 		);
 		return row ? Number(row.id) : undefined;
 	} catch (logError) {
 		// A broken log must not hide what happened to the call itself.
-		console.error("Could not write lr.connection_log", logError);
+		console.error("Could not write portal.connection_log", logError);
 		return undefined;
 	}
 }

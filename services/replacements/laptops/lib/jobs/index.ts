@@ -9,15 +9,15 @@ import {
 } from "@/lib/dates/working-days";
 import { query, queryOne } from "@/lib/db/query";
 import { withTransaction } from "@/lib/db/transaction";
-import { sendCaseEmail } from "@/services/replacements/laptops/lib/emails/send";
-import { addJournalEntry } from "@/services/replacements/laptops/lib/journal";
 import {
 	type JobContext,
 	type JobRunSummary,
 	type JobStart,
 	notSentToday,
 	runLogged,
-} from "./runner";
+} from "@/lib/jobs/runner";
+import { sendCaseEmail } from "@/services/replacements/laptops/lib/emails/send";
+import { addJournalEntry } from "@/services/replacements/laptops/lib/journal";
 
 type JobSettings = {
 	invitations_per_working_day: number;
@@ -75,7 +75,7 @@ export const JOBS = {
 		name: "Purge connection log",
 		runs: "Daily, 9:00am",
 		run: async (context) => {
-			const row = await queryOne<{ n: number }>("SELECT lr.purge_connection_log() AS n");
+			const row = await queryOne<{ n: number }>("SELECT portal.purge_connection_log() AS n");
 			context.note(`${row?.n ?? 0} entries older than 7 days deleted`);
 		},
 	},
@@ -90,6 +90,9 @@ export const JOBS = {
 } as const satisfies Record<string, JobDefinition>;
 
 export type JobKey = keyof typeof JOBS;
+
+/** This service's name in the portal's job log. */
+export const SERVICE = "laptop_replacements";
 
 export const JOB_KEYS = Object.keys(JOBS) as JobKey[];
 
@@ -106,7 +109,7 @@ export async function runJobs(keys: readonly JobKey[], start: JobStart): Promise
 	for (const key of keys) {
 		const job: JobDefinition = JOBS[key];
 		try {
-			const summary = await runLogged(key, job.name, start, (context) =>
+			const summary = await runLogged(SERVICE, key, job.name, start, (context) =>
 				job.run(context, environment),
 			);
 			results.push({ job: key, name: job.name, ...summary });
@@ -172,9 +175,9 @@ async function emailCase(
 async function sendInvitations(context: JobContext, { settings, holidays }: JobEnvironment) {
 	if (!isWorkingDay(context.day, holidays)) return context.note("Not a working day");
 	const done = await queryOne<{ n: number }>(
-		`SELECT count(*)::integer AS n FROM lr.job_run_cases jc JOIN lr.job_runs r ON r.id = jc.job_run_id
-		 WHERE r.job = 'invitations' AND r.run_date = $1 AND jc.outcome = 'sent'`,
-		[context.day],
+		`SELECT count(*)::integer AS n FROM portal.job_run_cases jc JOIN portal.job_runs r ON r.id = jc.job_run_id
+		 WHERE r.service = $1 AND r.job = 'invitations' AND r.run_date = $2 AND jc.outcome = 'sent'`,
+		[SERVICE, context.day],
 	);
 	const remaining = settings.invitations_per_working_day - (done?.n ?? 0);
 	if (remaining <= 0) return context.note("Today's invitations have already gone");
@@ -218,10 +221,10 @@ async function sendBookingReminders(context: JobContext, environment: JobEnviron
 		`SELECT c.id FROM lr.cases c
 		 WHERE c.status IN ('pending', 'unbooked') AND NOT c.reminders_paused
 		   AND c.invited_at IS NOT NULL
-		   AND (c.invited_at AT TIME ZONE 'Europe/London')::date + $3::integer <= $2::date
-		   AND ${notSentToday("c.id", 1, 2)}
+		   AND (c.invited_at AT TIME ZONE 'Europe/London')::date + $4::integer <= $3::date
+		   AND ${notSentToday("c.id", { service: 1, job: 2, day: 3 })}
 		 ORDER BY c.invited_at, c.id`,
-		["booking_reminders", context.day, settings.first_reminder_after_days],
+		[SERVICE, "booking_reminders", context.day, settings.first_reminder_after_days],
 	);
 	if (!cases.length) return context.note("Nobody due a reminder");
 	for (const { id } of cases) {
@@ -240,10 +243,10 @@ async function sendRebookReminders(context: JobContext, environment: JobEnvironm
 	const cases = await query<{ id: string }>(
 		`SELECT c.id FROM lr.cases c
 		 WHERE c.status = 'rebook_required'
-		   AND (c.rebook_requested_at AT TIME ZONE 'Europe/London')::date + 7 <= $2::date
-		   AND ${notSentToday("c.id", 1, 2)}
+		   AND (c.rebook_requested_at AT TIME ZONE 'Europe/London')::date + 7 <= $3::date
+		   AND ${notSentToday("c.id", { service: 1, job: 2, day: 3 })}
 		 ORDER BY c.rebook_requested_at, c.id`,
-		["rebook_reminders", context.day],
+		[SERVICE, "rebook_reminders", context.day],
 	);
 	if (!cases.length) return context.note("Nobody due a reminder");
 	for (const { id } of cases) {
@@ -297,11 +300,12 @@ async function sendSessionReminders(context: JobContext, { settings, holidays }:
 		   AND (se.id IS NULL OR se.status <> 'cancelled')
 		   AND (coalesce(se.starts_at, b.custom_starts_at) AT TIME ZONE 'Europe/London')::date = $1::date
 		   AND NOT EXISTS (
-		     SELECT 1 FROM lr.job_run_cases jc JOIN lr.job_runs r ON r.id = jc.job_run_id
-		     WHERE jc.booking_id = b.id AND jc.outcome = 'sent' AND r.job = 'session_reminders'
+		     SELECT 1 FROM portal.job_run_cases jc JOIN portal.job_runs r ON r.id = jc.job_run_id
+		     WHERE jc.booking_id = b.id AND jc.outcome = 'sent'
+		       AND r.service = $2 AND r.job = 'session_reminders'
 		   )
 		 ORDER BY coalesce(se.starts_at, b.custom_starts_at), b.id`,
-		[sessionDay],
+		[sessionDay, SERVICE],
 	);
 	if (!bookings.length) return context.note("No sessions that need a reminder");
 	for (const booking of bookings) {
@@ -321,9 +325,9 @@ async function sendReturnReminders(context: JobContext, { settings, holidays }: 
 	const cases = await query<{ id: string }>(
 		`SELECT c.id FROM lr.cases c
 		 WHERE c.status = 'awaiting_return' AND c.return_reminders
-		   AND ${notSentToday("c.id", 1, 2)}
+		   AND ${notSentToday("c.id", { service: 1, job: 2, day: 3 })}
 		 ORDER BY c.attended_at, c.id`,
-		["return_reminders", context.day],
+		[SERVICE, "return_reminders", context.day],
 	);
 	if (!cases.length) return context.note("Nobody due a return reminder");
 	for (const { id } of cases) await emailCase(context, "return_reminder", id);

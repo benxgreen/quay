@@ -37,7 +37,7 @@ export async function listConnections(): Promise<Connection[]> {
 	}>(
 		`SELECT c.key, c.label, c.url, l.last_used_at, c.updated_at, u.display_name AS updated_by
 		 FROM portal.connections c
-		 LEFT JOIN lr.connection_last_used l ON l.connection = c.key
+		 LEFT JOIN portal.connection_last_used l ON l.connection = c.key
 		 LEFT JOIN portal.users u ON u.id = c.updated_by
 		 ORDER BY c.label`,
 	);
@@ -81,7 +81,7 @@ export type ConnectionLogEntry = {
 
 export type ConnectionLogFilters = { connection: string; result: string; q: string };
 
-/** The last 7 days of calls, newest first (lr.connection_log_recent). */
+/** The last 7 days of calls, newest first (portal.connection_log_recent). */
 export async function listConnectionLog(
 	filters: ConnectionLogFilters,
 ): Promise<ConnectionLogEntry[]> {
@@ -90,7 +90,7 @@ export async function listConnectionLog(
 		        l.trigger_label AS "triggerLabel", a.display_name AS actor,
 		        c.reference AS "caseReference", p.display_name AS "caseName",
 		        l.outcome, l.status_code AS "statusCode", l.summary, l.error
-		 FROM lr.connection_log_recent l
+		 FROM portal.connection_log_recent l
 		 LEFT JOIN portal.users a ON a.id = l.actor_user_id
 		 LEFT JOIN lr.cases c ON c.id = l.case_id
 		 LEFT JOIN portal.users p ON p.id = c.user_id

@@ -31,8 +31,6 @@ Using laptop replacements as the pattern:
 5. If something you need would suit another service too, add it to `lib/` or `components/` without the service's name in it, with a story and tests.
 6. Record decisions in `CLAUDE.md` and differences from the mockups in `docs/design-differences.md`.
 
-## Known coupling to address before the second service
+## Shared logs
 
-- **Job runs and the connection log are in the `lr` schema** (`lr.job_runs`, `lr.job_run_cases`, `lr.connection_log`), though every service's jobs and calls belong there. Move them to `portal` with a `service` column before another service runs jobs.
-- **The job runner** (`services/replacements/laptops/lib/jobs/runner.ts`) is generic apart from those tables; move it to `lib/jobs` at the same time.
-- **Connections** are changed from laptop replacements' Settings page; with a second service they belong in Portal settings.
+Every service's scheduled jobs and external calls are logged in the portal schema, tagged with the service: `portal.job_runs` and `portal.job_run_cases` (run with `runLogged` from `lib/jobs/runner.ts`), and `portal.connection_log` (written by `callExternal`; pass `service` in the call context, as laptop replacements' Halo client and `sendEmail` do). Each service shows its own rows. Connection links (`portal.connections`) are changed in laptop replacements' Settings, as they are its connections.

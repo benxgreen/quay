@@ -69,7 +69,7 @@ export async function sendEmail({
 				...rendered,
 				subject: `${subjectPrefix}${rendered.subject}`,
 			},
-			context,
+			{ ...context, service: context.service ?? service },
 		);
 		return { ok: true, connectionLogId: sent.logId };
 	} catch (error) {

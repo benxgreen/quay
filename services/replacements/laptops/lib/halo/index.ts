@@ -108,6 +108,24 @@ export function getLaptopHaloClient(): LaptopHaloClient {
 			"Laptop replacements' Halo calls are not built yet: the report IDs, stock criteria and status IDs are open questions.",
 		);
 	}
-	client ??= createMockLaptopHaloClient();
+	client ??= forService(createMockLaptopHaloClient());
 	return client;
 }
+
+/** Tags every call with this service, so the connection log says whose call it was. */
+function forService(inner: LaptopHaloClient): LaptopHaloClient {
+	return new Proxy(inner, {
+		get(target, name: keyof LaptopHaloClient) {
+			const method = target[name] as (...args: unknown[]) => unknown;
+			return (...args: unknown[]) => {
+				const context = args[args.length - 1] as CallContext;
+				return method.apply(target, [
+					...args.slice(0, -1),
+					{ ...context, service: SERVICE },
+				]);
+			};
+		},
+	});
+}
+
+const SERVICE = "laptop_replacements";

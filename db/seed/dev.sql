@@ -327,11 +327,14 @@ FROM lr.cases WHERE box_number IS NOT NULL;
 
 -- Connection log and email counts ------------------------------------
 
-INSERT INTO lr.connection_log (occurred_at, connection, trigger_kind, trigger_label, actor_user_id, case_id, outcome, status_code, summary, error, duration_ms) VALUES
+INSERT INTO portal.connection_log (occurred_at, connection, trigger_kind, trigger_label, actor_user_id, case_id, outcome, status_code, summary, error, duration_ms) VALUES
   (now() - interval '3 hours', 'halo',          'user',     'Refresh from Halo',  pg_temp.u('john.smith@bcpcouncil.test'), NULL, 'success', 200, 'End-of-life report: 64 laptops', NULL, 1840),
   (now() - interval '2 hours', 'halo',          'system',   'Stock list',         NULL, NULL, 'success', 200, 'Stock: 46 devices', NULL, 920),
   (now() - interval '1 hour',  'email_webhook', 'schedule', 'Daily invitations',  NULL, NULL, 'success', 202, '15 sent', NULL, 3100),
   (now() - interval '50 minutes', 'halo',        'user',    'Complete replacement', pg_temp.u('john.smith@bcpcouncil.test'), pg_temp.c('31818'), 'failed', 503, NULL, 'Halo returned 503 Service Unavailable', 10000);
+
+-- Calls made for a case were laptop replacements' own.
+UPDATE portal.connection_log SET service = 'laptop_replacements' WHERE case_id IS NOT NULL;
 
 INSERT INTO lr.email_sends (email_key, case_id, to_address, scheduled, outcome, sent_at)
 SELECT key, pg_temp.c(asset), email, scheduled, 'sent', at

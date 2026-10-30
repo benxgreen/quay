@@ -3,7 +3,6 @@ import "server-only";
 import type { CallTrigger } from "@/lib/clients/connection-log";
 import type { IsoDate } from "@/lib/dates/working-days";
 import { query, queryOne } from "@/lib/db/query";
-import type { JournalActor } from "@/services/replacements/laptops/lib/journal";
 
 /** How a job was started: by the timer, or by someone in development. */
 export type JobStart = {
@@ -17,10 +16,13 @@ export type JobStart = {
 /** What a job is given while it runs. */
 export type JobContext = JobStart & {
 	runId: number;
+	/** The service the job belongs to, such as "laptop_replacements". */
+	service: string;
 	/** The job's name, such as "Send invitations"; used for the journal and connection log. */
 	name: string;
 	trigger: CallTrigger;
-	actor: JournalActor;
+	/** Who did it, for the service's journal: the job's name. */
+	actor: { system: string };
 	/** Logs a case the run touched, and counts it as processed or failed. */
 	logCase(entry: {
 		caseId: string | number;
@@ -41,12 +43,14 @@ export type JobRunSummary = {
 };
 
 /**
- * Runs one job and writes its job log: a row in lr.job_runs when it starts,
- * one in lr.job_run_cases for each case it touches, and the totals (or the
- * error that stopped it) when it ends. A run that fails part way keeps what
- * it logged, so a re-run picks up where it left off.
+ * Runs one of a service's jobs and writes the portal's job log: a row in
+ * portal.job_runs when it starts, one in portal.job_run_cases for each case
+ * it touches, and the totals (or the error that stopped it) when it ends. A
+ * run that fails part way keeps what it logged, so a re-run picks up where
+ * it left off. Only one run of each service's job at a time.
  */
 export async function runLogged(
+	service: string,
 	key: string,
 	name: string,
 	start: JobStart,
@@ -54,16 +58,16 @@ export async function runLogged(
 ): Promise<JobRunSummary> {
 	// A run that never finished (the app restarted part way) would block the job for ever.
 	await query(
-		`UPDATE lr.job_runs SET finished_at = now(), error = 'Did not finish'
-		 WHERE job = $1 AND finished_at IS NULL AND started_at < now() - interval '1 hour'`,
-		[key],
+		`UPDATE portal.job_runs SET finished_at = now(), error = 'Did not finish'
+		 WHERE service = $1 AND job = $2 AND finished_at IS NULL AND started_at < now() - interval '1 hour'`,
+		[service, key],
 	);
 	let run: { id: string } | undefined;
 	try {
 		run = await queryOne<{ id: string }>(
-			`INSERT INTO lr.job_runs (job, run_date, as_if, triggered_by)
-			 VALUES ($1, $2, $3, $4) RETURNING id`,
-			[key, start.day, start.asIf, start.userId ?? null],
+			`INSERT INTO portal.job_runs (service, job, run_date, as_if, triggered_by)
+			 VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+			[service, key, start.day, start.asIf, start.userId ?? null],
 		);
 	} catch (error) {
 		if ((error as { constraint?: string }).constraint === "job_runs_one_running") {
@@ -85,10 +89,11 @@ export async function runLogged(
 			trigger: start.userId
 				? { kind: "user", label: name, actorUserId: start.userId }
 				: { kind: "schedule", label: name },
+			service,
 			actor: { system: name },
 			async logCase(entry) {
 				await query(
-					`INSERT INTO lr.job_run_cases (job_run_id, case_id, booking_id, outcome, detail)
+					`INSERT INTO portal.job_run_cases (job_run_id, case_id, booking_id, outcome, detail)
 					 VALUES ($1, $2, $3, $4, $5)`,
 					[
 						runId,
@@ -111,7 +116,7 @@ export async function runLogged(
 	}
 
 	await query(
-		`UPDATE lr.job_runs SET finished_at = now(), processed = $2, failed = $3, note = $4, error = $5
+		`UPDATE portal.job_runs SET finished_at = now(), processed = $2, failed = $3, note = $4, error = $5
 		 WHERE id = $1`,
 		[runId, processed, failed, note, error],
 	);
@@ -120,12 +125,16 @@ export async function runLogged(
 
 /**
  * The SQL condition for "this job has already sent to this case today",
- * which keeps a re-run from sending twice. `$day` and `$job` are the
- * parameter numbers holding the run's day and job key.
+ * which keeps a re-run from sending twice. The numbers are the parameter
+ * positions holding the service, the job key and the run's day.
  */
-export function notSentToday(caseColumn: string, job: number, day: number): string {
+export function notSentToday(
+	caseColumn: string,
+	{ service, job, day }: { service: number; job: number; day: number },
+): string {
 	return `NOT EXISTS (
-		SELECT 1 FROM lr.job_run_cases jc JOIN lr.job_runs r ON r.id = jc.job_run_id
-		WHERE jc.case_id = ${caseColumn} AND jc.outcome = 'sent' AND r.job = $${job} AND r.run_date = $${day}
+		SELECT 1 FROM portal.job_run_cases jc JOIN portal.job_runs r ON r.id = jc.job_run_id
+		WHERE jc.case_id = ${caseColumn} AND jc.outcome = 'sent'
+		  AND r.service = $${service} AND r.job = $${job} AND r.run_date = $${day}
 	)`;
 }

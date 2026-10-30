@@ -13,7 +13,7 @@ export type FailedCall = {
 	statusCode?: number;
 	timedOut: boolean;
 	at: Date;
-	/** The lr.connection_log row, for the "Connection log" link. Absent if the call was never made. */
+	/** The portal.connection_log row, for the "Connection log" link. Absent if the call was never made. */
 	logId?: number;
 };
 

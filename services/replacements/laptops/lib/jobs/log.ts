@@ -1,7 +1,7 @@
 import "server-only";
 
 import { query, queryOne } from "@/lib/db/query";
-import { isJobKey, JOBS } from "./index";
+import { isJobKey, JOBS, SERVICE } from "./index";
 
 export type JobRun = {
 	id: string;
@@ -64,12 +64,16 @@ function toRun(row: JobRunRow): JobRun {
 export async function listJobRuns(limit: number): Promise<{ runs: JobRun[]; total: number }> {
 	const [rows, count] = await Promise.all([
 		query<JobRunRow>(
-			`SELECT ${RUN_COLUMNS} FROM lr.job_runs r
+			`SELECT ${RUN_COLUMNS} FROM portal.job_runs r
 			 LEFT JOIN portal.users u ON u.id = r.triggered_by
+			 WHERE r.service = $2
 			 ORDER BY r.started_at DESC, r.id DESC LIMIT $1`,
-			[limit],
+			[limit, SERVICE],
 		),
-		queryOne<{ n: number }>("SELECT count(*)::integer AS n FROM lr.job_runs"),
+		queryOne<{ n: number }>(
+			"SELECT count(*)::integer AS n FROM portal.job_runs WHERE service = $1",
+			[SERVICE],
+		),
 	]);
 	return { runs: rows.map(toRun), total: count?.n ?? 0 };
 }
@@ -77,9 +81,11 @@ export async function listJobRuns(limit: number): Promise<{ runs: JobRun[]; tota
 /** Each job's latest run, for the list of jobs. */
 export async function latestRuns(): Promise<Map<string, JobRun>> {
 	const rows = await query<JobRunRow>(
-		`SELECT DISTINCT ON (r.job) ${RUN_COLUMNS} FROM lr.job_runs r
+		`SELECT DISTINCT ON (r.job) ${RUN_COLUMNS} FROM portal.job_runs r
 		 LEFT JOIN portal.users u ON u.id = r.triggered_by
+		 WHERE r.service = $1
 		 ORDER BY r.job, r.started_at DESC, r.id DESC`,
+		[SERVICE],
 	);
 	return new Map(rows.map((row) => [row.job, toRun(row)]));
 }
@@ -88,10 +94,10 @@ export async function latestRuns(): Promise<Map<string, JobRun>> {
 export async function getJobRun(id: string): Promise<{ run: JobRun; cases: JobRunCase[] } | null> {
 	if (!/^\d+$/.test(id)) return null;
 	const row = await queryOne<JobRunRow>(
-		`SELECT ${RUN_COLUMNS} FROM lr.job_runs r
+		`SELECT ${RUN_COLUMNS} FROM portal.job_runs r
 		 LEFT JOIN portal.users u ON u.id = r.triggered_by
-		 WHERE r.id = $1`,
-		[id],
+		 WHERE r.id = $1 AND r.service = $2`,
+		[id, SERVICE],
 	);
 	if (!row) return null;
 	const cases = await query<{
@@ -102,7 +108,7 @@ export async function getJobRun(id: string): Promise<{ run: JobRun; cases: JobRu
 		created_at: Date;
 	}>(
 		`SELECT c.reference, u.display_name AS person_name, jc.outcome, jc.detail, jc.created_at
-		 FROM lr.job_run_cases jc
+		 FROM portal.job_run_cases jc
 		 JOIN lr.cases c ON c.id = jc.case_id
 		 JOIN portal.users u ON u.id = c.user_id
 		 WHERE jc.job_run_id = $1

@@ -17,7 +17,7 @@ describe.skipIf(!hasDatabase)("connection log against the local database", async
 	const logIds: number[] = [];
 
 	afterAll(async () => {
-		await query("DELETE FROM lr.connection_log WHERE id = ANY($1::bigint[])", [logIds]);
+		await query("DELETE FROM portal.connection_log WHERE id = ANY($1::bigint[])", [logIds]);
 		await getPool().end();
 	});
 
@@ -34,7 +34,7 @@ describe.skipIf(!hasDatabase)("connection log against the local database", async
 
 		logIds.push(Number(ok.logId), Number(failed.logId));
 		const rows = await query<{ connection: string; outcome: string; status_code: number }>(
-			`SELECT connection, outcome, status_code FROM lr.connection_log
+			`SELECT connection, outcome, status_code FROM portal.connection_log
 			 WHERE id = ANY($1::bigint[]) ORDER BY id`,
 			[logIds],
 		);
@@ -44,7 +44,7 @@ describe.skipIf(!hasDatabase)("connection log against the local database", async
 		]);
 
 		const error = await queryOne<{ error: string }>(
-			"SELECT error FROM lr.connection_log WHERE id = $1",
+			"SELECT error FROM portal.connection_log WHERE id = $1",
 			[failed.logId],
 		);
 		expect(error?.error).toBe("Power Automate returned 502 Bad Gateway");

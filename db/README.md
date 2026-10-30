@@ -22,6 +22,7 @@ PostgreSQL 16. The schema, connection rules and error mapping are in `docs/datab
 | 0018 | `lr.job_runs` and `lr.job_run_cases`: the scheduled job log, which also keeps the jobs from sending twice |
 | 0019 | One session per type at any start time |
 | 0020 | The old device's make and model on each case |
+| 0021 | The job log and connection log move to `portal` with a `service` column, for every service's jobs and calls |
 
 ## Local database
 

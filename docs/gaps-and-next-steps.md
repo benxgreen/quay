@@ -39,19 +39,13 @@ Typecheck and lint pass, but no automated tests were added from stage 9 onwards 
 
 ## 4. Before a second service
 
-The code is laid out for more services (see `services/README.md`), but three things still sit in the laptop replacements schema or pages although they belong to the portal:
-
-1. **Job log and connection log tables** are `lr.job_runs`, `lr.job_run_cases` and `lr.connection_log`. Move them to `portal` with a `service` column in a new migration.
-2. **The job runner** (`services/replacements/laptops/lib/jobs/runner.ts`) is generic apart from those tables. Move it to `lib/jobs` at the same time, leaving each service's job definitions in its own folder.
-3. **Connections** are changed from laptop replacements' Settings. Move the Connections section and Connection log to Portal settings, as they're portal-wide.
-
-The journal stays per service (`lr.journal_entries`) as decided, shown with the shared `Journal` pattern.
+Done on 30 October 2026: the job log and connection log moved to `portal` with a `service` column (migration 0021), and the job runner to `lib/jobs/runner.ts`. Connections stay in laptop replacements' Settings, as they are its connections. The journal stays per service (`lr.journal_entries`), shown with the shared `Journal` pattern.
 
 ## 5. Smaller things noticed
 
 - The Statistics stock tile shows "–" until the Stock page has loaded the Halo stock list once; a scheduled stock refresh (the old "Scheduled stock refresh" call in the mockups) would keep it current.
 - The development database counts in `db/README.md` ("19 people", "16 cases") should be checked against the seed when it next changes.
-- An Administrator needs the laptops admin role as well to change Invitations and reminders or Connections, because Settings sits inside laptop replacements. Moving Connections to Portal settings (above) removes half of this.
+- An Administrator needs the laptops admin role as well to change Invitations and reminders or Connections, because Settings sits inside laptop replacements. Connections stay in laptop replacements' Settings by decision.
 
 ## Suggested order
 
@@ -59,4 +53,3 @@ The journal stays per service (`lr.journal_entries`) as decided, shown with the 
 2. Error and not-found pages, and the cookies, privacy and accessibility pages.
 3. Stage 14: an App Service test environment, App Insights, the job timer, and a deploy checklist.
 4. Wire in the real Halo calls and Entra ID as their details arrive.
-5. Move the job and connection logs to `portal` before starting smartphone replacements.
