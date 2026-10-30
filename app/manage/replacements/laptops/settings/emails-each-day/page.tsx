@@ -9,6 +9,7 @@ import { requireRole } from "@/lib/auth/guards";
 import { londonToday } from "@/lib/clock";
 import { formatLongDate, formatShortDay } from "@/lib/dates/format";
 import { ACCESS, canAccess } from "@/lib/portal/access";
+import { plural } from "@/lib/utils/text";
 import {
 	emailsEachDay,
 	type ForecastDay,
@@ -28,7 +29,6 @@ export default async function EmailsEachDayPage() {
 		(top, day) => (!top || day.total > top.total ? day : top),
 		undefined,
 	);
-	const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 	return (
 		<LaptopsPage section="settings" parents={[LAPTOPS_SECTIONS.settings]}>

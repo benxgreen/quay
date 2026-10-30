@@ -122,3 +122,6 @@ export function isBookableByColleague(
 ): boolean {
 	return sessionDate > addWorkingDays(today, leadWorkingDays, holidays);
 }
+
+/** Monday to Friday, in ISO weekday order: WORKING_WEEKDAYS[isoWeekday - 1]. */
+export const WORKING_WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] as const;

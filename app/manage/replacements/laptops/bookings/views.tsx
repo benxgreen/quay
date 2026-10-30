@@ -9,7 +9,8 @@ import { PrintButton } from "@/components/ui/print-button";
 import { Table, TableSecondary } from "@/components/ui/table";
 import { Tag } from "@/components/ui/tag";
 import { formatLongDate, formatMonth, formatShortDay, formatTime } from "@/lib/dates/format";
-import { addDays, type IsoDate, isoWeekday } from "@/lib/dates/working-days";
+import { addDays, type IsoDate, isoWeekday, WORKING_WEEKDAYS } from "@/lib/dates/working-days";
+import { capitalise, listWords, plural } from "@/lib/utils/text";
 import {
 	addMonths,
 	allBookings,
@@ -33,16 +34,6 @@ type ViewProps = { filters: BookingsFilters; today: IsoDate };
 
 const CASES = LAPTOPS_SECTIONS.cases.href;
 const SESSIONS = LAPTOPS_SECTIONS.sessions.href;
-
-function plural(n: number, one: string, many = `${one}s`): string {
-	return `${n} ${n === 1 ? one : many}`;
-}
-
-/** "a, b and c". */
-function listWords(parts: string[]): string {
-	if (parts.length < 2) return parts.join("");
-	return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
-}
 
 function caseHref(reference: string): string {
 	return `${CASES}/${reference}`;
@@ -181,10 +172,6 @@ function daySummary(groups: DayGroup[]): string {
 	if (!parts.length && !cancelled) return "No sessions or custom appointments.";
 	const sentence = parts.length ? `${capitalise(listWords(parts))}.` : "";
 	return cancelled ? `${sentence} ${plural(cancelled, "cancelled session")}.`.trim() : sentence;
-}
-
-function capitalise(text: string): string {
-	return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 const PAGE_SIZE = 20;
@@ -403,13 +390,7 @@ function weekRow(item: WeekItem, dayTitle: string) {
 	};
 }
 
-const WEEKDAYS = [
-	{ short: "Mon", long: "Monday" },
-	{ short: "Tue", long: "Tuesday" },
-	{ short: "Wed", long: "Wednesday" },
-	{ short: "Thu", long: "Thursday" },
-	{ short: "Fri", long: "Friday" },
-];
+const WEEKDAYS = WORKING_WEEKDAYS.map((long) => ({ short: long.slice(0, 3), long }));
 
 /** Mockups: AdminDashboardMonth. A calendar of the month's sessions, each linking to its day. */
 export async function MonthView({ filters, today }: ViewProps) {

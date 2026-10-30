@@ -10,6 +10,19 @@ PostgreSQL 16. The schema, connection rules and error mapping are in `docs/datab
 | `scripts/setup-local.sh` | Runs the setup SQL against the local Docker Postgres. |
 | `seed/dev.sql`, `seed/portal-email-template.html` | Development data, loaded by `scripts/seed-dev.mjs`. Never for a shared environment. |
 
+## Migrations after the schema document
+
+| Migration | What it does |
+|---|---|
+| 0013 | Step completion columns, `portal.connections` for links, bank-holiday-aware `add_working_days`, nullable import file name, and no UPDATE/DELETE on journals for `portal_app` |
+| 0014 | `lr.is_weekly_send_day`: weekly emails move to the next working day after a bank holiday, in both the jobs and the forecast |
+| 0015 | One `halo` connection, `portal.users.halo_user_id`, and `outcome` on journal entries for failed attempts |
+| 0016 | `lr.halo_report`: the latest Halo end-of-life report for the Import screen |
+| 0017 | `lr.halo_stock`: the latest Halo stock list |
+| 0018 | `lr.job_runs` and `lr.job_run_cases`: the scheduled job log, which also keeps the jobs from sending twice |
+| 0019 | One session per type at any start time |
+| 0020 | The old device's make and model on each case |
+
 ## Local database
 
 Docker runs Postgres 16 (server timezone Europe/London) with PgBouncer in front in transaction mode, as on Azure (`compose.yaml`). Passwords are in `.env`; copy `.env.example` to start.

@@ -1,116 +1,35 @@
 "use client";
 
-import { type ReactNode, useActionState } from "react";
-import { InlineForm } from "@/components/patterns/inline-form";
-import { Button, ButtonGroup } from "@/components/ui/button";
+import {
+	FormErrors,
+	SaveOrCancel,
+	type SettingsAction,
+	useSettingsForm,
+} from "@/components/patterns/settings-form";
 import { Checkboxes } from "@/components/ui/checkboxes";
-import { ErrorSummary } from "@/components/ui/error-summary";
 import { InsetText } from "@/components/ui/inset-text";
-import { Link } from "@/components/ui/link";
-import { MarkdownText } from "@/components/ui/markdown";
-import { Preview } from "@/components/ui/preview";
 import { Radios } from "@/components/ui/radios";
 import { TextInput } from "@/components/ui/text-input";
 import { Textarea } from "@/components/ui/textarea";
 import { TimeInput } from "@/components/ui/time-input";
-import type { SettingsFormState } from "./actions";
+import { WORKING_WEEKDAYS } from "@/lib/dates/working-days";
 
-type Action = (state: SettingsFormState, formData: FormData) => Promise<SettingsFormState>;
+/** Laptop replacement settings forms; the generic ones are in components/patterns/settings-form. */
 
-const WEEKDAY_ITEMS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(
-	(label, index) => ({ value: String(index + 1), label }),
-);
+const WEEKDAY_ITEMS = WORKING_WEEKDAYS.map((label, index) => ({ value: String(index + 1), label }));
 
 /** The error summary, linking each error to its field (`ids` maps an error to a field id). */
-function Summary({
-	errors,
-	ids = {},
-}: {
-	errors: Record<string, string>;
-	ids?: Record<string, string>;
-}) {
-	return (
-		<ErrorSummary
-			errors={Object.entries(errors).map(([field, text]) => ({
-				fieldId: ids[field] ?? field,
-				text,
-			}))}
-		/>
-	);
-}
-
-function SaveOrCancel({
-	cancelHref,
-	pending,
-	label = "Save",
-	children,
-}: {
-	cancelHref: string;
-	pending: boolean;
-	label?: string;
-	children?: ReactNode;
-}) {
-	return (
-		<ButtonGroup>
-			<Button type="submit" aria-disabled={pending || undefined}>
-				{label}
-			</Button>
-			{children}
-			<Link href={cancelHref}>Cancel</Link>
-		</ButtonGroup>
-	);
-}
-
-function useSettingsForm(action: Action, initial: Record<string, string>) {
-	return useActionState(action, { values: initial, errors: {} });
-}
-
 /**
  * The "Add" form under a list on the Settings page, such as "Add software".
  * Errors show on the field rather than in a summary, because the form sits
  * in the middle of a long page.
  */
-export function InlineAddForm({
-	action,
-	fields,
-	button = "Add",
-}: {
-	action: Action;
-	fields: { name: string; label: string; width?: "20" | "30" }[];
-	button?: string;
-}) {
-	const [state, formAction, pending] = useSettingsForm(
-		action,
-		Object.fromEntries(fields.map((field) => [field.name, ""])),
-	);
-	return (
-		<form action={formAction} key={JSON.stringify(state.values)}>
-			<InlineForm>
-				{fields.map((field) => (
-					<TextInput
-						key={field.name}
-						id={`add-${field.name}-${button}`}
-						name={field.name}
-						label={field.label}
-						width={field.width ?? "20"}
-						defaultValue={state.values[field.name]}
-						error={state.errors[field.name]}
-					/>
-				))}
-				<Button type="submit" aria-disabled={pending || undefined}>
-					{button}
-				</Button>
-			</InlineForm>
-		</form>
-	);
-}
-
 export function SoftwareForm({
 	action,
 	initial,
 	cancelHref,
 }: {
-	action: Action;
+	action: SettingsAction;
 	initial: { name: string; hint: string };
 	cancelHref: string;
 }) {
@@ -118,7 +37,7 @@ export function SoftwareForm({
 	const { values, errors } = state;
 	return (
 		<form action={formAction} key={JSON.stringify(values)}>
-			<Summary errors={errors} />
+			<FormErrors errors={errors} />
 			<TextInput
 				id="name"
 				name="name"
@@ -145,7 +64,7 @@ export function FaqForm({
 	cancelHref,
 	saveLabel,
 }: {
-	action: Action;
+	action: SettingsAction;
 	initial: { question: string; answer: string; shownFor: string };
 	cancelHref: string;
 	saveLabel: string;
@@ -154,7 +73,7 @@ export function FaqForm({
 	const { values, errors } = state;
 	return (
 		<form action={formAction} key={JSON.stringify(values)}>
-			<Summary errors={errors} />
+			<FormErrors errors={errors} />
 			<TextInput
 				id="question"
 				name="question"
@@ -189,61 +108,12 @@ export function FaqForm({
 }
 
 /** Mockups: AdminMainContent. Markdown with a Preview button that renders it under the form. */
-export function ContentForm({
-	action,
-	initial,
-	cancelHref,
-}: {
-	action: Action;
-	initial: { body: string };
-	cancelHref: string;
-}) {
-	const [state, formAction, pending] = useSettingsForm(action, initial);
-	const { values, errors } = state;
-	return (
-		<>
-			<form action={formAction} key={JSON.stringify(values)}>
-				<Summary errors={errors} />
-				<Textarea
-					id="body"
-					name="body"
-					label="Content"
-					hint="Use Markdown: ## for headings, - for bullet points, **text** for bold and [text](link) for links. {username}, {date} and {location} are replaced with the colleague's details."
-					rows={19}
-					monospace
-					defaultValue={values.body}
-					error={errors.body}
-				/>
-				<SaveOrCancel cancelHref={cancelHref} pending={pending}>
-					<Button type="submit" name="intent" value="preview" variant="secondary">
-						Preview
-					</Button>
-				</SaveOrCancel>
-			</form>
-			{state.preview ? (
-				<section aria-labelledby="preview-heading">
-					<h2 id="preview-heading">Preview</h2>
-					<InsetText>
-						<p>
-							Not saved yet. The colleague's details are filled in when they see the
-							page.
-						</p>
-					</InsetText>
-					<Preview label="Preview of the page content">
-						<MarkdownText markdown={values.body} />
-					</Preview>
-				</section>
-			) : null}
-		</>
-	);
-}
-
 export function DefaultsForm({
 	action,
 	initial,
 	cancelHref,
 }: {
-	action: Action;
+	action: SettingsAction;
 	initial: Record<string, string>;
 	cancelHref: string;
 }) {
@@ -251,7 +121,7 @@ export function DefaultsForm({
 	const { values, errors } = state;
 	return (
 		<form action={formAction} key={JSON.stringify(values)}>
-			<Summary errors={errors} ids={{ time: "time-hour" }} />
+			<FormErrors errors={errors} ids={{ time: "time-hour" }} />
 			<TimeInput
 				name="time"
 				legend="Start time"
@@ -284,52 +154,6 @@ export function DefaultsForm({
 }
 
 /** Mockups: AdminSettingNumber. One number with words after it. */
-export function NumberForm({
-	action,
-	initial,
-	title,
-	caption,
-	hint,
-	suffix,
-	inset,
-	cancelHref,
-}: {
-	action: Action;
-	initial: { value: string };
-	title: string;
-	caption: string;
-	hint: string;
-	suffix: string;
-	inset: string;
-	cancelHref: string;
-}) {
-	const [state, formAction, pending] = useSettingsForm(action, initial);
-	const { values, errors } = state;
-	return (
-		<form action={formAction} key={JSON.stringify(values)}>
-			<Summary errors={errors} />
-			<TextInput
-				id="value"
-				name="value"
-				label={title}
-				caption={caption}
-				labelSize="l"
-				isPageHeading
-				hint={hint}
-				width="3"
-				inputMode="numeric"
-				defaultValue={values.value}
-				error={errors.value}
-				suffix={suffix}
-			/>
-			<InsetText>
-				<p>{inset}</p>
-			</InsetText>
-			<SaveOrCancel cancelHref={cancelHref} pending={pending} />
-		</form>
-	);
-}
-
 /** Mockups: AdminSettingReminder. */
 export function ReminderForm({
 	action,
@@ -337,7 +161,7 @@ export function ReminderForm({
 	cancelHref,
 	example,
 }: {
-	action: Action;
+	action: SettingsAction;
 	initial: { days: string; weekday: string };
 	cancelHref: string;
 	example: string;
@@ -346,7 +170,7 @@ export function ReminderForm({
 	const { values, errors } = state;
 	return (
 		<form action={formAction} key={JSON.stringify(values)}>
-			<Summary errors={errors} />
+			<FormErrors errors={errors} />
 			<TextInput
 				id="days"
 				name="days"
@@ -379,7 +203,7 @@ export function ReturnRemindersForm({
 	initial,
 	cancelHref,
 }: {
-	action: Action;
+	action: SettingsAction;
 	initial: { enabled: string; weekday: string };
 	cancelHref: string;
 }) {
@@ -387,7 +211,7 @@ export function ReturnRemindersForm({
 	const { values, errors } = state;
 	return (
 		<form action={formAction} key={JSON.stringify(values)}>
-			<Summary errors={errors} />
+			<FormErrors errors={errors} />
 			<Radios
 				name="enabled"
 				legend="Send return reminders"
@@ -423,7 +247,7 @@ export function CheckForm({
 	initial,
 	cancelHref,
 }: {
-	action: Action;
+	action: SettingsAction;
 	initial: { label: string };
 	cancelHref: string;
 }) {
@@ -431,7 +255,7 @@ export function CheckForm({
 	const { values, errors } = state;
 	return (
 		<form action={formAction} key={JSON.stringify(values)}>
-			<Summary errors={errors} />
+			<FormErrors errors={errors} />
 			<TextInput
 				id="label"
 				name="label"
@@ -445,45 +269,3 @@ export function CheckForm({
 }
 
 /** One value whose label is the page heading, such as the team name or a connection's link. */
-export function ValueForm({
-	action,
-	initial,
-	title,
-	caption,
-	hint,
-	type = "text",
-	autoComplete,
-	cancelHref,
-}: {
-	action: Action;
-	initial: { value: string };
-	title: string;
-	caption: string;
-	hint?: ReactNode;
-	type?: "text" | "email" | "url";
-	autoComplete?: string;
-	cancelHref: string;
-}) {
-	const [state, formAction, pending] = useSettingsForm(action, initial);
-	const { values, errors } = state;
-	return (
-		<form action={formAction} key={JSON.stringify(values)}>
-			<Summary errors={errors} />
-			<TextInput
-				id="value"
-				name="value"
-				label={title}
-				caption={caption}
-				labelSize="l"
-				isPageHeading
-				hint={hint}
-				type={type}
-				autoComplete={autoComplete}
-				spellCheck={false}
-				defaultValue={values.value}
-				error={errors.value}
-			/>
-			<SaveOrCancel cancelHref={cancelHref} pending={pending} />
-		</form>
-	);
-}

@@ -1,19 +1,12 @@
 import { requireRole } from "@/lib/auth/guards";
 import { londonToday } from "@/lib/clock";
+import { WORKING_WEEKDAYS } from "@/lib/dates/working-days";
 import { ACCESS } from "@/lib/portal/access";
+import { csvHeaders, toCsv } from "@/lib/utils/csv";
 import { getStatistics } from "@/services/replacements/laptops/lib/statistics";
 import { readFilters } from "../filters";
 
 export const dynamic = "force-dynamic";
-
-const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-
-/** A cell, quoted when it holds a comma, quote or line break, and never read as a formula. */
-function cell(value: string | number): string {
-	let text = String(value);
-	if (/^[=+\-@]/.test(text)) text = `'${text}`;
-	return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
 
 /** "Download as CSV": the same figures as the page, for its period and type. */
 export async function GET(request: Request) {
@@ -37,7 +30,7 @@ export async function GET(request: Request) {
 		...stats.software.typed.map((row) => ["Software typed in", row.name, row.count]),
 		...stats.weekdays.map((row) => [
 			"Bookings by weekday",
-			WEEKDAYS[row.weekday - 1],
+			WORKING_WEEKDAYS[row.weekday - 1],
 			row.count,
 		]),
 		...stats.sessions.flatMap((row) => [
@@ -47,11 +40,8 @@ export async function GET(request: Request) {
 			[`Sessions: ${row.type}`, "Did not attend", row.didNotAttend],
 		]),
 	];
-	const csv = `${rows.map((row) => row.map(cell).join(",")).join("\r\n")}\r\n`;
+	const csv = toCsv(rows);
 	return new Response(csv, {
-		headers: {
-			"Content-Type": "text/csv; charset=utf-8",
-			"Content-Disposition": `attachment; filename="laptop-replacement-statistics-${filters.from}-to-${filters.to}.csv"`,
-		},
+		headers: csvHeaders(`laptop-replacement-statistics-${filters.from}-to-${filters.to}.csv`),
 	});
 }

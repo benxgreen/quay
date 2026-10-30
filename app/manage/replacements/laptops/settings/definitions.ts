@@ -81,21 +81,3 @@ export const SAVED_MESSAGES: Record<string, string> = {
 	"check-saved": "Check saved",
 	"check-removed": "Check removed",
 };
-
-/** A whole number within limits, or an error message. */
-export function readWholeNumber(
-	raw: string,
-	{ min, max, name }: { min: number; max: number; name: string },
-): { value: number } | { error: string } {
-	const text = raw.trim();
-	if (!text) return { error: `Enter ${name}` };
-	if (!/^\d+$/.test(text)) return { error: `${capitalise(name)} must be a whole number` };
-	const value = Number(text);
-	if (value < min) return { error: `${capitalise(name)} must be ${min} or more` };
-	if (value > max) return { error: `${capitalise(name)} must be ${max} or fewer` };
-	return { value };
-}
-
-function capitalise(text: string): string {
-	return text.charAt(0).toUpperCase() + text.slice(1);
-}

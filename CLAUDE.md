@@ -75,6 +75,8 @@ Quay is early: a design proof of concept going through approval phases. Its name
 - `docs/database-schema.md` – schema working copy as of 28 Oct 2026: setup SQL, migrations 0001–0012, `migrate.mjs`, connection rules, scheduled jobs, error mapping.
 - `docs/mockups.md` – where the screen mockups are and what's in them.
 - `docs/design-differences.md` – how Quay's components differ from Harbour's, and why.
+- `docs/gaps-and-next-steps.md` – what's left after stage 13 and the suggested order.
+- `services/README.md` – what a service is made of and how to add one; shared code is listed in the root `README.md`.
 
 Decisions made after the handoff (29 Oct 2026), which override the spec and schema doc:
 

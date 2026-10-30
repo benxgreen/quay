@@ -53,7 +53,7 @@ export function isChecklistName(value: string): value is ChecklistName {
 	return value in CHECKLISTS;
 }
 
-export const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] as const;
+export { WORKING_WEEKDAYS as WEEKDAYS } from "@/lib/dates/working-days";
 
 // Reading ------------------------------------------------------------------
 

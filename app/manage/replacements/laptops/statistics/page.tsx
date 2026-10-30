@@ -14,14 +14,13 @@ import { Table } from "@/components/ui/table";
 import { requireRole } from "@/lib/auth/guards";
 import { londonToday } from "@/lib/clock";
 import { formatLongDate } from "@/lib/dates/format";
+import { WORKING_WEEKDAYS as WEEKDAYS } from "@/lib/dates/working-days";
 import { ACCESS } from "@/lib/portal/access";
 import { getStatistics } from "@/services/replacements/laptops/lib/statistics";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { filtersQuery, readFilters } from "./filters";
 
 export const metadata: Metadata = { title: "Statistics" };
-
-const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 function percent(part: number, whole: number): string {
 	return whole ? `${Math.round((part / whole) * 100)}%` : "–";

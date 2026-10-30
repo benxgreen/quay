@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { InlineAddForm } from "@/components/patterns/settings-form";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { TypeTag } from "@/components/service/replacements/type-tag";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { londonToday } from "@/lib/clock";
 import { formatFullDate, formatLongDate, formatTime, formatUpdatedAt } from "@/lib/dates/format";
 import { ACCESS, canAccess } from "@/lib/portal/access";
 import { listConnections } from "@/lib/portal/connections";
+import { plural } from "@/lib/utils/text";
 import { LAPTOP_EMAILS } from "@/services/replacements/laptops/lib/emails";
 import { emailsEachDay, getEmailSender } from "@/services/replacements/laptops/lib/emails/settings";
 import {
@@ -33,7 +35,6 @@ import {
 } from "@/services/replacements/laptops/lib/settings";
 import { addCheckAction, addSoftwareAction, moveItemAction } from "./actions";
 import { SAVED_MESSAGES, SETTINGS } from "./definitions";
-import { InlineAddForm } from "./forms";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -482,7 +483,6 @@ function reminderRows(settings: ServiceSettings, canChange: boolean) {
 		canChange
 			? [{ href: `${SETTINGS}/invitations/${slug}`, visuallyHiddenText: what }]
 			: undefined;
-	const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 	return [
 		{
 			key: "Invitations per working day",

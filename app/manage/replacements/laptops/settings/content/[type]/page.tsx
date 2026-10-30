@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { MarkdownForm } from "@/components/patterns/settings-form";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { PageHeading } from "@/components/ui/page-heading";
 import { listContent } from "@/services/replacements/laptops/lib/settings";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { saveContentAction } from "../../actions";
 import { SETTINGS } from "../../definitions";
-import { ContentForm } from "../../forms";
 
 export const metadata: Metadata = { title: "Edit page content" };
 
@@ -23,7 +23,7 @@ export default async function ContentPage({ params }: { params: Promise<{ type: 
 				Shown to colleagues booked onto a {word}, under their booking and software details.
 				Frequently asked questions are added separately.
 			</p>
-			<ContentForm
+			<MarkdownForm
 				action={saveContentAction.bind(null, type)}
 				initial={{ body: item?.body ?? "" }}
 				cancelHref={`${SETTINGS}#page`}

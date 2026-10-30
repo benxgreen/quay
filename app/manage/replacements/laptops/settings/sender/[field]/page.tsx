@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ValueForm } from "@/components/patterns/settings-form";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { getEmailSender } from "@/services/replacements/laptops/lib/emails/settings";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { SETTINGS } from "../../definitions";
 import { saveSenderAction } from "../../email-actions";
-import { ValueForm } from "../../forms";
 
 export const metadata: Metadata = { title: "Emails" };
 

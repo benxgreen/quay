@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { saveConnectionAction } from "@/app/manage/portal-settings/actions";
+import { ValueForm } from "@/components/patterns/settings-form";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { requireRole } from "@/lib/auth/guards";
 import { ACCESS, canAccess } from "@/lib/portal/access";
 import { listConnections } from "@/lib/portal/connections";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { SETTINGS } from "../../definitions";
-import { ValueForm } from "../../forms";
 
 export const metadata: Metadata = { title: "Change connection" };
 

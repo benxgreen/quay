@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { NumberForm } from "@/components/patterns/settings-form";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { PageHeading } from "@/components/ui/page-heading";
 import { requireRole } from "@/lib/auth/guards";
@@ -16,7 +17,7 @@ import {
 	saveReturnRemindersAction,
 } from "../../actions";
 import { isNumberSetting, NUMBER_SETTINGS, SETTINGS } from "../../definitions";
-import { NumberForm, ReminderForm, ReturnRemindersForm } from "../../forms";
+import { ReminderForm, ReturnRemindersForm } from "../../forms";
 
 export const metadata: Metadata = { title: "Invitations and reminders" };
 

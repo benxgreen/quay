@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import type { ReplacementType } from "@/components/service/replacements/type-tag";
 import { requireRole } from "@/lib/auth/guards";
+import { readFields, readWeekday, readWholeNumber } from "@/lib/forms/read";
 import type { FormState } from "@/lib/forms/state";
 import { ACCESS, canAccess } from "@/lib/portal/access";
 import {
@@ -20,14 +21,10 @@ import {
 	updateChecklistItem,
 	updateSoftware,
 } from "@/services/replacements/laptops/lib/settings";
-import { isNumberSetting, NUMBER_SETTINGS, readWholeNumber, SETTINGS } from "./definitions";
+import { isNumberSetting, NUMBER_SETTINGS, SETTINGS } from "./definitions";
 
 /** What a settings form gets back when something needs correcting. */
 export type SettingsFormState = FormState;
-
-function fields(formData: FormData, names: string[]): Record<string, string> {
-	return Object.fromEntries(names.map((name) => [name, String(formData.get(name) ?? "").trim()]));
-}
 
 function done(saved: string, anchor: string): never {
 	redirect(`${SETTINGS}?saved=${saved}#${anchor}`);
@@ -64,7 +61,7 @@ export async function addSoftwareAction(
 	formData: FormData,
 ): Promise<SettingsFormState> {
 	await requireSettings();
-	const values = fields(formData, ["name", "hint"]);
+	const values = readFields(formData, ["name", "hint"]);
 	const errors = checkSoftware(values);
 	if (Object.keys(errors).length) return { values, errors };
 	const result = await addSoftware(values.name, values.hint);
@@ -78,7 +75,7 @@ export async function editSoftwareAction(
 	formData: FormData,
 ): Promise<SettingsFormState> {
 	await requireSettings();
-	const values = fields(formData, ["name", "hint"]);
+	const values = readFields(formData, ["name", "hint"]);
 	const errors = checkSoftware(values);
 	if (Object.keys(errors).length) return { values, errors };
 	const result = await updateSoftware(id, values.name, values.hint);
@@ -94,7 +91,7 @@ export async function saveFaqAction(
 	formData: FormData,
 ): Promise<SettingsFormState> {
 	const user = await requireSettings();
-	const values = fields(formData, ["question", "answer"]);
+	const values = readFields(formData, ["question", "answer"]);
 	const shownFor = formData.getAll("shownFor").map(String).filter(isType);
 	values.shownFor = shownFor.join(",");
 	const errors: Record<string, string> = {};
@@ -116,7 +113,7 @@ export async function saveContentAction(
 	formData: FormData,
 ): Promise<SettingsFormState> {
 	const user = await requireSettings();
-	const values = fields(formData, ["body"]);
+	const values = readFields(formData, ["body"]);
 	if (formData.get("intent") === "preview") return { values, errors: {}, preview: true };
 	if (!values.body) return { values, errors: { body: "Enter the page content" } };
 	await savePageContent(type, values.body, user.id);
@@ -131,7 +128,7 @@ export async function saveDefaultsAction(
 	formData: FormData,
 ): Promise<SettingsFormState> {
 	const user = await requireSettings();
-	const values = fields(formData, ["time-hour", "time-minute", "capacity", "location"]);
+	const values = readFields(formData, ["time-hour", "time-minute", "capacity", "location"]);
 	const errors: Record<string, string> = {};
 	const hour = Number(values["time-hour"]);
 	const minute = Number(values["time-minute"]);
@@ -171,7 +168,7 @@ export async function saveNumberSettingAction(
 	const user = await requireAdministrator();
 	if (!isNumberSetting(slug)) redirect(SETTINGS);
 	const setting = NUMBER_SETTINGS[slug];
-	const values = fields(formData, ["value"]);
+	const values = readFields(formData, ["value"]);
 	const read = readWholeNumber(values.value, {
 		min: setting.min,
 		max: setting.max,
@@ -182,17 +179,12 @@ export async function saveNumberSettingAction(
 	done("setting", "invites");
 }
 
-function readWeekday(raw: string): number | null {
-	const day = Number(raw);
-	return Number.isInteger(day) && day >= 1 && day <= 5 ? day : null;
-}
-
 export async function saveReminderAction(
 	_state: SettingsFormState,
 	formData: FormData,
 ): Promise<SettingsFormState> {
 	const user = await requireAdministrator();
-	const values = fields(formData, ["days", "weekday"]);
+	const values = readFields(formData, ["days", "weekday"]);
 	const errors: Record<string, string> = {};
 	const days = readWholeNumber(values.days, { min: 0, max: 90, name: "the number of days" });
 	if ("error" in days) errors.days = days.error;
@@ -211,7 +203,7 @@ export async function saveReturnRemindersAction(
 	formData: FormData,
 ): Promise<SettingsFormState> {
 	const user = await requireAdministrator();
-	const values = fields(formData, ["enabled", "weekday"]);
+	const values = readFields(formData, ["enabled", "weekday"]);
 	const errors: Record<string, string> = {};
 	if (values.enabled !== "yes" && values.enabled !== "no") {
 		errors.enabled = "Select whether to send return reminders";
@@ -240,7 +232,7 @@ export async function addCheckAction(
 	formData: FormData,
 ): Promise<SettingsFormState> {
 	await requireSettings();
-	const values = fields(formData, ["label"]);
+	const values = readFields(formData, ["label"]);
 	const error = checkLabel(values.label);
 	if (error) return { values, errors: { label: error } };
 	await addChecklistItem(list, values.label);
@@ -254,7 +246,7 @@ export async function editCheckAction(
 	formData: FormData,
 ): Promise<SettingsFormState> {
 	await requireSettings();
-	const values = fields(formData, ["label"]);
+	const values = readFields(formData, ["label"]);
 	const error = checkLabel(values.label);
 	if (error) return { values, errors: { label: error } };
 	await updateChecklistItem(list, id, values.label);
