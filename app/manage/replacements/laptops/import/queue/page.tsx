@@ -31,6 +31,7 @@ type QueuePageProps = {
 		moved?: string;
 		typeChanged?: string;
 		removed?: string;
+		addedCase?: string;
 		refreshFailed?: string;
 	}>;
 };
@@ -139,9 +140,28 @@ async function QueueBanner({
 	params,
 	entries,
 }: {
-	params: { moved?: string; typeChanged?: string; removed?: string };
+	params: { moved?: string; typeChanged?: string; removed?: string; addedCase?: string };
 	entries: QueueEntry[];
 }) {
+	if (params.addedCase) {
+		const entry = await getQueuedCase(params.addedCase);
+		if (!entry) return null;
+		const estimate = entries.find((e) => e.caseId === entry.caseId)?.estimate;
+		return (
+			<NotificationBanner
+				variant="success"
+				heading={`${entry.name} has been added to the invitation queue`}
+			>
+				<p>
+					<Link href={`${LAPTOPS_SECTIONS.cases.href}/${entry.reference}`}>
+						Case {entry.reference}
+					</Link>{" "}
+					is number {entry.position} in the queue.
+					{estimate ? ` Estimated invitation: ${formatLongDate(estimate)}.` : ""}
+				</p>
+			</NotificationBanner>
+		);
+	}
 	if (params.moved || params.typeChanged) {
 		const entry = await getQueuedCase(params.moved ?? params.typeChanged ?? "");
 		if (!entry) return null;

@@ -20,7 +20,7 @@ The rule used: **the Components page defines each component, unless the Laptop r
 
 ### Contradictions to settle in the mockups
 
-- **Pronouns:** the change type page says "She keeps her place" and "with her"; we can't know anyone's pronouns, so Quay says "They keep their place" and "with them".
+- **Pronouns:** the case action pages (resend invitation, did not attend) and the change type page say "she" and "her"; Quay says "they" and "their". The change type page says "She keeps her place" and "with her"; we can't know anyone's pronouns, so Quay says "They keep their place" and "with them".
 - **User details dialog:** "Department", as on the user page, rather than the mockup's "Service area" (still an open question).
 - **Times:** the Sessions mockups write "10:00am" and "2:00pm"; Quay writes times in GOV.UK style, "10am" and "2pm" (and "9:30am", "midday"), as the email variables do.
 
@@ -50,6 +50,12 @@ The rule used: **the Components page defines each component, unless the Laptop r
 - **Logo:** Harbour's BCP Council logo SVG (`components/icons/organisations/bcp-logo.tsx`), not the mockups' "BCP Council Device portal" image. The link's accessible name is "BCP Council Device portal".
 
 ### Where the mockups say nothing
+
+- **Booking status tags:** the mockups show Booked (green) and Rebooked (grey); Cancelled is grey, Attended turquoise, Did not attend red and Unsuccessful orange.
+- **Flag on a case page:** a red "Flagged" tag beside the status, and a line under the heading with the reason, who flagged it and when.
+- **Clear flag:** has its own short confirmation page, like the other case actions.
+- **Resend booking details:** the mockup lists "What to bring"; that comes from the email's wording (Settings), so the confirmation page lists type, date and time, location and software only.
+- **Add a case:** "What happens next?" (queue or book on their behalf) waits for booking on behalf (stage 9); for now a manual case goes into the queue, and the page says so.
 
 - **Removing from the invitation queue:** withdraws the case, so it has its own confirmation page ("Remove Ben Whitaker from the invitation queue?", red "Remove from queue").
 - **Import type:** the mockup preselects Collection on the "Add to invitation queue" bar; Quay leaves the type unselected, so it is always a choice, with an error if it's missed.

@@ -1,5 +1,8 @@
 import { Tag, type TagColour } from "@/components/ui/tag";
 import {
+	BOOKING_STATUS_COLOURS,
+	BOOKING_STATUS_LABELS,
+	type BookingStatus,
 	CASE_STATUS_COLOURS,
 	CASE_STATUS_LABELS,
 	type CaseStatus,
@@ -24,4 +27,8 @@ export function SessionStatusTag({ status }: { status: SessionStatus }) {
 
 export function CaseStatusTag({ status }: { status: CaseStatus }) {
 	return <Tag colour={CASE_STATUS_COLOURS[status]}>{CASE_STATUS_LABELS[status]}</Tag>;
+}
+
+export function BookingStatusTag({ status }: { status: BookingStatus }) {
+	return <Tag colour={BOOKING_STATUS_COLOURS[status]}>{BOOKING_STATUS_LABELS[status]}</Tag>;
 }
