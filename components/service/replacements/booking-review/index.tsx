@@ -5,7 +5,7 @@ import "./booking-review.css";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LinkButton } from "@/components/ui/link";
+import { Link, LinkButton } from "@/components/ui/link";
 import { Modal } from "@/components/ui/modal";
 import { Note } from "@/components/ui/note";
 import { Tag } from "@/components/ui/tag";
@@ -26,7 +26,14 @@ export type ReviewItem = {
  * tab refreshes the list: a booking that has been dealt with shows as done,
  * and once none are left the note says so rather than vanishing mid-review.
  */
-export function BookingReview({ items }: { items: ReviewItem[] }) {
+export function BookingReview({
+	items,
+	listHref,
+}: {
+	items: ReviewItem[];
+	/** The Incomplete bookings view, the same bookings as a list. */
+	listHref: string;
+}) {
 	const router = useRouter();
 	// The list as it was when the page opened, so finished ones stay in place.
 	const [first] = useState(items);
@@ -122,6 +129,12 @@ export function BookingReview({ items }: { items: ReviewItem[] }) {
 						Cases open in a new tab. This list updates as each one is done.
 					</p>
 				</Modal>
+				{outstanding ? (
+					<>
+						{" "}
+						or <Link href={listHref}>see them as a list</Link>
+					</>
+				) : null}
 			</div>
 		</Note>
 	);

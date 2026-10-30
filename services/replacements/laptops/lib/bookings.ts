@@ -10,7 +10,7 @@ import type { SessionStatus } from "@/services/replacements/laptops/lib/sessions
  * of who is coming in, by day, week or month, or every upcoming booking.
  */
 
-export type BookingsView = "day" | "week" | "month" | "all";
+export type BookingsView = "day" | "week" | "month" | "all" | "incomplete";
 
 export type BookingsFilters = {
 	view: BookingsView;
@@ -38,7 +38,9 @@ export function parseBookingsFilters(
 		// A broken date falls back to today.
 	}
 	return {
-		view: ["week", "month", "all"].includes(view) ? (view as BookingsView) : "day",
+		view: ["week", "month", "all", "incomplete"].includes(view)
+			? (view as BookingsView)
+			: "day",
 		date,
 		q: (params.q ?? "").trim(),
 		type: params.type === "collection" || params.type === "session" ? params.type : "",
@@ -299,6 +301,19 @@ export async function allBookings(
 	const bookings = filters.past
 		? await bookingsBetween(null, null, filters, ["booked", "attended"])
 		: await bookingsBetween(today, null, filters);
+	return bookings.filter((booking) => matchesPeople(booking, filters));
+}
+
+/**
+ * Incomplete bookings: bookings from past days still marked Booked, oldest
+ * first, so the replacement was neither completed nor marked did not
+ * attend. The same bookings as the review modal, with the dashboard's filters.
+ */
+export async function incompleteBookings(
+	filters: BookingsFilters,
+	today: IsoDate,
+): Promise<DashboardBooking[]> {
+	const bookings = await bookingsBetween(null, addDays(today, -1), filters);
 	return bookings.filter((booking) => matchesPeople(booking, filters));
 }
 

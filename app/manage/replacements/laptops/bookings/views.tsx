@@ -18,6 +18,8 @@ import {
 	type DashboardSession,
 	type DayGroup,
 	dayGroups,
+	filtersPeople,
+	incompleteBookings,
 	monthSessions,
 	type WeekItem,
 	weekDays,
@@ -556,6 +558,71 @@ export async function AllView({ filters, today }: ViewProps) {
 						) : (
 							<TableSecondary>None requested</TableSecondary>
 						),
+						device: <PreparedTag prepared={booking.devicePrepared} />,
+						prepared: booking.software.length ? (
+							<PreparedTag prepared={booking.softwarePrepared} />
+						) : (
+							"–"
+						),
+					},
+				}))}
+			/>
+		</>
+	);
+}
+
+/**
+ * Incomplete bookings: every booking from a past day still marked Booked,
+ * oldest first. The same bookings as the review modal, as a list that
+ * can be searched, filtered and printed.
+ */
+export async function IncompleteView({ filters, today }: ViewProps) {
+	const bookings = await incompleteBookings(filters, today);
+
+	return (
+		<>
+			<p>
+				{bookings.length === 1
+					? "1 booking from a past day has"
+					: `${bookings.length} bookings from past days have`}{" "}
+				not been completed, oldest first. Open each case to complete the replacement, or
+				record that the person did not attend.
+			</p>
+			{bookings.length ? <PrintThisView /> : null}
+			<ShowMoreTable
+				caption="Incomplete bookings"
+				captionHidden
+				noun="bookings"
+				empty={
+					filtersPeople(filters) || filters.type || filters.kind
+						? "No incomplete bookings match. Try changing the search or filters."
+						: "Every booking from a past day has been completed or marked did not attend."
+				}
+				columns={[
+					{ key: "when", header: "Date and time" },
+					{ key: "person", header: "Person" },
+					{ key: "type", header: "Type" },
+					{ key: "box", header: "Box number" },
+					{ key: "device", header: "Device" },
+					{ key: "prepared", header: "Software" },
+				]}
+				rows={bookings.map((booking) => ({
+					id: booking.bookingId,
+					cells: {
+						when: `${formatShortDay(booking.date, { year: true })}, ${formatTime(booking.time)}`,
+						person: (
+							<>
+								<Link href={caseHref(booking.reference)} newTab>
+									{booking.name}
+								</Link>
+								<TableSecondary>{booking.reference}</TableSecondary>
+								{booking.sessionId ? null : (
+									<TableSecondary>Custom appointment</TableSecondary>
+								)}
+							</>
+						),
+						type: <TypeTag type={booking.type} />,
+						box: booking.boxNumber ?? "Not allocated",
 						device: <PreparedTag prepared={booking.devicePrepared} />,
 						prepared: booking.software.length ? (
 							<PreparedTag prepared={booking.softwarePrepared} />

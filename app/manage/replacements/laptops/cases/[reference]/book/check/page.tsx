@@ -9,7 +9,7 @@ import { SummaryList } from "@/components/ui/summary-list";
 import { formatLongDate, formatTime } from "@/lib/dates/format";
 import { offeredSessions } from "@/services/replacements/laptops/lib/booking";
 import { teamConfirmBooking } from "../../../booking-actions";
-import { loadForBooking } from "../load";
+import { loadForNewBooking } from "../load";
 
 export const metadata: Metadata = { title: "Check the booking" };
 
@@ -20,7 +20,7 @@ type Props = {
 
 /** Mockups: AdminBookCheck. */
 export default async function BookCheckPage({ params, searchParams }: Props) {
-	const { detail, href, crumbs, caption } = await loadForBooking((await params).reference);
+	const { detail, href, crumbs, caption } = await loadForNewBooking((await params).reference);
 	const { session: sessionId, software } = await searchParams;
 	const weeks = await offeredSessions(detail.type, { forTeam: true });
 	const session = weeks.flatMap((w) => w.sessions).find((s) => s.id === sessionId);

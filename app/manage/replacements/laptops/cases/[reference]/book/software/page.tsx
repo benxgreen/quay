@@ -6,7 +6,7 @@ import { Link } from "@/components/ui/link";
 import { softwareList, splitSoftware } from "@/services/replacements/laptops/lib/booking";
 import { previousSoftware } from "@/services/replacements/laptops/lib/my-laptop";
 import { teamChooseSoftware } from "../../../booking-actions";
-import { loadForBooking } from "../load";
+import { loadForNewBooking } from "../load";
 
 export const metadata: Metadata = { title: "Book on behalf" };
 
@@ -17,7 +17,7 @@ type Props = {
 
 /** Mockups: AdminBookSoftware. Starts from their last request, if any. */
 export default async function BookSoftwarePage({ params, searchParams }: Props) {
-	const { detail, href, crumbs, caption } = await loadForBooking((await params).reference);
+	const { detail, href, crumbs, caption } = await loadForNewBooking((await params).reference);
 	const { session } = await searchParams;
 	const [list, previous] = await Promise.all([softwareList(), previousSoftware(detail.id)]);
 	const { listed, other } = splitSoftware(previous, list);

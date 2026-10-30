@@ -469,6 +469,13 @@ export type CaseAction =
  * needs the service's admin role, checked where it is used. Archived cases
  * can't be changed.
  */
+const WAITING_FOR_BOOKING: readonly CaseStatus[] = [
+	"queued",
+	"pending",
+	"unbooked",
+	"rebook_required",
+];
+
 export function availableActions(detail: CaseDetail, now: Date = new Date()): CaseAction[] {
 	if (detail.archived || !BEFORE_COMPLETION.includes(detail.status)) return [];
 	const actions: CaseAction[] = [];
@@ -483,7 +490,10 @@ export function availableActions(detail: CaseDetail, now: Date = new Date()): Ca
 	}
 	if (detail.flag) actions.push("clear-flag");
 	else if (["queued", "pending", "rebook_required"].includes(detail.status)) actions.push("flag");
-	if (!detail.booking) actions.push("change-type", "book-on-behalf");
+	if (!detail.booking) actions.push("change-type");
+	// Only a case waiting for a booking, so a Booked case without one isn't offered it.
+	if (!detail.booking && WAITING_FOR_BOOKING.includes(detail.status))
+		actions.push("book-on-behalf");
 	if (detail.status === "unbooked") actions.push("custom-appointment");
 	actions.push("withdraw");
 	return actions;

@@ -25,6 +25,17 @@ async function load(reference: string) {
 	return { user, detail, back: `${BASE}/${reference}` };
 }
 
+/**
+ * Back to the date page with what went wrong: the date filled up, or the
+ * case can no longer be booked (someone else booked it, or its status
+ * changed), which must not be reported as a full date.
+ */
+function bookError(back: string, reason: "full" | "not_allowed", session: string): string {
+	return reason === "full"
+		? `${back}/book?error=full&session=${session}`
+		: `${back}/book?error=not_allowed`;
+}
+
 async function chosenSoftware(formData: FormData) {
 	const list = await softwareList();
 	const listed = formData.getAll("software").map(String);
@@ -38,7 +49,7 @@ export async function teamChooseDate(reference: string, formData: FormData) {
 	if (!session) redirect(`${back}/book?error=choose`);
 	if (detail.booking) {
 		const result = await rebook(detail.id, session, { userId: user.id, onBehalf: true });
-		if (!result.ok) redirect(`${back}/book?error=full&session=${session}`);
+		if (!result.ok) redirect(bookError(back, result.reason, session));
 		redirect(`${back}?done=rebooked`);
 	}
 	redirect(`${back}/book/software?session=${session}`);
@@ -64,7 +75,7 @@ export async function teamConfirmBooking(reference: string, formData: FormData) 
 		{ userId: user.id, onBehalf: true },
 		{ email },
 	);
-	if (!result.ok) redirect(`${back}/book?error=full&session=${session}`);
+	if (!result.ok) redirect(bookError(back, result.reason, session));
 	redirect(`${back}?done=booked`);
 }
 

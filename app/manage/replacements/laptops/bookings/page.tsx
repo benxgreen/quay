@@ -16,7 +16,7 @@ import {
 } from "@/services/replacements/laptops/lib/bookings";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { bookingsHref } from "./links";
-import { AllView, DayView, MonthView, WeekView } from "./views";
+import { AllView, DayView, IncompleteView, MonthView, WeekView } from "./views";
 
 export const metadata: Metadata = { title: "Bookings" };
 
@@ -60,6 +60,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
 							{ value: "week", label: "Week" },
 							{ value: "month", label: "Month" },
 							{ value: "all", label: "All bookings" },
+							{ value: "incomplete", label: "Incomplete bookings" },
 						]}
 					/>
 					<Select
@@ -116,6 +117,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
 			</FilterPanel>
 
 			<BookingReview
+				listHref={bookingsHref(parseBookingsFilters({ view: "incomplete" }, today), today)}
 				items={review.map((booking) => ({
 					bookingId: booking.bookingId,
 					reference: booking.reference,
@@ -137,6 +139,8 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
 				<WeekView filters={filters} today={today} />
 			) : filters.view === "month" ? (
 				<MonthView filters={filters} today={today} />
+			) : filters.view === "incomplete" ? (
+				<IncompleteView filters={filters} today={today} />
 			) : filters.view === "all" ? (
 				<AllView filters={filters} today={today} />
 			) : (

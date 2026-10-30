@@ -5,8 +5,9 @@ import { Button, ButtonGroup } from "@/components/ui/button";
 import { ErrorSummary } from "@/components/ui/error-summary";
 import { Link } from "@/components/ui/link";
 import { offeredSessions } from "@/services/replacements/laptops/lib/booking";
+import { CASE_STATUS_LABELS } from "@/services/replacements/laptops/lib/case-status";
 import { teamChooseDate } from "../../booking-actions";
-import { loadForBooking } from "./load";
+import { loadForNewBooking } from "./load";
 
 export const metadata: Metadata = { title: "Book on behalf" };
 
@@ -17,7 +18,7 @@ type Props = {
 
 /** Mockups: AdminBookDate. The team can book inside the lead time. */
 export default async function BookOnBehalfPage({ params, searchParams }: Props) {
-	const { detail, href, crumbs, caption } = await loadForBooking((await params).reference);
+	const { detail, href, crumbs, caption } = await loadForNewBooking((await params).reference);
 	const { error, session } = await searchParams;
 	const weeks = await offeredSessions(detail.type, {
 		forTeam: true,
@@ -27,9 +28,11 @@ export default async function BookOnBehalfPage({ params, searchParams }: Props) 
 	const message =
 		error === "full"
 			? "That date is now full. Choose another date"
-			: error
-				? "Choose a date and time"
-				: undefined;
+			: error === "not_allowed"
+				? `${detail.person.firstName} can't be booked now because the case is ${CASE_STATUS_LABELS[detail.status].toLowerCase()}. Check the case`
+				: error
+					? "Choose a date and time"
+					: undefined;
 
 	return (
 		<LaptopsPage section="cases" parents={crumbs} narrow>
