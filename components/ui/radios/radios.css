@@ -158,3 +158,13 @@
 .bcp-radios--small .bcp-radios-hint {
 	padding-left: 10px;
 }
+
+/* A heading over a group of options, such as a week of dates */
+.bcp-radios-heading {
+	margin: 20px 0 10px 0;
+	font-weight: var(--bcp-text-weight-bold);
+}
+
+.bcp-radios-heading:first-child {
+	margin-top: 0;
+}

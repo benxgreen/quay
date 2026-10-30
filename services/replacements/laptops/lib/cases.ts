@@ -460,7 +460,9 @@ export type CaseAction =
 	| "flag"
 	| "clear-flag"
 	| "withdraw"
-	| "change-type";
+	| "change-type"
+	| "book-on-behalf"
+	| "custom-appointment";
 
 /**
  * The actions open to a case now (spec, "Actions panel"). Withdraw also
@@ -481,7 +483,8 @@ export function availableActions(detail: CaseDetail, now: Date = new Date()): Ca
 	}
 	if (detail.flag) actions.push("clear-flag");
 	else if (["queued", "pending", "rebook_required"].includes(detail.status)) actions.push("flag");
-	if (!detail.booking) actions.push("change-type");
+	if (!detail.booking) actions.push("change-type", "book-on-behalf");
+	if (detail.status === "unbooked") actions.push("custom-appointment");
 	actions.push("withdraw");
 	return actions;
 }

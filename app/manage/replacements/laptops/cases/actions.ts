@@ -90,6 +90,12 @@ export async function runCaseAction(
 			result = await changeCaseType(detail, type, user.id);
 			break;
 		}
+		case "book-on-behalf":
+			redirect(`${BASE}/${reference}/book`);
+			break;
+		case "custom-appointment":
+			redirect(`${BASE}/${reference}/custom-appointment`);
+			break;
 		case "withdraw": {
 			const reason = text("reason");
 			if (!reason) return { error: "Enter the reason for withdrawing", field: "reason" };

@@ -60,7 +60,7 @@ The rule used: **the Components page defines each component, unless the Laptop r
 - **Flag on a case page:** a red "Flagged" tag beside the status, and a line under the heading with the reason, who flagged it and when.
 - **Clear flag:** has its own short confirmation page, like the other case actions.
 - **Resend booking details:** the mockup lists "What to bring"; that comes from the email's wording (Settings), so the confirmation page lists type, date and time, location and software only.
-- **Add a case:** "What happens next?" (queue or book on their behalf) waits for booking on behalf (stage 9); for now a manual case goes into the queue, and the page says so.
+- **Add a case:** "What happens next?" sits inside step 3 with Type, so the page keeps the mockup's three steps. "Book on their behalf now" creates the case as queued, then goes straight to the team booking pages.
 
 - **Removing from the invitation queue:** withdraws the case, so it has its own confirmation page ("Remove Ben Whitaker from the invitation queue?", red "Remove from queue").
 - **Import type:** the mockup preselects Collection on the "Add to invitation queue" bar; Quay leaves the type unselected, so it is always a choice, with an error if it's missed.

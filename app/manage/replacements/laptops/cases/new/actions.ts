@@ -10,7 +10,13 @@ import {
 } from "@/services/replacements/laptops/lib/add-case";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 
-export type AddCaseValues = { serial: string; same: string; email: string; type: string };
+export type AddCaseValues = {
+	serial: string;
+	same: string;
+	email: string;
+	type: string;
+	next: string;
+};
 
 export type FoundDevice = {
 	serial: string;
@@ -54,6 +60,7 @@ export async function addCaseStep(state: AddCaseState, formData: FormData): Prom
 			.trim()
 			.toLowerCase(),
 		type: String(formData.get("type") ?? ""),
+		next: String(formData.get("next") ?? ""),
 	};
 	const intent = String(formData.get("intent") ?? "add");
 	const errors: AddCaseState["errors"] = {};
@@ -120,6 +127,7 @@ export async function addCaseStep(state: AddCaseState, formData: FormData): Prom
 		errors.same = "Select whether the person receiving the laptop is the assigned user";
 	}
 	if (values.type !== "collection" && values.type !== "session") errors.type = "Select the type";
+	if (values.next !== "queue" && values.next !== "book") errors.next = "Select what happens next";
 	if (Object.keys(errors).length > 0 || !device || (values.same === "no" && !person)) {
 		return { values, device, person, errors };
 	}
@@ -146,5 +154,6 @@ export async function addCaseStep(state: AddCaseState, formData: FormData): Prom
 		user.id,
 	);
 	if (!result.ok) return { values, device, person, errors: { serial: result.error } };
+	if (values.next === "book") redirect(`${LAPTOPS_SECTIONS.cases.href}/${result.reference}/book`);
 	redirect(`${LAPTOPS_SECTIONS.import.href}/queue?addedCase=${result.id}`);
 }

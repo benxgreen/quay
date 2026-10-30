@@ -7,7 +7,7 @@ import { getEmailClient } from "@/lib/clients/email";
 import { query, queryOne } from "@/lib/db/query";
 import { withTransaction } from "@/lib/db/transaction";
 import { renderEmail } from "@/lib/emails/render";
-import { portalUrl } from "@/lib/portal/url";
+import { bookingLink } from "@/services/replacements/laptops/lib/booking-link";
 import {
 	type LaptopEmailCase,
 	type LaptopEmailKey,
@@ -179,8 +179,7 @@ async function loadEmailCase(
 				row.day && row.time
 					? { date: row.day, startTime: row.time, location: row.location }
 					: null,
-			// The signed case token in the link comes with the colleague journey (stage 9).
-			bookingLink: portalUrl("/my/replacements/laptop"),
+			bookingLink: bookingLink(caseId),
 			oldSerial: row.old_serial,
 			software: [...(row.software ?? [])].sort((a, b) => a.localeCompare(b)),
 		},

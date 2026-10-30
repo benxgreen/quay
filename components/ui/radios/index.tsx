@@ -17,6 +17,10 @@ export type RadioItem =
 	| {
 			/** Text between options, usually "or". */
 			divider: string;
+	  }
+	| {
+			/** A heading over the options that follow, such as "Week starting 9 November 2026". */
+			heading: string;
 	  };
 
 type RadiosProps = {
@@ -91,6 +95,13 @@ export function Radios({
 					)}
 				>
 					{items.map((item) => {
+						if ("heading" in item) {
+							return (
+								<p key={`heading-${item.heading}`} className="bcp-radios-heading">
+									{item.heading}
+								</p>
+							);
+						}
 						if ("divider" in item) {
 							return (
 								<div key={`divider-${item.divider}`} className="bcp-radios-divider">

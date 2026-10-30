@@ -176,6 +176,7 @@ export default async function CasePage({ params, searchParams }: CasePageProps) 
 }
 
 function detailRows(detail: CaseDetail, actions: CaseAction[], href: string) {
+	const canChange = !detail.archived && detail.status === "booked";
 	const { person, booking, oldDevice } = detail;
 	return [
 		{ key: "Email", value: person.email },
@@ -202,6 +203,10 @@ function detailRows(detail: CaseDetail, actions: CaseAction[], href: string) {
 			) : (
 				"Not booked"
 			),
+			actions:
+				booking && canChange
+					? [{ href: `${href}/book`, visuallyHiddenText: "booking" }]
+					: undefined,
 		},
 		{
 			key: "Software requested",
@@ -210,6 +215,10 @@ function detailRows(detail: CaseDetail, actions: CaseAction[], href: string) {
 					? booking.software.join(", ")
 					: "None"
 				: "–",
+			actions:
+				booking && canChange
+					? [{ href: `${href}/software`, visuallyHiddenText: "software requested" }]
+					: undefined,
 		},
 		{
 			key: "Old device",
@@ -280,6 +289,16 @@ function actionItems(detail: CaseDetail, actions: CaseAction[], href: string): A
 			description: "Once it has been dealt with",
 		},
 		"change-type": null,
+		"book-on-behalf": {
+			text: "Book on behalf",
+			href: `${href}/book`,
+			description: `Choose a date and software for ${first}`,
+		},
+		"custom-appointment": {
+			text: "Book a custom appointment",
+			href: `${href}/custom-appointment`,
+			description: "A date, time and place agreed with them",
+		},
 		withdraw: {
 			text: "Withdraw case",
 			href: `${href}/withdraw`,
@@ -307,6 +326,10 @@ const DONE: Record<string, (first: string) => [string, string?]> = {
 	"clear-flag": () => ["Flag cleared"],
 	"change-type": () => ["Type changed"],
 	withdraw: () => ["Case withdrawn", "Nothing was sent to the person."],
+	booked: (first) => [`Booked for ${first}`],
+	rebooked: (first) => [`${first} has been rebooked`],
+	custom: () => ["Custom appointment booked"],
+	software: () => ["Software saved"],
 };
 
 function DoneBanner({ action, detail }: { action: string; detail: CaseDetail }) {

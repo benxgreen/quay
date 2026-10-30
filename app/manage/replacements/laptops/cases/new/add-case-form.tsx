@@ -10,12 +10,12 @@ import { SummaryList, SummaryListSecondary } from "@/components/ui/summary-list"
 import { Tag } from "@/components/ui/tag";
 import { type AddCaseState, addCaseStep } from "./actions";
 
-const INITIAL: AddCaseState = { values: { serial: "", same: "", email: "", type: "" }, errors: {} };
+const INITIAL: AddCaseState = {
+	values: { serial: "", same: "", email: "", type: "", next: "" },
+	errors: {},
+};
 
-/**
- * Mockups: AdminAddCase. "Book on their behalf now" comes with booking
- * (stage 9); for now a manual case goes into the invitation queue.
- */
+/** Mockups: AdminAddCase. */
 export function AddCaseForm({ cancelHref }: { cancelHref: string }) {
 	const [state, action, pending] = useActionState(addCaseStep, INITIAL);
 	const { values, device, person, errors } = state;
@@ -26,6 +26,7 @@ export function AddCaseForm({ cancelHref }: { cancelHref: string }) {
 		errors.same && { fieldId: "same", text: errors.same },
 		errors.email && { fieldId: "email", text: errors.email },
 		errors.type && { fieldId: "type", text: errors.type },
+		errors.next && { fieldId: "next", text: errors.next },
 	].filter((item): item is { fieldId: string; text: string } => Boolean(item));
 
 	return (
@@ -97,7 +98,6 @@ export function AddCaseForm({ cancelHref }: { cancelHref: string }) {
 							Is the person receiving the new laptop the same as the assigned user?
 						</h2>
 					}
-					hint={`The case is in the name of the person receiving the laptop. ${device?.assignedName ?? "The assigned user"} stays on the case as the assigned user in Halo, for reference.`}
 					error={errors.same}
 					value={values.same}
 					items={[
@@ -164,10 +164,24 @@ export function AddCaseForm({ cancelHref }: { cancelHref: string }) {
 						},
 					]}
 				/>
-				<p>
-					The case goes into the invitation queue, and they get an invitation in a daily
-					batch.
-				</p>
+				<Radios
+					name="next"
+					legend={<h2 className="bcp-heading-ml">What happens next?</h2>}
+					error={errors.next}
+					value={values.next}
+					items={[
+						{
+							value: "queue",
+							label: "Add to the invitation queue",
+							hint: "They get an invitation in the next daily batch",
+						},
+						{
+							value: "book",
+							label: "Book on their behalf now",
+							hint: "Choose a date and their software next. No invitation is sent.",
+						},
+					]}
+				/>
 			</section>
 
 			<ButtonGroup>
