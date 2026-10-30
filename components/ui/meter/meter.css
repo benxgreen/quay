@@ -1,0 +1,23 @@
+.bcp-meter {
+	display: block;
+	width: 100px;
+	height: 6px;
+	margin-top: 6px;
+	background: #e5e5e5;
+}
+
+.bcp-meter-fill {
+	display: block;
+	height: 6px;
+	background: var(--bcp-colour-purple);
+}
+
+@media (forced-colors: active) {
+	.bcp-meter {
+		border: 1px solid CanvasText;
+	}
+
+	.bcp-meter-fill {
+		background: CanvasText;
+	}
+}

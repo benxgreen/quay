@@ -114,6 +114,19 @@ export const Inset: Story = {
 	),
 };
 
+/** Shaded, for a page's read-only notice (mockups: AdminSessionCancelled). */
+export const InsetShaded: Story = {
+	name: "Inset, shaded",
+	render: () => (
+		<InsetText shaded>
+			<p>
+				<strong>This session was cancelled on 9 November 2026 by Ben Green.</strong> It is
+				hidden from colleagues and cannot be booked or changed.
+			</p>
+		</InsetText>
+	),
+};
+
 export const Warning: Story = {
 	render: () => <WarningText>This updates Halo and cannot be undone.</WarningText>,
 };

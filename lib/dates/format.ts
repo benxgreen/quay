@@ -83,3 +83,43 @@ export function formatWhen(moment: Date, now: Date = new Date()): string {
 	if (day === addDays(today, -1)) return `Yesterday, ${formatTime(time)}`;
 	return formatShortDate(moment);
 }
+
+const SHORT_DAY = new Intl.DateTimeFormat("en-GB", {
+	weekday: "short",
+	day: "numeric",
+	month: "short",
+	timeZone: "UTC",
+});
+
+/** "Wed 11 Nov", or "Wed 11 Nov 2026" with `year`. */
+export function formatShortDay(day: IsoDate, { year = false }: { year?: boolean } = {}): string {
+	const text = SHORT_DAY.format(new Date(`${assertIsoDate(day)}T00:00:00Z`))
+		.replace(",", "")
+		.replace("Sept", "Sep");
+	return year ? `${text} ${day.slice(0, 4)}` : text;
+}
+
+/** "November 2026" for a YYYY-MM month. */
+export function formatMonth(month: string): string {
+	const [year, number] = month.split("-");
+	return `${new Intl.DateTimeFormat("en-GB", { month: "long", timeZone: "UTC" }).format(
+		new Date(Date.UTC(Number(year), Number(number) - 1, 1)),
+	)} ${year}`;
+}
+
+const FULL_DATE = new Intl.DateTimeFormat("en-GB", {
+	timeZone: "Europe/London",
+	day: "numeric",
+	month: "long",
+	year: "numeric",
+});
+
+/** "9 November 2026", in London time. */
+export function formatFullDate(moment: Date): string {
+	return FULL_DATE.format(moment);
+}
+
+/** "9 Nov 2026, 2:14pm", in London time. */
+export function formatShortDateTime(moment: Date): string {
+	return `${formatShortDate(moment)}, ${formatTime(londonParts(moment).time)}`;
+}

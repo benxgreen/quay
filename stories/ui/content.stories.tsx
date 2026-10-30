@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkboxes";
 import { Details } from "@/components/ui/details";
 import { Link } from "@/components/ui/link";
 import { Markdown } from "@/components/ui/markdown";
+import { Meter } from "@/components/ui/meter";
 import { StatTiles } from "@/components/ui/stat-tiles";
 import { SummaryList } from "@/components/ui/summary-list";
 import { Table, TableSecondary } from "@/components/ui/table";
@@ -212,6 +213,17 @@ export const MarkdownStory: Story = {
 				"[Choose a new date](/my/replacements/laptop) before the session.~",
 			].join("\n")}
 		</Markdown>
+	),
+};
+
+/** A small bar under a figure such as "7 of 10". Hidden from screen readers, as it repeats the figure. */
+export const MeterStory: Story = {
+	name: "Meter",
+	render: () => (
+		<p>
+			7 of 10
+			<Meter value={7} max={10} />
+		</p>
 	),
 };
 

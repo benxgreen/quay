@@ -96,3 +96,26 @@ describe("Markdown", () => {
 		expect(await axeViolations(container)).toEqual([]);
 	});
 });
+
+describe("Meter and status tags", () => {
+	it("hides the bar from screen readers and shows status as words", async () => {
+		const { Meter } = await import("@/components/ui/meter");
+		const { SessionStatusTag, CaseStatusTag } = await import(
+			"@/components/service/replacements/status-tag"
+		);
+		const { container } = render(
+			<p>
+				7 of 10
+				<Meter value={7} max={10} />
+				<SessionStatusTag status="full" />
+				<CaseStatusTag status="rebook_required" />
+			</p>,
+		);
+
+		expect(container.querySelector(".bcp-meter")).toHaveAttribute("aria-hidden", "true");
+		expect(container.querySelector(".bcp-meter-fill")).toHaveStyle({ width: "70%" });
+		expect(screen.getByText("Full")).toBeInTheDocument();
+		expect(screen.getByText("Rebook required")).toBeInTheDocument();
+		expect(await axeViolations(container)).toEqual([]);
+	});
+});

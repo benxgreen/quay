@@ -17,6 +17,8 @@ type TeamPageProps = {
 	};
 	/** Sidebar content, such as case actions. Pass it only when there is something to act on. */
 	sidebar?: ReactNode;
+	/** "start" puts the sidebar first, for a list's filters (mockups: AdminSessions). */
+	sidebarPosition?: "start" | "end";
 	/** A confirmation or form page: content up to 720px. */
 	narrow?: boolean;
 	children: ReactNode;
@@ -31,6 +33,7 @@ export function TeamPage({
 	breadcrumbs,
 	serviceNavigation,
 	sidebar,
+	sidebarPosition,
 	narrow,
 	children,
 }: TeamPageProps) {
@@ -40,7 +43,9 @@ export function TeamPage({
 			{serviceNavigation ? <ServiceNavigation {...serviceNavigation} width="full" /> : null}
 			<Container as="main" width="full" className="bcp-team-page">
 				<div className={narrow ? "bcp-team-page-narrow" : undefined}>
-					<SidebarLayout sidebar={sidebar}>{children}</SidebarLayout>
+					<SidebarLayout sidebar={sidebar} position={sidebarPosition}>
+						{children}
+					</SidebarLayout>
 				</div>
 			</Container>
 		</>

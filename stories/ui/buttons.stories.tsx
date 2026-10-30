@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Button, ButtonGroup, InfoButton } from "@/components/ui/button";
 import { BackLink, Link } from "@/components/ui/link";
+import { PrintButton } from "@/components/ui/print-button";
 
 const meta = {
 	title: "Components/Buttons and links",
@@ -28,6 +29,11 @@ export const Disabled: Story = { args: { disabled: true } };
 /** A link that looks like a button, for actions that navigate. */
 export const AsLink: Story = {
 	args: { href: "/manage/replacements/laptops/cases", children: "Add a case" },
+};
+
+/** Opens the print dialog, and hides itself in the printout. */
+export const Print: Story = {
+	render: () => <PrintButton>Print attendee list</PrintButton>,
 };
 
 export const Small: Story = { args: { small: true, children: "Apply filters" } };

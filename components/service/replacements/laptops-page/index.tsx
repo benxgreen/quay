@@ -18,6 +18,7 @@ type LaptopsPageProps = {
 	 */
 	parents?: Breadcrumb[];
 	sidebar?: ReactNode;
+	sidebarPosition?: "start" | "end";
 	narrow?: boolean;
 	children: ReactNode;
 };
@@ -33,6 +34,7 @@ export function LaptopsPage({
 	section,
 	parents = [],
 	sidebar,
+	sidebarPosition,
 	narrow,
 	children,
 }: LaptopsPageProps) {
@@ -45,6 +47,7 @@ export function LaptopsPage({
 				currentHref: LAPTOPS_SECTIONS[section].href,
 			}}
 			sidebar={sidebar}
+			sidebarPosition={sidebarPosition}
 			narrow={narrow}
 		>
 			{children}

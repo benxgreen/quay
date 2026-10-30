@@ -1,0 +1,5 @@
+@media print {
+	.bcp-print-button {
+		display: none;
+	}
+}

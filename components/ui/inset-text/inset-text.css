@@ -7,3 +7,11 @@
 .bcp-inset-text > :last-child {
 	margin-bottom: 0;
 }
+
+.bcp-inset-text--shaded {
+	max-width: 760px;
+	margin-bottom: 40px;
+	padding: 24px 30px;
+	border-left-color: var(--bcp-secondary-text-colour);
+	background: var(--bcp-colour-grey);
+}
