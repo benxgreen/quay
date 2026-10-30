@@ -15,6 +15,8 @@ type TextInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "classN
 	error?: string;
 	/** Size the field to the expected answer, in characters. */
 	width?: InputWidth;
+	/** Words after the field, such as "invitations" or "days after the invitation". */
+	suffix?: ReactNode;
 };
 
 /**
@@ -35,10 +37,24 @@ export function TextInput({
 	error,
 	width = "full",
 	type = "text",
+	suffix,
 	...props
 }: TextInputProps) {
 	const hintId = hint ? `${id}-hint` : undefined;
 	const errorId = error ? `${id}-error` : undefined;
+	const input = (
+		<input
+			id={id}
+			type={type}
+			className={classNames(
+				"bcp-input",
+				width !== "full" && `bcp-input--width-${width}`,
+				error && "bcp-input--error",
+			)}
+			aria-describedby={describedBy(hintId, errorId)}
+			{...props}
+		/>
+	);
 
 	return (
 		<FormGroup error={!!error}>
@@ -47,17 +63,14 @@ export function TextInput({
 			</Label>
 			{hint ? <Hint id={hintId}>{hint}</Hint> : null}
 			<ErrorMessage id={errorId}>{error}</ErrorMessage>
-			<input
-				id={id}
-				type={type}
-				className={classNames(
-					"bcp-input",
-					width !== "full" && `bcp-input--width-${width}`,
-					error && "bcp-input--error",
-				)}
-				aria-describedby={describedBy(hintId, errorId)}
-				{...props}
-			/>
+			{suffix ? (
+				<div className="bcp-input-wrapper">
+					{input}
+					<span className="bcp-input-suffix">{suffix}</span>
+				</div>
+			) : (
+				input
+			)}
 		</FormGroup>
 	);
 }

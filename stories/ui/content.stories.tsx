@@ -4,8 +4,9 @@ import { Accordion } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkboxes";
 import { Details } from "@/components/ui/details";
 import { Link } from "@/components/ui/link";
-import { Markdown } from "@/components/ui/markdown";
+import { Markdown, MarkdownText } from "@/components/ui/markdown";
 import { Meter } from "@/components/ui/meter";
+import { Preview } from "@/components/ui/preview";
 import { StatTiles } from "@/components/ui/stat-tiles";
 import { SummaryList } from "@/components/ui/summary-list";
 import { Table, TableSecondary } from "@/components/ui/table";
@@ -370,5 +371,17 @@ export const TableSecondLines: Story = {
 				},
 			]}
 		/>
+	),
+};
+
+/** What something will look like before it is saved, with an optional strip of details above. */
+export const PreviewStory: Story = {
+	name: "Preview",
+	render: () => (
+		<Preview label="Preview of the page content" meta="Subject: Your laptop replacement">
+			<MarkdownText
+				markdown={"## Before your session\n\nBring your laptop and its charger."}
+			/>
+		</Preview>
 	),
 };

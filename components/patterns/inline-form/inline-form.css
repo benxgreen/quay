@@ -1,0 +1,16 @@
+.bcp-inline-form {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0 var(--bcp-space-xl);
+}
+
+.bcp-inline-form > .bcp-form-group {
+	flex: 0 1 auto;
+	min-width: 0;
+}
+
+/* The button lines up with the bottom of the fields. */
+.bcp-inline-form > .bcp-button {
+	margin-bottom: 30px;
+}

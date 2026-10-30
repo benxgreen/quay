@@ -166,3 +166,24 @@
 .bcp-input--width-30 {
 	max-width: 59ex;
 }
+
+.bcp-textarea--monospace {
+	font-family: var(--bcp-font-family-mono);
+	font-size: var(--bcp-font-size-xs);
+	line-height: 1.5;
+}
+
+/* A field with words after it, such as "15 invitations" */
+.bcp-input-wrapper {
+	display: flex;
+	align-items: center;
+	gap: var(--bcp-space-lg);
+}
+
+.bcp-input-wrapper .bcp-input {
+	flex: 0 0 auto;
+}
+
+.bcp-input-suffix {
+	font-size: var(--bcp-font-size-body);
+}

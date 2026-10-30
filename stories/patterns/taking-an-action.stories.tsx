@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ActionList } from "@/components/patterns/action-list";
 import { Checklist } from "@/components/patterns/checklist";
+import { InlineForm } from "@/components/patterns/inline-form";
+import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/ui/sidebar";
+import { TextInput } from "@/components/ui/text-input";
 import { WarningText } from "@/components/ui/warning-text";
 
 const meta = {
@@ -72,5 +75,19 @@ export const ChecklistStory: Story = {
 				{ value: "3", label: "Asset label removed", ticked: false },
 			]}
 		/>
+	),
+};
+
+/** Adding to a list from under it, such as "Add software" in Settings: fields and the button on one row. */
+export const InlineFormStory: Story = {
+	name: "Inline form",
+	render: () => (
+		<form>
+			<InlineForm>
+				<TextInput id="name" name="name" label="Add software" width="20" />
+				<TextInput id="hint" name="hint" label="Hint (optional)" width="30" />
+				<Button type="submit">Add</Button>
+			</InlineForm>
+		</form>
 	),
 };

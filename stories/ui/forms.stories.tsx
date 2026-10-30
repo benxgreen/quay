@@ -33,6 +33,21 @@ export const TextInputWidth: Story = {
 	},
 };
 
+/** Words after the field, such as a unit. */
+export const TextInputSuffix: Story = {
+	name: "Text input with suffix",
+	args: {
+		id: "invitations",
+		name: "invitations",
+		label: "Invitations per working day",
+		hint: undefined,
+		width: "3",
+		inputMode: "numeric",
+		defaultValue: "15",
+		suffix: "invitations",
+	},
+};
+
 /** The same message appears in the error summary. */
 export const TextInputError: Story = {
 	name: "Text input with error",
@@ -94,6 +109,21 @@ export const SelectStory: Story = {
 export const TextareaStory: Story = {
 	name: "Textarea",
 	render: () => <Textarea id="note" name="note" label="Add a note" />,
+};
+
+/** A code font for Markdown, where spacing matters. */
+export const TextareaMonospace: Story = {
+	name: "Textarea, monospace",
+	render: () => (
+		<Textarea
+			id="content"
+			name="content"
+			label="Content"
+			monospace
+			rows={6}
+			defaultValue={"## Before your session\n\n- bring your laptop\n- bring its charger"}
+		/>
+	),
 };
 
 /** One choice from a few options, with hints under each. */

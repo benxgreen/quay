@@ -1,0 +1,21 @@
+.bcp-preview {
+	margin-bottom: 30px;
+	border: var(--bcp-border-width-sm) solid var(--bcp-colour-mid-grey);
+	background-color: var(--bcp-colour-white);
+}
+
+.bcp-preview-meta {
+	padding: 12px 16px;
+	border-bottom: var(--bcp-border-width-sm) solid var(--bcp-colour-mid-grey);
+	background-color: var(--bcp-colour-grey);
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-xs);
+}
+
+.bcp-preview-body {
+	padding: 20px 16px;
+}
+
+.bcp-preview-body > :last-child {
+	margin-bottom: 0;
+}

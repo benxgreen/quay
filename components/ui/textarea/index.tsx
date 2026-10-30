@@ -11,6 +11,8 @@ type TextareaProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "id" | "c
 	isPageHeading?: boolean;
 	hint?: ReactNode;
 	error?: string;
+	/** A code font, for Markdown and other text where spacing matters. */
+	monospace?: boolean;
 };
 
 /**
@@ -28,6 +30,7 @@ export function Textarea({
 	hint,
 	error,
 	rows = 5,
+	monospace,
 	...props
 }: TextareaProps) {
 	const hintId = hint ? `${id}-hint` : undefined;
@@ -43,7 +46,11 @@ export function Textarea({
 			<textarea
 				id={id}
 				rows={rows}
-				className={classNames("bcp-textarea", error && "bcp-textarea--error")}
+				className={classNames(
+					"bcp-textarea",
+					monospace && "bcp-textarea--monospace",
+					error && "bcp-textarea--error",
+				)}
 				aria-describedby={describedBy(hintId, errorId)}
 				{...props}
 			/>

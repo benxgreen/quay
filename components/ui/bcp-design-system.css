@@ -260,6 +260,11 @@ ol {
 	padding-inline-start: 0;
 }
 
+/* A plain list with room between items, such as "On this page" links */
+.bcp-list--spaced > li {
+	margin-bottom: 14px;
+}
+
 /* A plain list with a rule above each item, such as a role history */
 .bcp-list--divided {
 	list-style: none;
@@ -308,6 +313,11 @@ a:focus-visible {
 		0 -2px var(--bcp-colour-focus),
 		0 4px var(--bcp-colour-focus-text);
 	text-decoration: none;
+}
+
+/* A section of a long page, such as one part of Settings */
+.bcp-section {
+	margin-bottom: 60px;
 }
 
 /* Section break */
