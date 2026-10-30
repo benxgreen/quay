@@ -45,13 +45,25 @@ export async function callHalo<T>(
 			fetchFn,
 		});
 		const { value, summary } = await work(halo);
-		const requests = halo.requests.join(", ");
+		const requests = summariseRequests(halo.requests);
 		return {
 			value,
 			statusCode: halo.lastStatus,
 			summary: summary ? `${summary} (${requests})` : requests,
 		};
 	});
+}
+
+/** "GET /Users, GET /Users/{id}", with repeats counted: "GET /Users ×64". */
+export function summariseRequests(requests: readonly string[]): string {
+	const counts = new Map<string, number>();
+	for (const request of requests) {
+		const shape = request.replace(/\/\d+(?=\/|$)/g, "/{id}");
+		counts.set(shape, (counts.get(shape) ?? 0) + 1);
+	}
+	return [...counts]
+		.map(([shape, count]) => (count > 1 ? `${shape} ×${count}` : shape))
+		.join(", ");
 }
 
 /**

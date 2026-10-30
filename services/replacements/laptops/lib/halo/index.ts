@@ -30,6 +30,8 @@ export type HaloStockDevice = {
 
 export type HaloAssignedDevice = {
 	assetId: string;
+	/** Halo's asset type, such as "Laptop" or "Smartphone". */
+	assetType: string;
 	serial: string;
 	hostname: string;
 	model: string;

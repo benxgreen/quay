@@ -1,7 +1,7 @@
 import "./link.css";
 
 import NextLink from "next/link";
-import type { AnchorHTMLAttributes, ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 import { classNames } from "@/lib/utils/class-names";
 
 type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "target"> & {
@@ -77,5 +77,30 @@ export function BackLink({ href, children = "Back" }: { href: string; children?:
 		<Link href={href} className="bcp-back-link">
 			{children}
 		</Link>
+	);
+}
+
+/**
+ * A button that looks like a link, for an action in a table row that
+ * changes something, such as "Move to front". It is a real button in a form,
+ * because it posts rather than navigates.
+ *
+ * @example
+ * <form action={moveToFront}><LinkButton>Move to front <span className="sr-only">Sam Fuller</span></LinkButton></form>
+ */
+export function LinkButton({
+	children,
+	className,
+	type = "submit",
+	...props
+}: ButtonHTMLAttributes<HTMLButtonElement>) {
+	return (
+		<button
+			type={type}
+			className={classNames("bcp-link bcp-link-button", className)}
+			{...props}
+		>
+			{children}
+		</button>
 	);
 }

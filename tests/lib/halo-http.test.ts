@@ -128,6 +128,7 @@ describe("Halo users over HTTP", () => {
 			department: "Planning",
 			active: true,
 			manager: null,
+			lastSignIn: null,
 		});
 		const search = new URL(fetchFn.mock.calls[1][0]).searchParams;
 		expect(JSON.parse(search.get("advanced_search") ?? "")).toEqual([
@@ -136,7 +137,7 @@ describe("Halo users over HTTP", () => {
 		expect(fetchFn.mock.calls[2][0]).toBe("https://halo.example.test/api/Users/1002");
 		expect(logged[0]?.[0]).toBe("halo");
 		expect(logged[0]?.[7]).toBe(
-			"Staff details: found Priya Hart (GET /Users, GET /Users/1002)",
+			"Staff details: found Priya Hart (GET /Users, GET /Users/{id})",
 		);
 	});
 

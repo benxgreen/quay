@@ -16,6 +16,9 @@ Both assets and users carry a lot of BCP custom fields. With API access, search 
 - [ ] Confirm `advanced_search` on `azureoid` works for finding a user by Entra object ID
 - [ ] Which field holds the BCP username: `login`, `samaccountname` or a custom field
 - [ ] Whether `title` is the job title, and "Department" vs "Service area"
+- [ ] Whether `azure_last_login_date` is the person's last Microsoft sign-in (Import's "Last sign in")
+- [ ] Import checks each assigned user with `findByEmail` (two requests each) when refreshing; with ~64 laptops that is fine under the 700-in-5-minutes limit, but a report that already includes the user's Halo ID, Entra ID and inactive flag would avoid it
+- [ ] The Halo web address of an asset and a user, for "Open in Halo" links on Needs attention and the user details dialog
 - [ ] Which field holds the manager (`manager_email`?) for the user page's Manager row; `HaloUser.manager` is null from the real API until then
 
 ## Laptop replacements

@@ -123,3 +123,30 @@ export function formatFullDate(moment: Date): string {
 export function formatShortDateTime(moment: Date): string {
 	return `${formatShortDate(moment)}, ${formatTime(londonParts(moment).time)}`;
 }
+
+/**
+ * How long ago, for "Last seen": "Today", "Yesterday", "3 days ago",
+ * "2 weeks ago", then the date ("8 Mar 2026"). London days.
+ */
+export function formatAgo(moment: Date, now: Date = new Date()): string {
+	const day = londonParts(moment).day;
+	const today = londonParts(now).day;
+	const days = Math.round(
+		(Date.parse(`${today}T00:00:00Z`) - Date.parse(`${day}T00:00:00Z`)) / 86_400_000,
+	);
+	if (days <= 0) return "Today";
+	if (days === 1) return "Yesterday";
+	if (days < 14) return `${days} days ago`;
+	if (days < 56) return `${Math.floor(days / 7)} weeks ago`;
+	return formatShortDate(moment);
+}
+
+/** "9:14am today", "3:15pm yesterday" or "9:14am on 3 Nov 2026", for "Updated from Halo at …". */
+export function formatUpdatedAt(moment: Date, now: Date = new Date()): string {
+	const { day, time } = londonParts(moment);
+	const today = londonParts(now).day;
+	const at = formatTime(time);
+	if (day === today) return `${at} today`;
+	if (day === addDays(today, -1)) return `${at} yesterday`;
+	return `${at} on ${formatShortDate(moment)}`;
+}

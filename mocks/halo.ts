@@ -126,6 +126,17 @@ export const MOCK_END_OF_LIFE_DEVICES: HaloEndOfLifeDevice[] = [
 		"2019-03-09",
 		90,
 	),
+	// Needs attention: an assigned user who is not in Halo's staff directory
+	eol(
+		"31997",
+		"090011223366",
+		"IT-Zr4Qm9Lp2Xw7",
+		"Callum Reid",
+		"callum.reid@bcpcouncil.test",
+		"Surface Laptop 2",
+		"2019-02-14",
+		35,
+	),
 ];
 
 export const MOCK_STOCK: HaloStockDevice[] = [
@@ -176,7 +187,7 @@ export const MOCK_HALO_USERS: HaloUser[] = [
 	person(11, "Nadia Kowalski", "Social Worker", "Children’s Services"),
 	person(12, "Kate Morris", "Accountant", "Finance"),
 	person(13, "Tom Fielding", "Parks Officer", "Environment"),
-	person(14, "Leah Turner", "Events Coordinator", "Communities"),
+	person(14, "Leah Turner", "Events Coordinator", "Communities", true, null, 107),
 	person(15, "Ben Whitaker", "Project Manager", "IT & Programmes"),
 	person(16, "Ruth Collins", "Benefits Assessor", "Revenues & Benefits"),
 	person(17, "Aisha Begum", "Library Assistant", "Communities"),
@@ -196,16 +207,26 @@ export const MOCK_ASSIGNED_DEVICES: Record<string, HaloAssignedDevice[]> = {
 		{
 			assetId: "31991",
 			serial: "052497844099",
+			assetType: "Laptop",
 			hostname: "IT-99W6SVBnkBj9",
 			model: "Surface Pro 6",
-			lastSeen: daysAgo(0),
+			lastSeen: daysAgo(3),
 		},
 		{
 			assetId: "33410",
 			serial: "072233445566",
+			assetType: "Laptop",
 			hostname: "IT-Wm3Rk8Tq5Zs2",
 			model: "Surface Laptop 5",
 			lastSeen: daysAgo(0),
+		},
+		{
+			assetId: "40122",
+			assetType: "Smartphone",
+			serial: "F17ZK2Q8N72J",
+			hostname: "",
+			model: "iPhone 13",
+			lastSeen: daysAgo(1),
 		},
 	],
 };
@@ -217,6 +238,7 @@ function person(
 	department: string,
 	active = true,
 	manager: string | null = null,
+	lastSignInDaysAgo: number | null = n % 5,
 ): HaloUser {
 	const username = displayName.toLowerCase().replace(" ", ".");
 	return {
@@ -230,6 +252,7 @@ function person(
 		department,
 		active,
 		manager,
+		lastSignIn: lastSignInDaysAgo === null ? null : daysAgo(lastSignInDaysAgo),
 	};
 }
 

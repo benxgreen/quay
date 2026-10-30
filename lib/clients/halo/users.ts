@@ -24,6 +24,8 @@ export type HaloUser = {
 	active: boolean;
 	/** Their manager's name. Not read from the real API yet (see TODO.md). */
 	manager: string | null;
+	/** Their last Microsoft sign-in (ISO), as Halo records it. Only on a single user. */
+	lastSignIn: string | null;
 };
 
 export type HaloUserPage = { users: HaloUser[]; total: number };
@@ -40,6 +42,14 @@ export type HaloUsersClient = {
 		context: CallContext,
 	): Promise<CallResult<HaloUser | null>>;
 	findByEmail(email: string, context: CallContext): Promise<CallResult<HaloUser | null>>;
+	/**
+	 * Several people by email in one logged call, such as every assigned
+	 * user on the Import report. Keys are the emails in lower case.
+	 */
+	findByEmails(
+		emails: readonly string[],
+		context: CallContext,
+	): Promise<CallResult<Map<string, HaloUser | null>>>;
 	/** Name, email or username contains the text. */
 	search(text: string, context: CallContext): Promise<CallResult<HaloUser[]>>;
 	/** One page of the directory, by name, with the total for "Showing X of Y". */
@@ -67,6 +77,23 @@ export function createMockHaloUsersClient(): HaloUsersClient {
 			mockHaloCall(context, () =>
 				found(MOCK_HALO_USERS.find((user) => user.email === email.trim().toLowerCase())),
 			),
+
+		findByEmails: (emails, context) =>
+			mockHaloCall(context, () => {
+				const found = new Map(
+					emails.map((email) => {
+						const key = email.trim().toLowerCase();
+						return [
+							key,
+							MOCK_HALO_USERS.find((user) => user.email === key) ?? null,
+						] as const;
+					}),
+				);
+				return {
+					value: found,
+					summary: `Staff details: ${[...found.values()].filter(Boolean).length} of ${found.size} found`,
+				};
+			}),
 
 		search: (text, context) =>
 			mockHaloCall(context, () => {
@@ -112,12 +139,13 @@ type HaloApiUser = {
 	department?: string;
 	inactive?: boolean;
 	azureoid?: string;
+	azure_last_login_date?: string;
 };
 
 /**
- * Maps a Halo user to the portal's. OPEN QUESTIONS (CLAUDE.md): which Halo
- * field holds the BCP username (login is used for now) and whether `title`
- * is the job title.
+ * Maps a Halo user to the portal's. OPEN QUESTIONS (TODO.md): which Halo
+ * field holds the BCP username (login is used for now), whether `title` is
+ * the job title, and whether azure_last_login_date is the last sign-in.
  */
 export function toHaloUser(user: HaloApiUser): HaloUser {
 	return {
@@ -131,6 +159,7 @@ export function toHaloUser(user: HaloApiUser): HaloUser {
 		department: user.department || null,
 		active: !user.inactive,
 		manager: null,
+		lastSignIn: user.azure_last_login_date || null,
 	};
 }
 
@@ -175,6 +204,31 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 						halo,
 						users.find((user) => user.emailaddress?.toLowerCase() === wanted),
 					);
+				},
+				{ fetchFn },
+			),
+
+		findByEmails: (emails, context) =>
+			callHalo(
+				context,
+				async (halo) => {
+					const found = new Map<string, HaloUser | null>();
+					for (const email of emails) {
+						const wanted = email.trim().toLowerCase();
+						const { users } = await halo.get<{ users: HaloApiUser[] }>("/Users", {
+							...LIST,
+							count: 10,
+							search: wanted,
+						});
+						const match = users.find(
+							(user) => user.emailaddress?.toLowerCase() === wanted,
+						);
+						found.set(wanted, (await fullUser(halo, match)).value);
+					}
+					return {
+						value: found,
+						summary: `Staff details: ${[...found.values()].filter(Boolean).length} of ${found.size} found`,
+					};
 				},
 				{ fetchFn },
 			),

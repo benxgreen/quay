@@ -1,0 +1,35 @@
+.bcp-selection-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px 30px;
+	margin: 30px 0;
+	padding: 24px 30px;
+	border-top: 5px solid var(--bcp-colour-purple);
+	background: var(--bcp-colour-grey);
+}
+
+.bcp-selection-bar-choices {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 10px;
+}
+
+.bcp-selection-bar-count {
+	margin: 0;
+	font-size: var(--bcp-font-size-ms);
+	font-weight: var(--bcp-text-weight-bold);
+}
+
+.bcp-selection-bar .bcp-form-group {
+	margin: 0;
+}
+
+.bcp-selection-bar-note {
+	flex-basis: 100%;
+	margin: 0;
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-sm);
+}

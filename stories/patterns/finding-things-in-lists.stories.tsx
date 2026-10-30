@@ -8,9 +8,13 @@ import {
 	FilterPanel,
 } from "@/components/patterns/filter-panel";
 import { GroupHeading } from "@/components/patterns/group-heading";
+import { SelectionBar } from "@/components/patterns/selection-bar";
+import { ShowMoreTable } from "@/components/patterns/show-more-table";
 import { TypeTag } from "@/components/service/replacements/type-tag";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkboxes";
 import { Link } from "@/components/ui/link";
+import { Radios } from "@/components/ui/radios";
 import { Select } from "@/components/ui/select";
 import { Table } from "@/components/ui/table";
 import { Tag } from "@/components/ui/tag";
@@ -54,6 +58,55 @@ export const FilterBarStory: Story = {
 				]}
 			/>
 		</FilterBar>
+	),
+};
+
+/** Under a list with ticked rows: how many, any choices for them, and the action (Import). */
+export const SelectionBarStory: Story = {
+	args: { search: { label: "" }, clearHref: "#", children: null },
+	name: "Selection bar",
+	render: () => (
+		<SelectionBar
+			count="3 laptops selected"
+			action={<Button type="submit">Add 3 to invitation queue</Button>}
+			note="41 cases are already queued. At 15 a working day, these 3 would be invited by Monday 16 November."
+		>
+			<Radios
+				name="type"
+				legend="Type"
+				legendSize="s"
+				inline
+				small
+				items={[
+					{ value: "collection", label: "Collection" },
+					{ value: "session", label: "Session" },
+				]}
+			/>
+		</SelectionBar>
+	),
+};
+
+/** A list loaded whole but shown 20 at a time, with Show more (the invitation queue). */
+export const ShowMoreTableStory: Story = {
+	args: { search: { label: "" }, clearHref: "#", children: null },
+	name: "Show more table",
+	render: () => (
+		<ShowMoreTable
+			caption="Invitation queue"
+			captionHidden
+			noun="cases"
+			pageSize={3}
+			columns={[
+				{ key: "position", header: "No.", numeric: true },
+				{ key: "person", header: "Person" },
+			]}
+			rows={["Ben Whitaker", "Sam Fuller", "Aisha Begum", "Ruth Collins", "Leah Turner"].map(
+				(name, index) => ({
+					id: String(index + 1),
+					cells: { position: index + 1, person: name },
+				}),
+			)}
+		/>
 	),
 };
 

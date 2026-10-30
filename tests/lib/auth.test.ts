@@ -1,6 +1,6 @@
 import { safeReturnTo } from "@/lib/auth/constants";
 import { isReference, newReference } from "@/lib/auth/reference";
-import { formatWhen } from "@/lib/dates/format";
+import { formatAgo, formatUpdatedAt, formatWhen } from "@/lib/dates/format";
 import { ACCESS, canAccess } from "@/lib/portal/access";
 import { menuGroups } from "@/lib/portal/navigation";
 import { describeChange, groupRoleChanges, parseUserFilters } from "@/lib/portal/users";
@@ -84,5 +84,22 @@ describe("Users pages", () => {
 		// 23:30 UTC on 29 Oct is still 29 Oct in London (GMT), but 23:30 UTC on
 		// 24 Oct is 00:30 on 25 Oct (BST).
 		expect(formatWhen(new Date("2026-10-24T23:30:00Z"), now)).toBe("25 Oct 2026");
+	});
+});
+
+describe("relative dates", () => {
+	it("says how long ago and when the report was updated, in London time", () => {
+		const now = new Date("2026-11-12T15:00:00Z");
+		expect(
+			[
+				"2026-11-12T08:00:00Z",
+				"2026-11-11T08:00:00Z",
+				"2026-11-09T08:00:00Z",
+				"2026-10-29T08:00:00Z",
+				"2026-08-01T08:00:00Z",
+			].map((iso) => formatAgo(new Date(iso), now)),
+		).toEqual(["Today", "Yesterday", "3 days ago", "2 weeks ago", "1 Aug 2026"]);
+		expect(formatUpdatedAt(new Date("2026-11-12T09:14:00Z"), now)).toBe("9:14am today");
+		expect(formatUpdatedAt(new Date("2026-11-03T09:14:00Z"), now)).toBe("9:14am on 3 Nov 2026");
 	});
 });

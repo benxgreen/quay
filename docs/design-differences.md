@@ -20,6 +20,8 @@ The rule used: **the Components page defines each component, unless the Laptop r
 
 ### Contradictions to settle in the mockups
 
+- **Pronouns:** the change type page says "She keeps her place" and "with her"; we can't know anyone's pronouns, so Quay says "They keep their place" and "with them".
+- **User details dialog:** "Department", as on the user page, rather than the mockup's "Service area" (still an open question).
 - **Times:** the Sessions mockups write "10:00am" and "2:00pm"; Quay writes times in GOV.UK style, "10am" and "2pm" (and "9:30am", "midday"), as the email variables do.
 
 | What | Components page | Laptop replacements screens | Built as |
@@ -48,6 +50,11 @@ The rule used: **the Components page defines each component, unless the Laptop r
 - **Logo:** Harbour's BCP Council logo SVG (`components/icons/organisations/bcp-logo.tsx`), not the mockups' "BCP Council Device portal" image. The link's accessible name is "BCP Council Device portal".
 
 ### Where the mockups say nothing
+
+- **Removing from the invitation queue:** withdraws the case, so it has its own confirmation page ("Remove Ben Whitaker from the invitation queue?", red "Remove from queue").
+- **Import type:** the mockup preselects Collection on the "Add to invitation queue" bar; Quay leaves the type unselected, so it is always a choice, with an error if it's missed.
+- **Import columns:** the two Import mockups show different columns (Model, or Last sign in with the user details button). Quay shows both sets.
+- **"Open in Halo" links** (Needs attention, user details) wait for Halo's web addresses (`lib/clients/halo/TODO.md`).
 
 - **Session filters:** the mockup's filter sidebar has only "Clear filters". Quay adds a secondary "Apply filters" button (and makes "Clear filters" a link), because filtering as each select changes would move people on without warning (WCAG 3.2.2).
 - **Closed sessions and Withdrawn cases:** no tag colour in the mockups; both are grey, like Cancelled and Completed.

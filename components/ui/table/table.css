@@ -87,3 +87,16 @@
 		overflow: visible;
 	}
 }
+
+/* Several actions in one cell, such as "Change type" and "Remove" */
+.bcp-table-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 4px 16px;
+}
+
+.bcp-table-actions form {
+	display: inline;
+	margin: 0;
+}

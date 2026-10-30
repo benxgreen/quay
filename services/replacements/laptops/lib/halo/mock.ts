@@ -39,6 +39,7 @@ export function createMockLaptopHaloClient(): LaptopHaloClient {
 						(d) => d.assignedUser?.email === email.toLowerCase(),
 					).map(({ assetId, serial, hostname, model, lastSeen }) => ({
 						assetId,
+						assetType: "Laptop",
 						serial,
 						hostname,
 						model,
