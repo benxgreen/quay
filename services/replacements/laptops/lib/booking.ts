@@ -549,23 +549,35 @@ export async function bookCustomAppointment(
 				[caseId],
 				tx,
 			);
-			if (target?.status !== "unbooked") return false;
+			if (!target || !["unbooked", "booked"].includes(target.status)) return false;
 			const request = await queryOne<{ software: string[] }>(
 				"SELECT software_requested AS software FROM lr.availability_requests WHERE case_id = $1 AND resolved_at IS NULL",
 				[caseId],
 				tx,
 			);
-			const previous = await queryOne<{ software: string[] }>(
-				"SELECT software_requested AS software FROM lr.bookings WHERE case_id = $1 ORDER BY created_at DESC LIMIT 1",
-				[caseId],
-				tx,
-			);
+			const current =
+				target.status === "booked" ? await currentBooking(tx, caseId, true) : null;
+			if (target.status === "booked" && !current) return false;
+			const previous =
+				current ??
+				(await queryOne<{ software: string[] }>(
+					"SELECT software_requested AS software FROM lr.bookings WHERE case_id = $1 ORDER BY created_at DESC LIMIT 1",
+					[caseId],
+					tx,
+				));
 			const software = request?.software ?? previous?.software ?? [];
+			if (current) {
+				await query(
+					"UPDATE lr.bookings SET status = 'rebooked' WHERE id = $1",
+					[current.id],
+					tx,
+				);
+			}
 			await query(
 				`INSERT INTO lr.bookings
-				   (case_id, custom_starts_at, custom_location, custom_note, software_requested, software_changed_at, booked_by)
-				 VALUES ($1, ($2::date + $3::time) AT TIME ZONE ${LONDON}, $4, $5, $6, now(), $7)`,
-				[caseId, date, time, location, note || null, software, userId],
+				   (case_id, custom_starts_at, custom_location, custom_note, software_requested, software_changed_at, booked_by, replaces_booking_id)
+				 VALUES ($1, ($2::date + $3::time) AT TIME ZONE ${LONDON}, $4, $5, $6, now(), $7, $8)`,
+				[caseId, date, time, location, note || null, software, userId, current?.id ?? null],
 				tx,
 			);
 			await markBooked(tx, caseId, "custom_booking", userId);
@@ -573,7 +585,7 @@ export async function bookCustomAppointment(
 				caseId,
 				actor: { userId },
 				kind: "booking",
-				body: `Custom appointment booked: ${sessionLabel({ date, time })}, ${location}. Software: ${software.length ? software.join(", ") : "none"}`,
+				body: `${current ? `Booking changed from ${sessionLabel(current)} to ` : ""}custom appointment: ${sessionLabel({ date, time })}, ${location}. Software: ${software.length ? software.join(", ") : "none"}`,
 			});
 			return true;
 		},

@@ -491,10 +491,14 @@ export function availableActions(detail: CaseDetail, now: Date = new Date()): Ca
 	if (detail.flag) actions.push("clear-flag");
 	else if (["queued", "pending", "rebook_required"].includes(detail.status)) actions.push("flag");
 	if (!detail.booking) actions.push("change-type");
-	// Only a case waiting for a booking, so a Booked case without one isn't offered it.
-	if (!detail.booking && WAITING_FOR_BOOKING.includes(detail.status))
+	// A booked case can use this to move to another published session.
+	if (
+		(detail.booking && detail.status === "booked") ||
+		(!detail.booking && WAITING_FOR_BOOKING.includes(detail.status))
+	)
 		actions.push("book-on-behalf");
-	if (detail.status === "unbooked") actions.push("custom-appointment");
+	if (detail.status === "unbooked" || (detail.status === "booked" && detail.booking))
+		actions.push("custom-appointment");
 	actions.push("withdraw");
 	return actions;
 }

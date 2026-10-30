@@ -17,11 +17,7 @@ export async function loadForBooking(reference: string) {
 	return { detail, href, crumbs, caption };
 }
 
-/**
- * The same, for the booking steps: a case with neither a booking to move
- * nor Book on behalf open to it (such as one already Booked) goes back to
- * the case page.
- */
+/** The same, for the booking steps: only cases that can be booked or rebooked. */
 export async function loadForNewBooking(reference: string) {
 	const loaded = await loadForBooking(reference);
 	const { detail, href } = loaded;

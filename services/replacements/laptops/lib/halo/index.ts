@@ -9,6 +9,8 @@ export type HaloEndOfLifeDevice = {
 	assetId: string;
 	serial: string;
 	hostname: string;
+	/** Null when Halo does not provide the manufacturer. */
+	make?: string | null;
 	model: string;
 	/** YYYY-MM-DD. */
 	purchaseDate: string;

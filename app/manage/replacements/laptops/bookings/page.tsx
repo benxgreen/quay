@@ -31,7 +31,8 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
 	const filters = parseBookingsFilters(await searchParams, today);
 	const review = await bookingsToReview(today);
 	const filtered =
-		filtersPeople(filters) || Boolean(filters.type || filters.kind || filters.past);
+		filtersPeople({ ...filters, q: "" }) ||
+		Boolean(filters.type || filters.kind || filters.past);
 
 	return (
 		<LaptopsPage section="bookings">

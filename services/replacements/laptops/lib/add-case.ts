@@ -115,8 +115,8 @@ export async function createCase(
 			const row = await queryOne<{ id: string; reference: string }>(
 				`INSERT INTO lr.cases
 				   (user_id, halo_assigned_user_id, session_type, status, old_asset_id, old_serial,
-				    old_hostname, created_by)
-				 VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7)
+				    old_hostname, old_make, old_model, created_by)
+				 VALUES ($1, $2, $3, 'queued', $4, $5, $6, $7, $8, $9)
 				 RETURNING id, reference`,
 				[
 					personId,
@@ -125,6 +125,8 @@ export async function createCase(
 					device.assetId,
 					device.serial,
 					device.hostname,
+					device.make ?? null,
+					device.model,
 					actorId,
 				],
 				tx,

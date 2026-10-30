@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { PageHeading } from "@/components/ui/page-heading";
 import { openAvailabilityRequest } from "@/services/replacements/laptops/lib/booking";
@@ -16,13 +15,12 @@ export default async function CustomAppointmentPage({
 	params: Promise<{ reference: string }>;
 }) {
 	const { detail, href, crumbs } = await loadForBooking((await params).reference);
-	if (detail.status !== "unbooked") redirect(href);
 	const [defaults, request] = await Promise.all([
 		getSessionDefaults(),
 		openAvailabilityRequest(detail.id),
 	]);
 	const first = detail.person.firstName;
-	const software = request?.software ?? [];
+	const software = request?.software ?? detail.booking?.software ?? [];
 
 	return (
 		<LaptopsPage section="cases" parents={crumbs} narrow>
@@ -33,6 +31,7 @@ export default async function CustomAppointmentPage({
 			<p>
 				This is not linked to a published session and does not use a session place. {first}{" "}
 				gets the same booking confirmation and reminder emails as everyone else.
+				{detail.booking ? " Their existing booking will be replaced." : ""}
 			</p>
 			<p>Software: {software.length ? software.join(", ") : "none requested yet"}.</p>
 			<CustomForm

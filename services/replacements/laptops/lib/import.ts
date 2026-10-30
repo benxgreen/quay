@@ -213,9 +213,9 @@ export async function addToQueue(
 				const row = await queryOne<{ id: string; reference: string }>(
 					`INSERT INTO lr.cases
 					   (user_id, halo_assigned_user_id, session_type, status, old_asset_id, old_serial,
-					    old_hostname, import_id, queued_at, created_by)
+					    old_hostname, old_make, old_model, import_id, queued_at, created_by)
 					 VALUES ($1, $1, $2, 'queued', $3, $4, $5, $6,
-					         now() + make_interval(secs => $7::double precision / 1000), $8)
+					         $7, $8, now() + make_interval(secs => $9::double precision / 1000), $10)
 					 RETURNING id, reference`,
 					[
 						userId,
@@ -223,6 +223,8 @@ export async function addToQueue(
 						device.assetId,
 						device.serial,
 						device.hostname,
+						device.make ?? null,
+						device.model,
 						batch?.id,
 						index,
 						actorId,

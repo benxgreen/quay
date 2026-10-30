@@ -31,6 +31,7 @@ export function parseBookingsFilters(
 	today: IsoDate,
 ): BookingsFilters {
 	const view = params.view ?? "";
+	const q = (params.q ?? "").trim();
 	let date = today;
 	try {
 		if (params.date) date = assertIsoDate(params.date);
@@ -38,11 +39,13 @@ export function parseBookingsFilters(
 		// A broken date falls back to today.
 	}
 	return {
-		view: ["week", "month", "all", "incomplete"].includes(view)
-			? (view as BookingsView)
-			: "day",
+		view: q
+			? "all"
+			: ["week", "month", "all", "incomplete"].includes(view)
+				? (view as BookingsView)
+				: "day",
 		date,
-		q: (params.q ?? "").trim(),
+		q,
 		type: params.type === "collection" || params.type === "session" ? params.type : "",
 		kind: params.kind === "published" || params.kind === "custom" ? params.kind : "",
 		deviceUnprepared: params.device === "1",

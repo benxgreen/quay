@@ -30,6 +30,8 @@ export type MyCase = {
 	id: string;
 	status: CaseStatus;
 	type: ReplacementType;
+	make: string | null;
+	model: string | null;
 	serial: string | null;
 	booking: MyBooking | null;
 	/** Why the last booking ended, when the case needs a new one. */
@@ -46,12 +48,15 @@ export async function myCase(userId: string, token?: string): Promise<MyCase | n
 		id: string;
 		status: CaseStatus;
 		type: ReplacementType;
+		make: string | null;
+		model: string | null;
 		serial: string | null;
 		name: string;
 		email: string;
 		username: string | null;
 	}>(
-		`SELECT c.id, c.status, c.session_type AS type, c.old_serial AS serial,
+		`SELECT c.id, c.status, c.session_type AS type, c.old_make AS make,
+		        c.old_model AS model, c.old_serial AS serial,
 		        u.display_name AS name, u.email, u.username
 		 FROM lr.cases c JOIN portal.users u ON u.id = c.user_id
 		 WHERE c.user_id = $1 AND c.status NOT IN ('completed', 'withdrawn', 'queued')
@@ -95,6 +100,8 @@ export async function myCase(userId: string, token?: string): Promise<MyCase | n
 		id: row.id,
 		status: row.status,
 		type: row.type,
+		make: row.make,
+		model: row.model,
 		serial: row.serial,
 		booking: booking
 			? {

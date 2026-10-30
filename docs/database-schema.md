@@ -109,6 +109,7 @@ Each error the database raises below has a matching friendly message on the page
 | Constraint                        | Meaning | Show |
 |-----------------------------------|---------|------|
 | `sessions_not_overbooked`         | Someone took the last place | "That date has just filled up. Choose another." |
+| `sessions_one_per_type_and_time`  | Same replacement type already has a session at that date and time | "There is already a session of this type at this date and time." |
 | `bookings_session_open`           | Session was closed or cancelled | Same as above |
 | `bookings_one_active_per_case`    | Case already has a booking | Send them to Rebook |
 | `cases_one_open_per_device`       | Device already has an open case | Import "needs attention" |
@@ -411,6 +412,8 @@ CREATE TABLE lr.cases (
   old_asset_id       text NOT NULL,
   old_serial         text,
   old_hostname       text,
+  old_make           text,
+  old_model          text,
 
   -- Replacement device: Halo asset ID of the allocated box.
   box_number         text,

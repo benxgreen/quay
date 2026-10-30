@@ -77,6 +77,8 @@ describe.skipIf(!hasDatabase)("case actions against the local database", async (
 			"resend-booking",
 			"resend-invitation",
 			"cancel-booking",
+			"book-on-behalf",
+			"custom-appointment",
 			"withdraw",
 		]);
 	});
