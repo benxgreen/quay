@@ -46,3 +46,8 @@ const STOCK: Record<StockStatus, { label: string; colour: TagColour }> = {
 export function StockStatusTag({ status }: { status: StockStatus }) {
 	return <Tag colour={STOCK[status].colour}>{STOCK[status].label}</Tag>;
 }
+
+/** A booking's device or software preparation, on the session page and the dashboard. */
+export function PreparedTag({ prepared }: { prepared: boolean }) {
+	return prepared ? <Tag colour="green">Prepared</Tag> : <Tag colour="grey">Not prepared</Tag>;
+}

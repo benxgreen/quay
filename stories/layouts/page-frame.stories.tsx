@@ -182,7 +182,7 @@ export const QuestionPage: Story = {
 					items={[
 						{
 							value: "1",
-							label: "Wednesday 11 November, 10am",
+							label: "Wednesday 11 November, 10:00am",
 							hint: "Room 310, BCP Council Civic Centre, Bournemouth · 2 places left",
 						},
 						{

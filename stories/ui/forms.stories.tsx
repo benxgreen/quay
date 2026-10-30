@@ -157,7 +157,7 @@ export const RadiosDivider: Story = {
 			name="session"
 			legend="Choose a new date and time"
 			items={[
-				{ value: "1", label: "Wednesday 11 November, 10am", hint: "2 places left" },
+				{ value: "1", label: "Wednesday 11 November, 10:00am", hint: "2 places left" },
 				{ value: "2", label: "Friday 13 November, 10am", hint: "Full", disabled: true },
 				{ divider: "or" },
 				{ value: "none", label: "I am not available for any of these dates" },

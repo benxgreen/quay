@@ -132,7 +132,7 @@ export const LAPTOP_EMAIL_VARIABLES: readonly LaptopEmailVariable[] = [
 	{
 		name: "time",
 		description: "Start time of the booking",
-		example: "10am",
+		example: "10:00am",
 		value: (c) => (c.booking ? formatTime(c.booking.startTime) : undefined),
 	},
 	{

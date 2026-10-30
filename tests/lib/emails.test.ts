@@ -19,14 +19,14 @@ const ELLIE: LaptopEmailCase = {
 };
 
 describe("formatLongDate and formatTime", () => {
-	it("writes dates and times in GOV.UK style", () => {
+	it("writes dates in GOV.UK style and times in full", () => {
 		expect(formatLongDate("2026-11-17")).toBe("Tuesday 17 November");
 		expect(formatLongDate("2026-11-08", { year: true })).toBe("Sunday 8 November 2026");
 		expect(["09:30", "10:00:00", "12:00", "00:00", "23:59"].map(formatTime)).toEqual([
 			"9:30am",
-			"10am",
-			"midday",
-			"midnight",
+			"10:00am",
+			"12:00pm",
+			"12:00am",
 			"11:59pm",
 		]);
 	});

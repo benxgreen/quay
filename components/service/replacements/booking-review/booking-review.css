@@ -1,0 +1,24 @@
+.bcp-booking-review {
+	margin: 0 0 20px 0;
+	padding: 0;
+	list-style: none;
+}
+
+.bcp-booking-review-item {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px 20px;
+	padding: 14px 0;
+	border-bottom: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+}
+
+.bcp-booking-review-item .bcp-button {
+	margin: 0;
+}
+
+.bcp-booking-review-detail {
+	display: block;
+	font-size: var(--bcp-font-size-sm);
+}

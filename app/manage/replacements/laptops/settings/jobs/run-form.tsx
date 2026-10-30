@@ -31,7 +31,7 @@ export function RunForm({ jobs }: { jobs: { key: string; name: string }[] }) {
 				error={errors.job}
 				defaultValue={values.job}
 				options={[
-					{ value: "all", label: "All the 9am jobs" },
+					{ value: "all", label: "All the 9:00am jobs" },
 					...jobs.map((job) => ({ value: job.key, label: job.name })),
 				]}
 			/>

@@ -21,3 +21,12 @@
 	margin-left: auto;
 	font-size: var(--bcp-font-size-sm);
 }
+
+/* In a printout each group starts a new block, with its heading kept on its table. */
+@media print {
+	.bcp-group-heading {
+		break-after: avoid;
+		break-inside: avoid;
+		margin-top: 20px;
+	}
+}

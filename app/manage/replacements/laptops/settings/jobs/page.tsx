@@ -37,7 +37,7 @@ export default async function JobsPage({
 			{justRan.length ? <RanBanner runs={justRan} /> : null}
 			<PageHeading caption="Settings" title="Scheduled jobs" />
 			<p>
-				A timer runs every job together at 9am. Each job only sends what is due and skips
+				A timer runs every job together at 9:00am. Each job only sends what is due and skips
 				anyone it has already emailed that day, so running it again never sends a duplicate.
 			</p>
 

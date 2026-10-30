@@ -1,6 +1,7 @@
 "use client";
 
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 import { ShowMore, useShowMoreFocus } from "@/components/ui/show-more";
 import { Table, type TableColumn, type TableRow } from "@/components/ui/table";
 
@@ -20,7 +21,7 @@ type ShowMoreTableProps = {
  * A table whose rows are all on the page but shown a batch at a time, with
  * "Show more" and "Showing X of Y" (focus moves to the first new row). For
  * lists that are loaded whole, such as the invitation queue; a list fetched
- * in batches uses ShowMore directly.
+ * in batches uses ShowMore directly. Printing shows every row.
  */
 export function ShowMoreTable({
 	caption,
@@ -34,6 +35,13 @@ export function ShowMoreTable({
 	const [shown, setShown] = useState(pageSize);
 	const { containerRef, focusRow } = useShowMoreFocus<HTMLDivElement>();
 	const visible = rows.slice(0, shown);
+
+	// A printout has every row, not just the batches shown so far.
+	useEffect(() => {
+		const showAll = () => flushSync(() => setShown(Number.POSITIVE_INFINITY));
+		window.addEventListener("beforeprint", showAll);
+		return () => window.removeEventListener("beforeprint", showAll);
+	}, []);
 
 	return (
 		<div ref={containerRef}>

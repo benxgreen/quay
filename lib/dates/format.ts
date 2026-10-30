@@ -22,7 +22,7 @@ export function formatLongDate(day: IsoDate, { year = false }: { year?: boolean 
 }
 
 /**
- * A time of day in GOV.UK style: "9:30am", "10am", "midday", "midnight".
+ * A time of day, always in full: "9:30am", "10:00am", "12:00pm", "12:00am".
  * Takes the database's "HH:MM" or "HH:MM:SS".
  */
 export function formatTime(time: string): string {
@@ -32,11 +32,9 @@ export function formatTime(time: string): string {
 	const minutes = Number(match[2]);
 	if (hours > 23 || minutes > 59) throw new Error(`Not a time: ${time}`);
 
-	if (minutes === 0 && hours === 12) return "midday";
-	if (minutes === 0 && hours === 0) return "midnight";
 	const hour = hours % 12 === 0 ? 12 : hours % 12;
 	const suffix = hours < 12 ? "am" : "pm";
-	return minutes === 0 ? `${hour}${suffix}` : `${hour}:${match[2]}${suffix}`;
+	return `${hour}:${match[2]}${suffix}`;
 }
 
 const LONDON_PARTS = new Intl.DateTimeFormat("en-GB", {

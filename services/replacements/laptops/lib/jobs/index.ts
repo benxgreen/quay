@@ -48,32 +48,32 @@ type JobDefinition = {
 export const JOBS = {
 	invitations: {
 		name: "Send invitations",
-		runs: "Working days, 9am",
+		runs: "Working days, 9:00am",
 		run: sendInvitations,
 	},
 	booking_reminders: {
 		name: "Send booking reminders",
-		runs: "Weekly on the reminder day, 9am",
+		runs: "Weekly on the reminder day, 9:00am",
 		run: sendBookingReminders,
 	},
 	rebook_reminders: {
 		name: "Send rebook reminders",
-		runs: "Weekly on the reminder day, 9am",
+		runs: "Weekly on the reminder day, 9:00am",
 		run: sendRebookReminders,
 	},
 	session_reminders: {
 		name: "Send session reminders",
-		runs: "Working days, 9am",
+		runs: "Working days, 9:00am",
 		run: sendSessionReminders,
 	},
 	return_reminders: {
 		name: "Send return reminders",
-		runs: "Weekly on the return reminder day, 9am",
+		runs: "Weekly on the return reminder day, 9:00am",
 		run: sendReturnReminders,
 	},
 	purge_connection_log: {
 		name: "Purge connection log",
-		runs: "Daily, 9am",
+		runs: "Daily, 9:00am",
 		run: async (context) => {
 			const row = await queryOne<{ n: number }>("SELECT lr.purge_connection_log() AS n");
 			context.note(`${row?.n ?? 0} entries older than 7 days deleted`);
@@ -81,7 +81,7 @@ export const JOBS = {
 	},
 	purge_email_counts: {
 		name: "Purge email counts",
-		runs: "Daily, 9am",
+		runs: "Daily, 9:00am",
 		run: async (context) => {
 			const row = await queryOne<{ n: number }>("SELECT lr.purge_email_sends() AS n");
 			context.note(`${row?.n ?? 0} emails older than 13 months deleted`);

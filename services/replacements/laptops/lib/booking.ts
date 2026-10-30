@@ -149,7 +149,7 @@ export async function offeredSessions(
 	return weeks;
 }
 
-/** "Fri 13 Nov, 10am": a session in an error message. */
+/** "Fri 13 Nov, 10:00am": a session in an error message. */
 export function sessionLabel(session: { date: IsoDate; time: string }): string {
 	return `${formatShortDay(session.date)}, ${formatTime(session.time)}`;
 }

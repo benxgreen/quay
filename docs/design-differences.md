@@ -22,7 +22,7 @@ The rule used: **the Components page defines each component, unless the Laptop r
 
 - **Pronouns:** the case action pages (resend invitation, did not attend) and the change type page say "she" and "her"; Quay says "they" and "their". The change type page says "She keeps her place" and "with her"; we can't know anyone's pronouns, so Quay says "They keep their place" and "with them".
 - **User details dialog:** "Department", as on the user page, rather than the mockup's "Service area" (still an open question).
-- **Times:** the Sessions mockups write "10:00am" and "2:00pm"; Quay writes times in GOV.UK style, "10am" and "2pm" (and "9:30am", "midday"), as the email variables do.
+- **Times are always written in full** across the portal and in emails: "10:00am", "2:00pm", "9:30am", "12:00pm", as the mockups do (decided 30 Oct 2026). This differs from GOV.UK style ("10am", "midday").
 
 | What | Components page | Laptop replacements screens | Built as |
 |---|---|---|---|
@@ -61,6 +61,7 @@ The rule used: **the Components page defines each component, unless the Laptop r
 - **Clear flag:** has its own short confirmation page, like the other case actions.
 - **Resend booking details:** the mockup lists "What to bring"; that comes from the email's wording (Settings), so the confirmation page lists type, date and time, location and software only.
 - **Add a case:** "What happens next?" sits inside step 3 with Type, so the page keeps the mockup's three steps. "Book on their behalf now" creates the case as queued, then goes straight to the team booking pages.
+- **Bookings dashboard:** the Week view's day headings link to that day. The Month view uses a real table (`Calendar`), so the weekday is read with each day, and on phones the days stack with their full date. Day groups only get "Show more" over 20 people, so "Showing 1 of 1 people" isn't shown. A cancelled session shows a grey "Cancelled" tag. "Print this view" sits under the summary; the mockups don't place it. The review note says "Review it" for one booking. Hostnames on the Day view are read live from Halo, like the session page; if Halo can't be reached the page says so and shows "–".
 
 - **Removing from the invitation queue:** withdraws the case, so it has its own confirmation page ("Remove Ben Whitaker from the invitation queue?", red "Remove from queue").
 - **Import type:** the mockup preselects Collection on the "Add to invitation queue" bar; Quay leaves the type unselected, so it is always a choice, with an error if it's missed.

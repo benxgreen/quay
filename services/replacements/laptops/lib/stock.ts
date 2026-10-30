@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { ReplacementType } from "@/components/service/replacements/type-tag";
+import { type CallTrigger, ExternalCallError } from "@/lib/clients/connection-log";
 import type { IsoDate } from "@/lib/dates/working-days";
 import { query, queryOne } from "@/lib/db/query";
 import { withTransaction } from "@/lib/db/transaction";
@@ -329,4 +330,19 @@ export async function addDeviceNote(boxNumber: string, text: string, actorId: st
 			),
 		{ actingUserId: actorId },
 	);
+}
+
+/**
+ * Each box's hostname, read from Halo's stock list (spec, "HaloITSM": read
+ * when showing a case or the dashboard). Null when Halo can't be reached,
+ * so the page can still show everything else.
+ */
+export async function boxHostnames(trigger: CallTrigger): Promise<Map<string, string> | null> {
+	try {
+		const { value } = await getLaptopHaloClient().listStock({ trigger });
+		return new Map(value.map((device) => [device.assetId, device.hostname]));
+	} catch (error) {
+		if (error instanceof ExternalCallError) return null;
+		throw error;
+	}
 }

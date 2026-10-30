@@ -98,3 +98,9 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+@media print {
+	.bcp-filter-panel {
+		display: none;
+	}
+}

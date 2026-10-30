@@ -53,7 +53,7 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
 						{queue.total} {queue.total === 1 ? "case is" : "cases are"} waiting for an
 						invitation.
 					</strong>{" "}
-					Up to {queue.perDay} go out at 9am each working day, in this order. Estimated
+					Up to {queue.perDay} go out at 9:00am each working day, in this order. Estimated
 					dates update if the limit changes or cases are moved or removed.
 				</p>
 			</Note>

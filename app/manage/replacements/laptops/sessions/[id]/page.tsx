@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
-import { CaseStatusTag, SessionStatusTag } from "@/components/service/replacements/status-tag";
+import {
+	CaseStatusTag,
+	PreparedTag,
+	SessionStatusTag,
+} from "@/components/service/replacements/status-tag";
 import { TypeTag } from "@/components/service/replacements/type-tag";
 import { Button, ButtonGroup } from "@/components/ui/button";
 import { InsetText } from "@/components/ui/inset-text";
@@ -12,11 +16,10 @@ import { SummaryList, SummaryListSecondary } from "@/components/ui/summary-list"
 import { Table, TableSecondary } from "@/components/ui/table";
 import { Tag } from "@/components/ui/tag";
 import { requireRole } from "@/lib/auth/guards";
-import { ExternalCallError } from "@/lib/clients/connection-log";
 import { formatFullDate, formatShortDateTime } from "@/lib/dates/format";
 import { ACCESS } from "@/lib/portal/access";
-import { getLaptopHaloClient } from "@/services/replacements/laptops/lib/halo";
 import { getSession, type SessionDetail } from "@/services/replacements/laptops/lib/sessions";
+import { boxHostnames } from "@/services/replacements/laptops/lib/stock";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { sessionCrumb, sessionTitle } from "../session-text";
 
@@ -82,7 +85,7 @@ async function OpenSession({
 	session: SessionDetail;
 	actorUserId: string;
 }) {
-	const hostnames = await boxHostnames(actorUserId);
+	const hostnames = await boxHostnames({ kind: "user", label: "Session page", actorUserId });
 	const { attendees } = session;
 	const needSoftware = attendees.filter((attendee) => attendee.software.length > 0);
 	const needNone = attendees.length - needSoftware.length;
@@ -164,23 +167,6 @@ async function OpenSession({
 			) : null}
 		</>
 	);
-}
-
-function PreparedTag({ prepared }: { prepared: boolean }) {
-	return prepared ? <Tag colour="green">Prepared</Tag> : <Tag colour="grey">Not prepared</Tag>;
-}
-
-/** Each allocated box's hostname, from the Halo stock list. Null if Halo can't be reached. */
-async function boxHostnames(actorUserId: string): Promise<Map<string, string> | null> {
-	try {
-		const { value } = await getLaptopHaloClient().listStock({
-			trigger: { kind: "user", label: "Session page", actorUserId },
-		});
-		return new Map(value.map((device) => [device.assetId, device.hostname]));
-	} catch (error) {
-		if (error instanceof ExternalCallError) return null;
-		throw error;
-	}
 }
 
 function CancelledSession({ session }: { session: SessionDetail }) {

@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { ReactNode } from "react";
 import { TypeTag } from "@/components/service/replacements/type-tag";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Button, InfoButton } from "@/components/ui/button";
+import { Calendar, type CalendarDay, CalendarEntry } from "@/components/ui/calendar";
 import { DateNavigation } from "@/components/ui/date-navigation";
 import { Link } from "@/components/ui/link";
 import { Modal } from "@/components/ui/modal";
@@ -109,6 +111,69 @@ export const DateNavigationStory: Story = {
 			next={{ href: "?day=2026-11-12", text: "Next day" }}
 		/>
 	),
+};
+
+/** A month of weekdays, each session linking to its day. Cancelled sessions are struck through. */
+export const CalendarStory: Story = {
+	name: "Calendar",
+	render: () => {
+		const names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+		const entries: Record<number, ReactNode> = {
+			3: (
+				<CalendarEntry
+					href="?day=3"
+					title="10:00am Collection"
+					detail="10 of 10"
+					colour="light-blue"
+				/>
+			),
+			11: (
+				<>
+					<CalendarEntry
+						href="?day=11"
+						title="9:30am Session"
+						detail="5 of 5"
+						colour="purple"
+					/>
+					<CalendarEntry
+						href="?day=11"
+						title="2:00pm Collection"
+						detail="4 of 10"
+						colour="light-blue"
+					/>
+				</>
+			),
+			17: (
+				<CalendarEntry
+					href="?day=17"
+					title="9:30am Session"
+					detail="Cancelled"
+					colour="purple"
+					struck
+				/>
+			),
+		};
+		const weeks: CalendarDay[][] = [2, 9, 16, 23, 30].map((monday) =>
+			names.map((name, offset) => {
+				const day = monday + offset;
+				return {
+					key: String(day),
+					number: String(day),
+					label: `${name} ${day} November`,
+					inPeriod: day <= 30,
+					past: day < 5,
+					children: entries[day],
+				};
+			}),
+		);
+		return (
+			<Calendar
+				caption="Sessions in November 2026"
+				weekdays={names.map((long) => ({ short: long.slice(0, 3), long }))}
+				weeks={weeks}
+			/>
+		);
+	},
 };
 
 /** Numbered steps: done, current and not started. Every step is always open, with no show or hide. */
