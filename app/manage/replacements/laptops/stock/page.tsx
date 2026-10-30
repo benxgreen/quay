@@ -41,8 +41,13 @@ export default async function StockPage({ searchParams }: StockPageProps) {
 	};
 	const { snapshot, failed } = await loadStock(user.id);
 	const rows = snapshot ? await listStock(snapshot, filters) : [];
-	const models = [...new Set(snapshot?.devices.map((device) => device.model))].sort();
-	const locations = [...new Set(snapshot?.devices.map((device) => device.stockLocation))].sort();
+	// Blank values are left out: "" is already "All models" / "All locations".
+	const models = [...new Set(snapshot?.devices.map((device) => device.model))]
+		.filter(Boolean)
+		.sort();
+	const locations = [...new Set(snapshot?.devices.map((device) => device.stockLocation))]
+		.filter(Boolean)
+		.sort();
 	const refreshFailed = params.refreshFailed ?? failed;
 
 	return (
