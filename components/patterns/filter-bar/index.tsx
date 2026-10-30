@@ -10,6 +10,8 @@ type FilterBarProps = {
 	action?: string;
 	/** The fields, such as a TextInput and Selects. */
 	children: ReactNode;
+	/** The button's words. Defaults to "Search"; use "Apply" when there is nothing to type. */
+	buttonText?: string;
 };
 
 /**
@@ -23,7 +25,7 @@ type FilterBarProps = {
  *   <Select id="role" name="role" label="Role" options={…} />
  * </FilterBar>
  */
-export function FilterBar({ label, action, children }: FilterBarProps) {
+export function FilterBar({ label, action, children, buttonText = "Search" }: FilterBarProps) {
 	return (
 		// biome-ignore lint/a11y/useSemanticElements: role="search" on the form has wider assistive technology support than <search>
 		<form
@@ -38,7 +40,7 @@ export function FilterBar({ label, action, children }: FilterBarProps) {
 				className="bcp-button bcp-button--secondary bcp-filter-bar-button"
 				type="submit"
 			>
-				Search
+				{buttonText}
 			</button>
 		</form>
 	);

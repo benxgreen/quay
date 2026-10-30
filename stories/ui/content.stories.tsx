@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { TypeTag } from "@/components/service/replacements/type-tag";
 import { Accordion } from "@/components/ui/accordion";
+import { BarList, ColumnChart } from "@/components/ui/bar-chart";
 import { Checkbox } from "@/components/ui/checkboxes";
 import { Details } from "@/components/ui/details";
 import { Link } from "@/components/ui/link";
@@ -383,5 +384,34 @@ export const PreviewStory: Story = {
 				markdown={"## Before your session\n\nBring your laptop and its charger."}
 			/>
 		</Preview>
+	),
+};
+
+/** One series in the portal purple, every bar labelled with its number. Pair the columns with a table. */
+export const BarChartsStory: Story = {
+	name: "Bar charts",
+	render: () => (
+		<div style={{ maxWidth: 560 }}>
+			<BarList
+				label="Bookings by application"
+				unit="bookings"
+				items={[
+					{ label: "Adobe Acrobat Pro", value: 58 },
+					{ label: "Microsoft Visio", value: 31 },
+					{ label: "Typed in by colleagues", value: 22 },
+				]}
+			/>
+			<ColumnChart
+				unit="bookings"
+				description="Bookings by weekday: Monday 16, Tuesday 28, Wednesday 32, Thursday 30, Friday 19"
+				items={[
+					{ label: "Monday", value: 16 },
+					{ label: "Tuesday", value: 28 },
+					{ label: "Wednesday", value: 32 },
+					{ label: "Thursday", value: 30 },
+					{ label: "Friday", value: 19 },
+				]}
+			/>
+		</div>
 	),
 };

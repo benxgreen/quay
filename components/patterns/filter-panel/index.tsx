@@ -12,8 +12,8 @@ import { useId, useState } from "react";
 import { Checkbox } from "@/components/ui/checkboxes";
 
 type FilterPanelProps = {
-	/** The search box above the filters. */
-	search: {
+	/** The search box above the filters. Leave out for filters only, such as Statistics. */
+	search?: {
 		label: string;
 		hint?: string;
 		/** Query parameter name. Defaults to "q". */
@@ -26,6 +26,8 @@ type FilterPanelProps = {
 	clearHref: string;
 	/** Open the panel when the page loads, for example when filters are applied. */
 	defaultOpen?: boolean;
+	/** Buttons beside "Show filters" when there is no search, such as "Download as CSV". */
+	actions?: ReactNode;
 	/** Hidden fields to keep, such as the current view. */
 	hiddenFields?: Record<string, string>;
 	/** The filters: FilterGrid, FilterOptions and ColumnChooser. */
@@ -50,43 +52,63 @@ export function FilterPanel({
 	clearHref,
 	defaultOpen = false,
 	hiddenFields,
+	actions,
 	children,
 }: FilterPanelProps) {
 	const [open, setOpen] = useState(defaultOpen);
 	const panelId = useId();
 	const searchId = useId();
-	const name = search.name ?? "q";
-	const hintId = search.hint ? `${searchId}-hint` : undefined;
+	const name = search?.name ?? "q";
+	const hintId = search?.hint ? `${searchId}-hint` : undefined;
 
 	return (
-		// biome-ignore lint/a11y/useSemanticElements: role="search" on the form has wider assistive technology support than <search>
-		<form className="bcp-filter-panel" role="search" method="get" action={action}>
-			<div className="bcp-search-box">
-				<div className="bcp-search-box-field">
-					<label className="bcp-search-box-label" htmlFor={searchId}>
-						{search.label}
-					</label>
-					{search.hint ? (
-						<div id={hintId} className="bcp-search-box-hint">
-							{search.hint}
+		<form
+			className="bcp-filter-panel"
+			role={search ? "search" : undefined}
+			aria-label={search ? undefined : "Filters"}
+			method="get"
+			action={action}
+		>
+			{search ? (
+				<div className="bcp-search-box">
+					<div className="bcp-search-box-field">
+						<label className="bcp-search-box-label" htmlFor={searchId}>
+							{search.label}
+						</label>
+						{search.hint ? (
+							<div id={hintId} className="bcp-search-box-hint">
+								{search.hint}
+							</div>
+						) : null}
+						<div className="bcp-search-box-row">
+							<input
+								className="bcp-input bcp-search-box-input"
+								id={searchId}
+								name={name}
+								type="search"
+								defaultValue={search.defaultValue}
+								aria-describedby={hintId}
+								spellCheck={false}
+							/>
+							<button className="bcp-button bcp-search-box-button" type="submit">
+								Search
+							</button>
 						</div>
-					) : null}
-					<div className="bcp-search-box-row">
-						<input
-							className="bcp-input bcp-search-box-input"
-							id={searchId}
-							name={name}
-							type="search"
-							defaultValue={search.defaultValue}
-							aria-describedby={hintId}
-							spellCheck={false}
-						/>
-						<button className="bcp-button bcp-search-box-button" type="submit">
-							Search
+					</div>
+					<div className="bcp-search-box-aside">
+						<button
+							type="button"
+							className="bcp-button bcp-button--secondary bcp-filter-panel-toggle"
+							aria-expanded={open}
+							aria-controls={panelId}
+							onClick={() => setOpen((current) => !current)}
+						>
+							{open ? "Hide filters" : "Show filters"}
 						</button>
 					</div>
 				</div>
-				<div className="bcp-search-box-aside">
+			) : (
+				<div className="bcp-filter-panel-bar">
 					<button
 						type="button"
 						className="bcp-button bcp-button--secondary bcp-filter-panel-toggle"
@@ -96,8 +118,9 @@ export function FilterPanel({
 					>
 						{open ? "Hide filters" : "Show filters"}
 					</button>
+					{actions}
 				</div>
-			</div>
+			)}
 			{hiddenFields
 				? Object.entries(hiddenFields).map(([key, value]) => (
 						<input key={key} type="hidden" name={key} value={value} />

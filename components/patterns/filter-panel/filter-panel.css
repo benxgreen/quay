@@ -6,6 +6,17 @@
 	margin-bottom: 0;
 }
 
+.bcp-filter-panel-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--bcp-space-xl);
+}
+
+.bcp-filter-panel-bar .bcp-button {
+	margin-bottom: 0;
+}
+
 .bcp-filter-panel-toggle {
 	display: inline-flex;
 	align-items: center;
