@@ -67,11 +67,17 @@ export async function loadStock(
 ): Promise<{ snapshot: StockSnapshot | null; failed: string | null }> {
 	const snapshot = await getStockSnapshot();
 	if (snapshot) return { snapshot, failed: null };
-	const result = await refreshStock(actorId, "Stock (first load)");
+	// Pages that load at the same moment share one first read from Halo.
+	firstLoad ??= refreshStock(actorId, "Stock (first load)").finally(() => {
+		firstLoad = undefined;
+	});
+	const result = await firstLoad;
 	return result.ok
 		? { snapshot: await getStockSnapshot(), failed: null }
 		: { snapshot: null, failed: result.failure.message };
 }
+
+let firstLoad: ReturnType<typeof refreshStock> | undefined;
 
 export type Allocation = {
 	boxNumber: string;

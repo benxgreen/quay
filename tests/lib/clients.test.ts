@@ -164,7 +164,12 @@ describe("mock clients", () => {
 		expect(await assetIds()).toContain("45856");
 
 		await halo.issueDevice(
-			{ assetId: "45856", issuedTo: "ellie.ward@bcpcouncil.test", date: "2026-11-17" },
+			{
+				assetId: "45856",
+				personName: "Ellie Ward",
+				reference: "LR-000128",
+				date: "2026-11-17",
+			},
 			context,
 		);
 		expect(await assetIds()).not.toContain("45856");

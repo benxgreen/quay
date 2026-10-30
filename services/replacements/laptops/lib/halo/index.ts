@@ -2,6 +2,7 @@ import "server-only";
 
 import type { CallContext, CallResult } from "@/lib/clients/connection-log";
 import { haloMode } from "@/lib/clients/halo";
+import { createHttpLaptopHaloClient } from "./http";
 import { createMockLaptopHaloClient } from "./mock";
 
 /** A laptop on the Halo end-of-life report. */
@@ -20,7 +21,10 @@ export type HaloEndOfLifeDevice = {
 	assignedUser: { name: string; email: string } | null;
 };
 
-/** A replacement device matching the Halo stock criteria. Its asset ID is the box number. */
+/**
+ * A replacement device in stock. Its asset ID is the box number: Halo's
+ * asset ID, such as 26620. The serial is Halo's inventory number.
+ */
 export type HaloStockDevice = {
 	assetId: string;
 	serial: string;
@@ -28,6 +32,17 @@ export type HaloStockDevice = {
 	model: string;
 	stockLocation: string;
 	stockRoom: string;
+};
+
+/** An update that writes an audit note on the device. `assetId` is the Halo asset ID. */
+export type AuditedUpdate = {
+	assetId: string;
+	/** The colleague the case is for, such as "Ellie Ward". */
+	personName: string;
+	/** The case reference, such as "LR-000128". */
+	reference: string;
+	/** YYYY-MM-DD, London. */
+	date: string;
 };
 
 export type HaloAssignedDevice = {
@@ -76,21 +91,19 @@ export type LaptopHaloClient = {
 	listStock(context: CallContext): Promise<CallResult<HaloStockDevice[]>>;
 	/**
 	 * The completion update on the new device: status In Service, stock
-	 * location and room cleared, audit details and date set to today with the
-	 * comment "Issued through the Device portal laptop replacement service".
+	 * location and room cleared, Last Audit Date `date` and Audit Details
+	 * "Device collected by {personName} - {reference}".
 	 */
-	issueDevice(
-		device: { assetId: string; issuedTo: string; date: string },
-		context: CallContext,
-	): Promise<CallResult<void>>;
-	/** The old device has come back. What changes in Halo is an open question. */
-	markOldDeviceReturned(
-		device: { assetId: string },
-		context: CallContext,
-	): Promise<CallResult<void>>;
+	issueDevice(device: AuditedUpdate, context: CallContext): Promise<CallResult<void>>;
 	/**
-	 * Decommission the old device once every decommission check is ticked.
-	 * The case is closed only when this succeeds.
+	 * The old device has come back: Stock Room Room 310, Last Audit Date
+	 * `date` and Audit Details "Device returned by {personName} - {reference}".
+	 */
+	markOldDeviceReturned(device: AuditedUpdate, context: CallContext): Promise<CallResult<void>>;
+	/**
+	 * Decommission the old device once every decommission check is ticked:
+	 * Out of Service, Stock Location Decommissioned, Stock Room Room 310. The
+	 * case is closed only when this succeeds.
 	 */
 	decommissionDevice(
 		device: { assetId: string; serial: string | null; hostname: string | null },
@@ -103,12 +116,9 @@ export const HALO_COMMENT = "Issued through the Device portal laptop replacement
 let client: LaptopHaloClient | undefined;
 
 export function getLaptopHaloClient(): LaptopHaloClient {
-	if (haloMode() === "http") {
-		throw new Error(
-			"Laptop replacements' Halo calls are not built yet: the report IDs, stock criteria and status IDs are open questions.",
-		);
-	}
-	client ??= forService(createMockLaptopHaloClient());
+	client ??= forService(
+		haloMode() === "http" ? createHttpLaptopHaloClient() : createMockLaptopHaloClient(),
+	);
 	return client;
 }
 

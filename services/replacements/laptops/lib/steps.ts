@@ -517,7 +517,12 @@ export async function completeReplacement(
 	const result: ExternalFirstResult<void> = await externalFirst({
 		call: () =>
 			getLaptopHaloClient().issueDevice(
-				{ assetId: box, issuedTo: detail.person.email, date: londonToday() },
+				{
+					assetId: box,
+					personName: detail.person.name,
+					reference: detail.reference,
+					date: londonToday(),
+				},
 				{ trigger, caseId: detail.id },
 			),
 		save: async (tx) => {
@@ -612,7 +617,12 @@ export async function markReturned(
 	const result = await externalFirst({
 		call: () =>
 			getLaptopHaloClient().markOldDeviceReturned(
-				{ assetId: detail.oldDevice.assetId },
+				{
+					assetId: detail.oldDevice.assetId,
+					personName: detail.person.name,
+					reference: detail.reference,
+					date,
+				},
 				{
 					trigger: {
 						kind: "user",
