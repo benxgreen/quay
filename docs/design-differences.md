@@ -51,6 +51,11 @@ The rule used: **the Components page defines each component, unless the Laptop r
 
 ### Where the mockups say nothing
 
+- **Checklist buttons:** the mockups disable "Confirm device prepared" (and the like) until every item is ticked, and disable "Save…" until something changes. Quay keeps both buttons enabled, as GOV.UK advises against disabled buttons: confirming early saves the ticks and says what's left.
+- **Stock status tags:** Allocated is light blue as in the mockups; Available is green and Issued grey.
+- **Stock "Last activity":** the first words of the box's latest journal entry and its date, such as "Allocated · 9 Nov".
+- **Failed banners:** as in the mockups, without the "Connection log" link until the Connection log page exists (stage 12).
+
 - **Booking status tags:** the mockups show Booked (green) and Rebooked (grey); Cancelled is grey, Attended turquoise, Did not attend red and Unsuccessful orange.
 - **Flag on a case page:** a red "Flagged" tag beside the status, and a line under the heading with the reason, who flagged it and when.
 - **Clear flag:** has its own short confirmation page, like the other case actions.

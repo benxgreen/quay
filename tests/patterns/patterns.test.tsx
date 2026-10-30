@@ -92,3 +92,35 @@ describe("FilterBar", () => {
 		expect(await axeViolations(container)).toEqual([]);
 	});
 });
+
+describe("Checklist", () => {
+	it("counts ticks and says when there are unsaved changes", async () => {
+		const { Checklist } = await import("@/components/patterns/checklist");
+		const user = userEvent.setup();
+		const { container } = render(
+			<Checklist
+				legend="Device preparation checks"
+				name="check"
+				action={async () => {}}
+				saveText="Save preparation checks"
+				confirmText="Confirm device prepared"
+				saved="Last saved by John Smith"
+				items={[
+					{ value: "1", label: "Primary user changed in Intune", ticked: true },
+					{ value: "2", label: "Windows updates installed", ticked: false },
+				]}
+			/>,
+		);
+
+		expect(screen.getByText("1 of 2 done")).toBeInTheDocument();
+		expect(screen.getByText("Last saved by John Smith")).toBeInTheDocument();
+		await user.click(screen.getByLabelText("Windows updates installed"));
+		expect(screen.getByText("2 of 2 done")).toBeInTheDocument();
+		expect(screen.getByRole("status")).toHaveTextContent("You have unsaved changes");
+		expect(screen.getByRole("button", { name: "Confirm device prepared" })).toHaveAttribute(
+			"value",
+			"confirm",
+		);
+		expect(await axeViolations(container)).toEqual([]);
+	});
+});

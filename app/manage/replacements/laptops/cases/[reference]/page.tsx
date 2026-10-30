@@ -9,7 +9,6 @@ import { InsetText } from "@/components/ui/inset-text";
 import { NotificationBanner, NotificationBannerDetail } from "@/components/ui/notification-banner";
 import { PageHeading } from "@/components/ui/page-heading";
 import { Sidebar } from "@/components/ui/sidebar";
-import { type Step, StepList } from "@/components/ui/step-list";
 import { SummaryList, SummaryListSecondary } from "@/components/ui/summary-list";
 import { Table } from "@/components/ui/table";
 import { Tag } from "@/components/ui/tag";
@@ -23,15 +22,17 @@ import {
 	formatTime,
 } from "@/lib/dates/format";
 import { ACCESS, canAccess } from "@/lib/portal/access";
-import { STEP_TITLES } from "@/services/replacements/laptops/lib/case-steps";
 import {
 	availableActions,
 	type CaseAction,
 	type CaseDetail,
 	getCase,
 } from "@/services/replacements/laptops/lib/cases";
+import { getStepData } from "@/services/replacements/laptops/lib/steps";
+import { availableDevices } from "@/services/replacements/laptops/lib/stock";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { addCaseNote } from "../actions";
+import { CaseSteps } from "./case-steps";
 
 export const metadata: Metadata = { title: "Case – Laptop replacements" };
 
@@ -39,7 +40,15 @@ const BASE = LAPTOPS_SECTIONS.cases.href;
 
 type CasePageProps = {
 	params: Promise<{ reference: string }>;
-	searchParams: Promise<{ done?: string; noteError?: string }>;
+	searchParams: Promise<{
+		done?: string;
+		noteError?: string;
+		step?: string;
+		stepError?: string;
+		failed?: string;
+		message?: string;
+		at?: string;
+	}>;
 };
 
 /** Mockups: AdminCase and its stages, AdminCaseArchived. */
@@ -48,7 +57,11 @@ export default async function CasePage({ params, searchParams }: CasePageProps) 
 	const { reference } = await params;
 	const detail = await getCase(reference);
 	if (!detail) notFound();
-	const { done, noteError } = await searchParams;
+	const { done, noteError, step: stepDone, stepError, failed, message, at } = await searchParams;
+	const [stepData, devices] = await Promise.all([
+		getStepData(detail),
+		!detail.archived && detail.step === 1 ? availableDevices(user.id) : [],
+	]);
 	const href = `${BASE}/${reference}`;
 	const actions = availableActions(detail).filter(
 		(action) => action !== "withdraw" || canAccess(user.roles, ACCESS.laptopsSettings),
@@ -68,6 +81,15 @@ export default async function CasePage({ params, searchParams }: CasePageProps) 
 			}
 		>
 			{done ? <DoneBanner action={done} detail={detail} /> : null}
+			{stepDone ? <StepBanner done={stepDone} detail={detail} /> : null}
+			{stepError ? (
+				<NotificationBanner variant="important" heading="Not done yet">
+					<NotificationBannerDetail>{stepError}</NotificationBannerDetail>
+				</NotificationBanner>
+			) : null}
+			{failed ? (
+				<FailedBanner action={failed} message={message} at={at} detail={detail} />
+			) : null}
 			<PageHeading
 				caption={`Case ${detail.reference}`}
 				title={detail.person.name}
@@ -101,9 +123,9 @@ export default async function CasePage({ params, searchParams }: CasePageProps) 
 				<SummaryList rows={detailRows(detail, actions, href)} />
 			</section>
 
-			<section>
+			<section id="steps">
 				<h2>Replacement steps</h2>
-				<StepList steps={steps(detail)} />
+				<CaseSteps detail={detail} data={stepData} devices={devices} />
 			</section>
 
 			<section>
@@ -221,53 +243,6 @@ function detailRows(detail: CaseDetail, actions: CaseAction[], href: string) {
 	];
 }
 
-/**
- * The six steps with their status and what has been done. Working the
- * steps (allocating, checklists, completing) comes with the next stage.
- */
-function steps(detail: CaseDetail): Step[] {
-	const { progress, step, boxNumber, booking } = detail;
-	const closed = step === null;
-	const by = (who: string | null, at: Date | null) =>
-		at ? `${formatFullDate(at)}${who ? `, by ${who}` : ""}` : "";
-	const summaries = [
-		boxNumber
-			? `Box number ${boxNumber} is allocated to this case${progress.allocatedAt ? ` (${by(progress.allocatedBy, progress.allocatedAt)})` : ""}.`
-			: "No device is allocated yet.",
-		progress.devicePreparedAt
-			? `Device prepared on ${by(progress.devicePreparedBy, progress.devicePreparedAt)}.`
-			: boxNumber
-				? `Preparation checks for box ${boxNumber} are not confirmed yet.`
-				: "Available after a device is allocated.",
-		progress.softwarePreparedAt
-			? `Software prepared on ${by(progress.softwarePreparedBy, progress.softwarePreparedAt)}.`
-			: booking
-				? booking.software.length > 0
-					? `To install: ${booking.software.join(", ")}.`
-					: "No software was requested."
-				: "Waiting for the person to choose their software when they book.",
-		progress.attendedAt
-			? `Completed on ${formatFullDate(progress.attendedAt)}. Halo was updated and the new device issued.`
-			: "Records attendance and updates Halo. Needs an allocated device.",
-		progress.returnedAt
-			? `Old device returned on ${by(progress.returnedBy, progress.returnedAt)}.`
-			: "Available after the replacement is completed.",
-		progress.decommissionedAt
-			? `Decommissioned on ${by(progress.decommissionedBy, progress.decommissionedAt)}.`
-			: "Available after the old device is returned.",
-	];
-	return STEP_TITLES.map((title, index) => {
-		const number = index + 1;
-		const status =
-			detail.status === "completed" || (!closed && step !== null && number < step)
-				? "done"
-				: number === step
-					? "current"
-					: "not-started";
-		return { id: `step-${number}`, title, status, content: <p>{summaries[index]}</p> };
-	});
-}
-
 function actionItems(detail: CaseDetail, actions: CaseAction[], href: string): ActionListItem[] {
 	const first = detail.person.firstName;
 	const items: Record<CaseAction, ActionListItem | null> = {
@@ -340,6 +315,89 @@ function DoneBanner({ action, detail }: { action: string; detail: CaseDetail }) 
 	return (
 		<NotificationBanner variant="success" heading={text[0]}>
 			{text[1] ? <NotificationBannerDetail>{text[1]}</NotificationBannerDetail> : null}
+		</NotificationBanner>
+	);
+}
+
+const STEP_DONE: Record<string, (detail: CaseDetail) => [string, string?]> = {
+	allocated: (d) => [
+		`Box ${d.boxNumber} allocated to this case`,
+		"Halo hasn’t been changed yet.",
+	],
+	unallocated: () => ["Device unallocated", "It is back in stock, and the case is on step 1."],
+	"prep-saved": () => ["Preparation checks saved"],
+	prepared: () => ["Device prepared"],
+	"software-saved": () => ["Software saved"],
+	"software-prepared": () => ["Software prepared"],
+	"reopened-2": () => ["Device preparation reopened", "Your ticks are kept."],
+	"reopened-3": () => ["Software reopened", "Your ticks are kept."],
+	"checklist-updated": () => ["Checklist updated to the latest list"],
+	completed: (d) => [
+		"Replacement completed",
+		`Halo has been updated and ${d.person.firstName} has been sent the Device issued email.`,
+	],
+	"reminders-saved": () => ["Reminder setting saved"],
+	returned: () => [
+		"Old device marked as returned",
+		"Halo has been updated. Next, the decommission checklist.",
+	],
+	"decom-saved": () => ["Decommission checks saved"],
+	decommissioned: () => ["Replacement complete. The case is now closed."],
+};
+
+function StepBanner({ done, detail }: { done: string; detail: CaseDetail }) {
+	const text = STEP_DONE[done]?.(detail);
+	if (!text) return null;
+	return (
+		<NotificationBanner variant="success" heading={text[0]}>
+			{text[1] ? <NotificationBannerDetail>{text[1]}</NotificationBannerDetail> : null}
+		</NotificationBanner>
+	);
+}
+
+/** When Halo or the decommission call failed (mockups: AdminCaseHaloFailed, AdminCaseHookFailed). */
+function FailedBanner({
+	action,
+	message,
+	at,
+	detail,
+}: {
+	action: string;
+	message?: string;
+	at?: string;
+	detail: CaseDetail;
+}) {
+	const texts: Record<string, [string, string]> = {
+		complete: [
+			"Replacement not completed",
+			`Halo could not be updated, so nothing has been changed. Box ${detail.boxNumber} is still in stock in Halo and the case is still on step 4.`,
+		],
+		returned: [
+			"Old device not marked as returned",
+			"Halo could not be updated, so nothing has been changed. The case is still on step 5.",
+		],
+		decommission: [
+			"Old device not decommissioned",
+			"The decommission call did not succeed, so nothing has been changed. Your ticks are saved and the case is still on step 6.",
+		],
+	};
+	const text = texts[action];
+	if (!text) return null;
+	const when =
+		at && !Number.isNaN(Date.parse(at)) ? ` at ${formatShortDateTime(new Date(at))}` : "";
+	return (
+		<NotificationBanner variant="failed" heading={text[0]}>
+			<NotificationBannerDetail>{text[1]}</NotificationBannerDetail>
+			{message ? (
+				<NotificationBannerDetail>
+					{message}
+					{when}.
+				</NotificationBannerDetail>
+			) : null}
+			<NotificationBannerDetail>
+				Try again. If it keeps failing, check the connection in Settings. The attempt is in
+				the case journal.
+			</NotificationBannerDetail>
 		</NotificationBanner>
 	);
 }

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ActionList } from "@/components/patterns/action-list";
+import { Checklist } from "@/components/patterns/checklist";
 import { Sidebar } from "@/components/ui/sidebar";
+import { WarningText } from "@/components/ui/warning-text";
 
 const meta = {
 	title: "Patterns/Taking an action",
@@ -43,5 +45,32 @@ export const ActionListStory: Story = {
 				/>
 			</Sidebar>
 		</div>
+	),
+};
+
+/**
+ * A checklist on a case step: ticks aren't saved until "Save…" or the
+ * primary button, which also moves the case on once everything is ticked.
+ * Tick something to see "You have unsaved changes".
+ */
+export const ChecklistStory: Story = {
+	name: "Checklist",
+	render: () => (
+		<Checklist
+			legend="Decommission checklist"
+			name="check"
+			action={async () => {}}
+			saveText="Save decommission checks"
+			confirmText="Decommission old device"
+			saved="Last saved by John Smith, 12 Nov 2026, 2:15pm"
+			beforeButtons={
+				<WarningText>This runs the decommission call and cannot be undone.</WarningText>
+			}
+			items={[
+				{ value: "1", label: "Removed from Intune and Autopilot", ticked: true },
+				{ value: "2", label: "Disk wiped", ticked: false },
+				{ value: "3", label: "Asset label removed", ticked: false },
+			]}
+		/>
 	),
 };

@@ -32,7 +32,8 @@ export type CaseProgress = {
 /**
  * The step a case is on, 1 to 6, or null once it is Completed or Withdrawn.
  * Steps 1 to 3 can be done before the person books; step 3 waits for their
- * software choice unless they asked for none.
+ * software choice unless they asked for none. Step 4 also needs a booking,
+ * which the page says when there isn't one.
  */
 export function currentStep(progress: CaseProgress): number | null {
 	switch (progress.status) {
@@ -47,8 +48,8 @@ export function currentStep(progress: CaseProgress): number | null {
 	if (!progress.boxNumber) return 1;
 	if (!progress.devicePreparedAt) return 2;
 	const needsSoftware =
-		progress.softwareRequested === null ||
-		(progress.softwareRequested.length > 0 && !progress.softwarePreparedAt);
+		!progress.softwarePreparedAt &&
+		(progress.softwareRequested === null || progress.softwareRequested.length > 0);
 	return needsSoftware ? 3 : 4;
 }
 

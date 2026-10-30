@@ -32,3 +32,17 @@ export function CaseStatusTag({ status }: { status: CaseStatus }) {
 export function BookingStatusTag({ status }: { status: BookingStatus }) {
 	return <Tag colour={BOOKING_STATUS_COLOURS[status]}>{BOOKING_STATUS_LABELS[status]}</Tag>;
 }
+
+export type StockStatus = "available" | "allocated" | "issued" | "not_in_stock";
+
+/** A replacement device: Allocated is light blue in the mockups; Available green; Issued grey. */
+const STOCK: Record<StockStatus, { label: string; colour: TagColour }> = {
+	available: { label: "Available", colour: "green" },
+	allocated: { label: "Allocated", colour: "light-blue" },
+	issued: { label: "Issued", colour: "grey" },
+	not_in_stock: { label: "Not in stock", colour: "grey" },
+};
+
+export function StockStatusTag({ status }: { status: StockStatus }) {
+	return <Tag colour={STOCK[status].colour}>{STOCK[status].label}</Tag>;
+}

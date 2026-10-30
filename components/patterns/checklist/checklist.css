@@ -1,0 +1,17 @@
+.bcp-checklist-items {
+	margin: 0 0 10px 0;
+	padding: 0;
+	border: 0;
+}
+
+.bcp-checklist-count,
+.bcp-checklist-saved {
+	margin: 0 0 15px 0;
+	color: var(--bcp-secondary-text-colour);
+	font-size: var(--bcp-font-size-sm);
+}
+
+.bcp-checklist-unsaved {
+	margin: 0 0 15px 0;
+	font-weight: var(--bcp-text-weight-bold);
+}
