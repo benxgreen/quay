@@ -67,6 +67,15 @@ describe.skipIf(!hasDatabase)("sessions against the local database", async () =>
 		expect(months).toContain(date.slice(0, 7));
 	});
 
+	it("rejects another session of the same type at the same time", async () => {
+		await expect(
+			sessions.createSession(
+				{ type: "collection", date, time: "13:15", capacity: 2, location: "Another room" },
+				ALEX,
+			),
+		).rejects.toMatchObject({ constraint: "sessions_one_per_type_and_time" });
+	});
+
 	it("cancels it: the case needs a rebook, and a failed email is journaled and listed", async () => {
 		vi.stubEnv("MOCK_FAILURES", "email_webhook");
 		vi.spyOn(console, "error").mockImplementation(() => {});

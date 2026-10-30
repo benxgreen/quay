@@ -31,6 +31,14 @@ describe("describeConstraintError", () => {
 		});
 	});
 
+	it("explains a duplicate session slot", () => {
+		expect(describeConstraintError({ constraint: "sessions_one_per_type_and_time" })).toEqual({
+			constraint: "sessions_one_per_type_and_time",
+			problem: "session_duplicate",
+			message: "There is already a session of this type at this date and time.",
+		});
+	});
+
 	it("leaves unknown errors alone", () => {
 		expect(describeConstraintError({ constraint: "something_else" })).toBeUndefined();
 		expect(describeConstraintError(new Error("boom"))).toBeUndefined();

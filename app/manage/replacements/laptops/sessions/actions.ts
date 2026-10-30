@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/guards";
 import { resolveToday } from "@/lib/clock";
+import { describeConstraintError } from "@/lib/db/errors";
 import { ACCESS } from "@/lib/portal/access";
 import {
 	type SessionFormErrors,
@@ -50,10 +51,27 @@ export async function saveSession(
 	if (!result.ok) return { values, errors: result.errors };
 
 	if (sessionId) {
-		await updateSession(sessionId, result.input, user.id);
+		try {
+			await updateSession(sessionId, result.input, user.id);
+		} catch (error) {
+			const constraint = describeConstraintError(error);
+			if (constraint?.problem === "session_duplicate") {
+				return { values, errors: { time: constraint.message } };
+			}
+			throw error;
+		}
 		redirect(`${BASE}/${sessionId}?saved=updated`);
 	}
-	const id = await createSession(result.input, user.id);
+	let id: string;
+	try {
+		id = await createSession(result.input, user.id);
+	} catch (error) {
+		const constraint = describeConstraintError(error);
+		if (constraint?.problem === "session_duplicate") {
+			return { values, errors: { time: constraint.message } };
+		}
+		throw error;
+	}
 	redirect(`${BASE}/${id}?saved=added`);
 }
 

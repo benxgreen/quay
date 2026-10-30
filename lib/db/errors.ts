@@ -13,6 +13,8 @@ export type ConstraintProblem =
 	| "device_has_open_case"
 	/** The box is allocated to another open case. */
 	| "box_allocated"
+	/** A session of this type already exists at the requested time. */
+	| "session_duplicate"
 	/** A code path broke a rule the UI should have prevented. Report it as a bug. */
 	| "bug";
 
@@ -40,6 +42,10 @@ const CONSTRAINTS: Record<string, { problem: ConstraintProblem; message: string 
 	cases_one_open_per_box: {
 		problem: "box_allocated",
 		message: "That device is already allocated to another case.",
+	},
+	sessions_one_per_type_and_time: {
+		problem: "session_duplicate",
+		message: "There is already a session of this type at this date and time.",
 	},
 	bookings_session_type_matches: {
 		problem: "bug",

@@ -78,6 +78,7 @@ export function SessionForm({
 	const values = state.values ?? chosen.values;
 	const errors = state.errors ?? {};
 	const typeLocked = booked > 0;
+	const hasSelectedType = values.type === "collection" || values.type === "session";
 
 	function chooseType(type: string) {
 		if (type !== "collection" && type !== "session") return;
@@ -134,51 +135,56 @@ export function SessionForm({
 					},
 				]}
 			/>
-			{chosen.filledFrom && !sessionId ? (
-				<InsetText>
-					Time, capacity and location have been filled in from the{" "}
-					{TYPE_LABELS[chosen.filledFrom]} defaults. You can change them for this session.
-				</InsetText>
+			{hasSelectedType ? (
+				<>
+					{chosen.filledFrom && !sessionId ? (
+						<InsetText>
+							Time, capacity and location have been filled in from the{" "}
+							{TYPE_LABELS[chosen.filledFrom]} defaults. You can change them for this
+							session.
+						</InsetText>
+					) : null}
+					<div key={fieldsKey}>
+						<DateInput
+							name="date"
+							legend="Date"
+							legendSize="m"
+							hint="For example, 12 11 2026"
+							error={errors.date}
+							errorParts={errors.dateParts}
+							value={{ day: values.day, month: values.month, year: values.year }}
+						/>
+						<TimeInput
+							name="time"
+							legend="Start time"
+							legendSize="m"
+							hint="Use the 24-hour clock, for example 14 30"
+							error={errors.time}
+							errorParts={errors.timeParts}
+							value={{ hour: values.hour, minute: values.minute }}
+						/>
+						<TextInput
+							id="capacity"
+							name="capacity"
+							label="Capacity"
+							labelSize="m"
+							hint="Most people who can book this session"
+							inputMode="numeric"
+							width="3"
+							error={errors.capacity}
+							defaultValue={values.capacity}
+						/>
+						<TextInput
+							id="location"
+							name="location"
+							label="Location"
+							labelSize="m"
+							error={errors.location}
+							defaultValue={values.location}
+						/>
+					</div>
+				</>
 			) : null}
-			<div key={fieldsKey}>
-				<DateInput
-					name="date"
-					legend="Date"
-					legendSize="m"
-					hint="For example, 12 11 2026"
-					error={errors.date}
-					errorParts={errors.dateParts}
-					value={{ day: values.day, month: values.month, year: values.year }}
-				/>
-				<TimeInput
-					name="time"
-					legend="Start time"
-					legendSize="m"
-					hint="Use the 24-hour clock, for example 14 30"
-					error={errors.time}
-					errorParts={errors.timeParts}
-					value={{ hour: values.hour, minute: values.minute }}
-				/>
-				<TextInput
-					id="capacity"
-					name="capacity"
-					label="Capacity"
-					labelSize="m"
-					hint="Most people who can book this session"
-					inputMode="numeric"
-					width="3"
-					error={errors.capacity}
-					defaultValue={values.capacity}
-				/>
-				<TextInput
-					id="location"
-					name="location"
-					label="Location"
-					labelSize="m"
-					error={errors.location}
-					defaultValue={values.location}
-				/>
-			</div>
 			<ButtonGroup>
 				<Button type="submit" aria-disabled={pending || undefined}>
 					Save session
