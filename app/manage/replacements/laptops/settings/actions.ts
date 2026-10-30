@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import type { ReplacementType } from "@/components/service/replacements/type-tag";
 import { requireRole } from "@/lib/auth/guards";
+import type { FormState } from "@/lib/forms/state";
 import { ACCESS, canAccess } from "@/lib/portal/access";
 import {
 	addChecklistItem,
@@ -22,12 +23,7 @@ import {
 import { isNumberSetting, NUMBER_SETTINGS, readWholeNumber, SETTINGS } from "./definitions";
 
 /** What a settings form gets back when something needs correcting. */
-export type SettingsFormState = {
-	values: Record<string, string>;
-	errors: Record<string, string>;
-	/** Page content only: show the preview. */
-	preview?: boolean;
-};
+export type SettingsFormState = FormState;
 
 function fields(formData: FormData, names: string[]): Record<string, string> {
 	return Object.fromEntries(names.map((name) => [name, String(formData.get(name) ?? "").trim()]));

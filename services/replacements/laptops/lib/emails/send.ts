@@ -1,12 +1,9 @@
 import "server-only";
 
 import type { CallTrigger } from "@/lib/clients/connection-log";
-import { ExternalCallError } from "@/lib/clients/connection-log";
-import { ConnectionNotConfiguredError } from "@/lib/clients/connections";
-import { getEmailClient } from "@/lib/clients/email";
 import { query, queryOne } from "@/lib/db/query";
 import { withTransaction } from "@/lib/db/transaction";
-import { renderEmail } from "@/lib/emails/render";
+import { type SendEmailResult, sendEmail } from "@/lib/emails/send";
 import { bookingLink } from "@/services/replacements/laptops/lib/booking-link";
 import {
 	type LaptopEmailCase,
@@ -15,9 +12,7 @@ import {
 } from "@/services/replacements/laptops/lib/emails";
 import { addJournalEntry, type JournalActor } from "@/services/replacements/laptops/lib/journal";
 
-export type SendEmailResult =
-	| { ok: true }
-	| { ok: false; message: string; connectionLogId?: number };
+export type { SendEmailResult } from "@/lib/emails/send";
 
 type SendCaseEmailOptions = {
 	key: LaptopEmailKey;
@@ -45,7 +40,7 @@ export async function sendCaseEmail({
 	actor,
 	scheduled = false,
 }: SendCaseEmailOptions): Promise<SendEmailResult> {
-	const [emailCase, template, settings, layout] = await Promise.all([
+	const [emailCase, template, settings] = await Promise.all([
 		loadEmailCase(caseId, bookingId),
 		queryOne<{ subject: string; preheader: string; body_markdown: string }>(
 			"SELECT subject, preheader, body_markdown FROM lr.email_templates WHERE key = $1",
@@ -54,52 +49,27 @@ export async function sendCaseEmail({
 		queryOne<{ team_name: string; sent_from: string }>(
 			"SELECT team_name, sent_from FROM lr.settings WHERE id = 1",
 		),
-		queryOne<{ html: string }>("SELECT html FROM portal.email_template WHERE id = 1"),
 	]);
-	if (!template || !settings || !layout) {
-		throw new Error(
-			`The ${key} email, the laptop settings or the portal email template is missing`,
-		);
+	if (!template || !settings) {
+		throw new Error(`The ${key} email or the laptop settings are missing`);
 	}
 
-	const rendered = renderEmail({
+	const result = await sendEmail({
+		key,
+		service: "laptop_replacements",
+		caseReference: emailCase.values.caseReference,
+		to: emailCase.email,
+		sender: { teamName: settings.team_name, sentFrom: settings.sent_from },
 		template: {
 			subject: template.subject,
 			preheader: template.preheader,
 			bodyMarkdown: template.body_markdown,
 		},
-		layoutHtml: layout.html,
-		teamName: settings.team_name,
 		values: laptopEmailValues(emailCase.values, settings.team_name),
 		mode: "send",
+		context: { trigger, caseId },
 	});
-
-	let result: SendEmailResult;
-	let connectionLogId: number | undefined;
-	try {
-		const sent = await getEmailClient().send(
-			{
-				template: key,
-				service: "laptop_replacements",
-				case: emailCase.values.caseReference,
-				to: emailCase.email,
-				from_name: settings.team_name,
-				from: settings.sent_from,
-				...rendered,
-			},
-			{ trigger, caseId },
-		);
-		connectionLogId = sent.logId;
-		result = { ok: true };
-	} catch (error) {
-		if (
-			!(error instanceof ExternalCallError || error instanceof ConnectionNotConfiguredError)
-		) {
-			throw error;
-		}
-		connectionLogId = error instanceof ExternalCallError ? error.logId : undefined;
-		result = { ok: false, message: error.message, connectionLogId };
-	}
+	const { connectionLogId } = result;
 
 	const words = key.replaceAll("_", " ");
 	await withTransaction(async (tx) => {

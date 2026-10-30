@@ -320,6 +320,11 @@ a:focus-visible {
 	margin-bottom: 60px;
 }
 
+/* Long unbroken text, such as a link, that may wrap anywhere */
+.bcp-break-all {
+	word-break: break-all;
+}
+
 /* Section break */
 .bcp-section-break {
 	margin: var(--bcp-space-7xl) 0;

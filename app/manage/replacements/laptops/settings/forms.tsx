@@ -443,3 +443,47 @@ export function CheckForm({
 		</form>
 	);
 }
+
+/** One value whose label is the page heading, such as the team name or a connection's link. */
+export function ValueForm({
+	action,
+	initial,
+	title,
+	caption,
+	hint,
+	type = "text",
+	autoComplete,
+	cancelHref,
+}: {
+	action: Action;
+	initial: { value: string };
+	title: string;
+	caption: string;
+	hint?: ReactNode;
+	type?: "text" | "email" | "url";
+	autoComplete?: string;
+	cancelHref: string;
+}) {
+	const [state, formAction, pending] = useSettingsForm(action, initial);
+	const { values, errors } = state;
+	return (
+		<form action={formAction} key={JSON.stringify(values)}>
+			<Summary errors={errors} />
+			<TextInput
+				id="value"
+				name="value"
+				label={title}
+				caption={caption}
+				labelSize="l"
+				isPageHeading
+				hint={hint}
+				type={type}
+				autoComplete={autoComplete}
+				spellCheck={false}
+				defaultValue={values.value}
+				error={errors.value}
+			/>
+			<SaveOrCancel cancelHref={cancelHref} pending={pending} />
+		</form>
+	);
+}

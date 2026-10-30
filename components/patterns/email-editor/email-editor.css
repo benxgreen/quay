@@ -1,0 +1,7 @@
+.bcp-email-editor-variable {
+	padding: 1px 4px;
+	background-color: var(--bcp-colour-light-grey);
+	font-family: var(--bcp-font-family-mono);
+	font-size: 0.875rem;
+	white-space: nowrap;
+}

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ActionList } from "@/components/patterns/action-list";
 import { Checklist } from "@/components/patterns/checklist";
+import { Editor, EditorCode, EditorFrame } from "@/components/patterns/editor";
 import { InlineForm } from "@/components/patterns/inline-form";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/ui/sidebar";
@@ -89,5 +90,29 @@ export const InlineFormStory: Story = {
 				<Button type="submit">Add</Button>
 			</InlineForm>
 		</form>
+	),
+};
+
+/** An editor beside its preview, such as an email: two columns, one under the other below 900px. */
+export const EditorStory: Story = {
+	name: "Editor with preview",
+	render: () => (
+		<Editor>
+			<form>
+				<TextInput
+					id="subject"
+					name="subject"
+					label="Subject"
+					defaultValue="Your laptop replacement"
+				/>
+			</form>
+			<section>
+				<EditorFrame
+					title="Email preview"
+					html="<p style='font-family:Arial'>Hello Ellie,</p>"
+				/>
+				<EditorCode>{"<p>Hello Ellie,</p>"}</EditorCode>
+			</section>
+		</Editor>
 	),
 };

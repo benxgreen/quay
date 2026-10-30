@@ -8,12 +8,16 @@ import { Link, LinkButton } from "@/components/ui/link";
 import { NotificationBanner } from "@/components/ui/notification-banner";
 import { PageHeading } from "@/components/ui/page-heading";
 import { Sidebar } from "@/components/ui/sidebar";
-import { SummaryList } from "@/components/ui/summary-list";
+import { SummaryList, SummaryListSecondary } from "@/components/ui/summary-list";
 import { Table } from "@/components/ui/table";
 import { TagGroup } from "@/components/ui/tag";
 import { requireRole } from "@/lib/auth/guards";
-import { formatFullDate, formatTime } from "@/lib/dates/format";
+import { londonToday } from "@/lib/clock";
+import { formatFullDate, formatLongDate, formatTime, formatUpdatedAt } from "@/lib/dates/format";
 import { ACCESS, canAccess } from "@/lib/portal/access";
+import { listConnections } from "@/lib/portal/connections";
+import { LAPTOP_EMAILS } from "@/services/replacements/laptops/lib/emails";
+import { emailsEachDay, getEmailSender } from "@/services/replacements/laptops/lib/emails/settings";
 import {
 	CHECKLISTS,
 	type ChecklistItem,
@@ -37,12 +41,16 @@ const SECTIONS = [
 	{ id: "software", text: "Software list" },
 	{ id: "page", text: "Portal content" },
 	{ id: "faqs", text: "Frequently asked questions" },
+	{ id: "emails", text: "Emails" },
 	{ id: "defaults", text: "Session defaults" },
 	{ id: "invites", text: "Invitations and reminders" },
 	{ id: "prep", text: "Device preparation checks" },
 	{ id: "decom", text: "Decommission checklist" },
 	{ id: "jobs", text: "Scheduled jobs" },
 ];
+
+/** Only Administrators see Connections. */
+const CONNECTIONS_SECTION = { id: "connections", text: "Connections" };
 
 /** Mockups: AdminSettings. */
 export default async function SettingsPage({
@@ -53,15 +61,20 @@ export default async function SettingsPage({
 	const user = await requireRole(ACCESS.laptopsSettings);
 	const isAdministrator = canAccess(user.roles, ACCESS.management);
 	const { saved } = await searchParams;
-	const [software, content, faqs, defaults, settings, prep, decom] = await Promise.all([
-		listSoftware(),
-		listContent(),
-		listFaqs(),
-		listDefaults(),
-		getServiceSettings(),
-		listChecklist("device_preparation"),
-		listChecklist("decommission"),
-	]);
+	const today = londonToday();
+	const [software, content, faqs, defaults, settings, prep, decom, sender, counts, connections] =
+		await Promise.all([
+			listSoftware(),
+			listContent(),
+			listFaqs(),
+			listDefaults(),
+			getServiceSettings(),
+			listChecklist("device_preparation"),
+			listChecklist("decommission"),
+			getEmailSender(),
+			emailsEachDay(today),
+			isAdministrator ? listConnections() : Promise.resolve([]),
+		]);
 	const message = saved ? SAVED_MESSAGES[saved] : undefined;
 
 	return (
@@ -77,11 +90,13 @@ export default async function SettingsPage({
 			sidebar={
 				<Sidebar label="On this page">
 					<ul className="bcp-list--plain bcp-list--spaced">
-						{SECTIONS.map((section) => (
-							<li key={section.id}>
-								<Link href={`#${section.id}`}>{section.text}</Link>
-							</li>
-						))}
+						{(isAdministrator ? [...SECTIONS, CONNECTIONS_SECTION] : SECTIONS).map(
+							(section) => (
+								<li key={section.id}>
+									<Link href={`#${section.id}`}>{section.text}</Link>
+								</li>
+							),
+						)}
 					</ul>
 				</Sidebar>
 			}
@@ -208,6 +223,100 @@ export default async function SettingsPage({
 				</Button>
 			</Section>
 
+			<Section id="emails" title="Emails">
+				<p className="bcp-secondary-text">
+					The wording of each email sent to colleagues. Sent through Power Automate; the
+					portal fills in the person's details.
+				</p>
+				<InsetText>
+					<p>
+						<strong>
+							{counts.today.totalSent}{" "}
+							{counts.today.totalSent === 1 ? "email" : "emails"} sent today
+						</strong>
+						{counts.today.failed ? ` (${counts.today.failed} failed)` : ""} and{" "}
+						{counts.forecast[0]?.total ?? 0} scheduled for{" "}
+						{counts.forecast[0]
+							? formatLongDate(counts.forecast[0].day)
+							: "the next working day"}{" "}
+						at 9:00am.{" "}
+						<Link href={`${SETTINGS}/emails-each-day`}>See emails each day</Link>
+					</p>
+				</InsetText>
+				<SummaryList
+					rows={[
+						{
+							key: "Team name",
+							value: (
+								<>
+									{sender.teamName}
+									<SummaryListSecondary>
+										Shown as the sender name and used in emails as{" "}
+										{"{team_name}"}
+									</SummaryListSecondary>
+								</>
+							),
+							actions: [
+								{
+									href: `${SETTINGS}/sender/team`,
+									visuallyHiddenText: "team name",
+								},
+							],
+						},
+						{
+							key: "Sent from",
+							value: (
+								<>
+									{sender.sentFrom}
+									<SummaryListSecondary>
+										The mailbox laptop replacement emails are sent from
+									</SummaryListSecondary>
+								</>
+							),
+							actions: [
+								{
+									href: `${SETTINGS}/sender/from`,
+									visuallyHiddenText: "sent from email address",
+								},
+							],
+						},
+						{
+							key: "Template",
+							value: isAdministrator ? (
+								<Link href="/manage/portal-settings/email-template">
+									Portal email template
+								</Link>
+							) : (
+								"Portal email template, changed by Administrators in Portal settings"
+							),
+						},
+					]}
+				/>
+				<Table
+					caption="Emails"
+					captionHidden
+					columns={[
+						{ key: "email", header: "Email" },
+						{ key: "when", header: "When it is sent" },
+						{ key: "actions", header: <span className="sr-only">Actions</span> },
+					]}
+					rows={LAPTOP_EMAILS.map((email) => ({
+						id: email.key,
+						cells: {
+							email: email.name,
+							when: <span className="bcp-secondary-text">{email.sentWhen}</span>,
+							actions: (
+								<span className="bcp-table-actions">
+									<Link href={`${SETTINGS}/emails/${email.key}`}>
+										Edit<span className="sr-only"> {email.name} email</span>
+									</Link>
+								</span>
+							),
+						},
+					}))}
+				/>
+			</Section>
+
 			<Section id="defaults" title="Session defaults">
 				<p className="bcp-secondary-text">
 					Filled in when you add a session of that type. You can change them on each
@@ -270,6 +379,45 @@ export default async function SettingsPage({
 					The 9:00am invitation and reminder jobs, when each last ran, and the job log.
 				</p>
 			</Section>
+
+			{isAdministrator ? (
+				<Section id="connections" title="Connections">
+					<p className="bcp-secondary-text">
+						Only shown to Administrator users. Only the start of each link is shown;
+						passwords and keys are kept on the server, not here.
+					</p>
+					<SummaryList
+						rows={connections.map((connection) => ({
+							key: connection.label,
+							value: (
+								<>
+									<span className="bcp-break-all">
+										{connection.urlStart ?? "Not set"}
+									</span>
+									<SummaryListSecondary>
+										{connection.lastUsedAt
+											? `Last used ${formatUpdatedAt(connection.lastUsedAt)}`
+											: "Not used in the last 7 days"}
+									</SummaryListSecondary>
+								</>
+							),
+							actions: [
+								{
+									href: `${SETTINGS}/connections/${connection.key}`,
+									visuallyHiddenText: connection.label,
+								},
+							],
+						}))}
+					/>
+					<p>
+						<Link href={`${SETTINGS}/connection-log`}>Connection log</Link>
+					</p>
+					<p className="bcp-secondary-text">
+						Every call to Halo and Power Automate in the last 7 days, with what
+						triggered it and the case it was for.
+					</p>
+				</Section>
+			) : null}
 		</LaptopsPage>
 	);
 }

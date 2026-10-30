@@ -1,0 +1,34 @@
+.bcp-editor {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: 40px;
+	align-items: start;
+}
+
+@media (max-width: 900px) {
+	.bcp-editor {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.bcp-editor-frame {
+	display: block;
+	width: 100%;
+	height: 640px;
+	border: 0;
+	background-color: var(--bcp-colour-white);
+}
+
+.bcp-editor-code {
+	max-height: 400px;
+	margin: 0;
+	padding: 16px;
+	overflow: auto;
+	border-left: var(--bcp-border-width-lg) solid var(--bcp-colour-mid-grey);
+	background-color: var(--bcp-colour-light-grey);
+	font-family: var(--bcp-font-family-mono);
+	font-size: 0.875rem;
+	line-height: 1.5;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
