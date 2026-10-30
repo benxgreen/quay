@@ -1,0 +1,13 @@
+.bcp-standout {
+	margin: 40px 0 30px 0;
+	padding: 48px 32px;
+	border: var(--bcp-border-width-sm) solid var(--bcp-colour-dark-grey);
+	border-top: var(--bcp-border-width-lg) solid var(--bcp-colour-purple);
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.bcp-standout > * {
+	margin: 0;
+}

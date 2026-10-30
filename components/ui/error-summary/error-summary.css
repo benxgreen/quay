@@ -5,10 +5,6 @@
 	border: var(--bcp-border-width-lg) solid var(--bcp-colour-red);
 }
 
-.bcp-error-summary:focus {
-	outline: 3px solid var(--bcp-colour-focus);
-}
-
 .bcp-error-summary-title {
 	margin: 0 0 14px 0;
 	font-size: var(--bcp-font-size-md);

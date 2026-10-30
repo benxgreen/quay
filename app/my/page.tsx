@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { ColleaguePage } from "@/components/layouts/colleague-page";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/components/ui/link";
 import { NotificationBanner, NotificationBannerDetail } from "@/components/ui/notification-banner";
 import { PageHeading } from "@/components/ui/page-heading";
+import { Standout } from "@/components/ui/standout";
 import { requireUser } from "@/lib/auth/guards";
 import { formatLongDate } from "@/lib/dates/format";
 import { type MyCase, myCase } from "@/services/replacements/laptops/lib/my-laptop";
@@ -33,9 +35,19 @@ export default async function YourDevicesPage({
 					? "You have 1 thing to do."
 					: "You have nothing to do right now. We will email you when you do."}
 			</p>
-			{found ? <LaptopPanel found={found} token={token} /> : null}
-			<h2>Technical support</h2>
-			<p>Support can be accessed via the Halo Hub or by calling the ICT Service Desk.</p>
+
+			{found ? (
+				<Standout>
+					<LaptopPanel found={found} token={token} />
+				</Standout>
+			) : null}
+
+			<h2>Find support for your council equipment</h2>
+			<p>
+				Support can be accessed via the{" "}
+				<Link href="https://halohub.bcpcouncil.gov.uk">Halo Hub</Link> or by calling the{" "}
+				<Link href="tel:01202096666">ICT Service Desk</Link>.
+			</p>
 		</ColleaguePage>
 	);
 }
@@ -106,7 +118,7 @@ function LaptopPanel({ found, token }: { found: MyCase; token?: string }) {
 				Your laptop
 				{found.serial ? (
 					<>
-						, <strong>{found.serial}</strong>,
+						, serial number <strong>{found.serial}</strong>,
 					</>
 				) : null}{" "}
 				is no longer supported by the council and needs to be replaced.

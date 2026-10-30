@@ -12,13 +12,13 @@ export const TYPE_WORDS: Record<
 	session: {
 		name: "Session",
 		involves: "An engineer sets up your new laptop with you.",
-		book: "Book a session with an engineer, who will set up your new laptop with you.",
+		book: "Book on a replacement session to collect and set up your new laptop.",
 		choose: "An engineer will set up your new laptop with you.",
 	},
 	collection: {
 		name: "Collection",
 		involves: "You collect a new laptop that is already set up for you.",
-		book: "Book a time to collect your new laptop, which will already be set up for you.",
+		book: "Book a time to collect your new laptop.",
 		choose: "Your new laptop will be set up and ready for you to collect.",
 	},
 };

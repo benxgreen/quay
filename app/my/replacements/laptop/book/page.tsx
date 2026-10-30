@@ -42,7 +42,7 @@ export default async function ChooseDatePage({ searchParams }: BookPageProps) {
 	return (
 		<ColleaguePage backHref={`${LAPTOP_PAGE}${withCase(token)}`}>
 			<ErrorSummary errors={message ? [{ fieldId: "session", text: message }] : []} />
-			<form action={chooseDate}>
+			<form action={chooseDate} style={{ marginBottom: "2rem" }}>
 				{token ? <input type="hidden" name="case" value={token} /> : null}
 				{software.map((name) => (
 					<input key={name} type="hidden" name="keep" value={name} />
