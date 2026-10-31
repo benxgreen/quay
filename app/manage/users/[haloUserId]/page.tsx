@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TeamPage } from "@/components/layouts/team-page";
+import { Button } from "@/components/ui/button";
 import { BackLink } from "@/components/ui/link";
 import { NotificationBanner } from "@/components/ui/notification-banner";
 import { PageHeading } from "@/components/ui/page-heading";
 import { Sidebar } from "@/components/ui/sidebar";
 import { SummaryList } from "@/components/ui/summary-list";
 import { Tag } from "@/components/ui/tag";
+import { WarningText } from "@/components/ui/warning-text";
+import { getRealUser } from "@/lib/auth/current-user";
 import { requireRole } from "@/lib/auth/guards";
 import { formatShortDate, formatWhen } from "@/lib/dates/format";
 import { ACCESS } from "@/lib/portal/access";
+import { canImpersonate } from "@/lib/portal/impersonation";
 import { MANAGE_BREADCRUMB } from "@/lib/portal/navigation";
 import { describeChange, getUserDetail, type UserDetail } from "@/lib/portal/users";
 import { RolesForm } from "./roles-form";
@@ -27,16 +31,21 @@ export default async function UserPage({ params, searchParams }: UserPageProps) 
 	if (!Number.isInteger(haloUserId) || haloUserId <= 0) notFound();
 
 	const detail = await getUserDetail(haloUserId, {
-		trigger: { kind: "user", label: "User page", actorUserId: viewer.id },
+		trigger: { kind: "user", label: "User page", actorUserId: viewer.actorId },
 	});
 	if (!detail) notFound();
-	const { halo, portal } = detail;
+	const { halo, portal, mismatch } = detail;
 	const saved = (await searchParams).saved === "1";
+	const real = await getRealUser();
+	const impersonateHref =
+		real && portal && canImpersonate(real, viewer, portal.id)
+			? `/manage/users/${halo.haloUserId}/impersonate`
+			: null;
 
 	return (
 		<TeamPage
 			breadcrumbs={[MANAGE_BREADCRUMB, { text: "Users", href: "/manage/users" }]}
-			sidebar={<PortalUserPanel detail={detail} />}
+			sidebar={<PortalUserPanel detail={detail} impersonateHref={impersonateHref} />}
 		>
 			<BackLink href="/manage/users" />
 			{saved ? (
@@ -44,6 +53,13 @@ export default async function UserPage({ params, searchParams }: UserPageProps) 
 					variant="success"
 					heading={`${halo.displayName}’s roles have been updated`}
 				/>
+			) : null}
+			{mismatch ? (
+				<WarningText>
+					The portal user with this Halo ID is {mismatch.name}, whose email does not
+					match. They are not shown here and roles cannot be changed until the Halo ID is
+					put right.
+				</WarningText>
 			) : null}
 			<PageHeading caption="User" title={halo.displayName} />
 
@@ -64,7 +80,9 @@ export default async function UserPage({ params, searchParams }: UserPageProps) 
 				</p>
 			</section>
 
-			<RolesForm haloUserId={halo.haloUserId} roles={portal?.roles ?? []} />
+			{mismatch ? null : (
+				<RolesForm haloUserId={halo.haloUserId} roles={portal?.roles ?? []} />
+			)}
 		</TeamPage>
 	);
 }
@@ -75,7 +93,26 @@ const CREATED_VIA = {
 	role_granted: (by: string | null) => (by ? `when given a role by ${by}` : "when given a role"),
 };
 
-function PortalUserPanel({ detail: { halo, portal } }: { detail: UserDetail }) {
+function PortalUserPanel({
+	detail: { halo, portal, mismatch },
+	impersonateHref,
+}: {
+	detail: UserDetail;
+	/** Set when the viewer can impersonate this person. */
+	impersonateHref: string | null;
+}) {
+	if (mismatch) {
+		return (
+			<Sidebar label="Portal user">
+				<h2 className="bcp-heading-md">Portal user</h2>
+				<p>
+					<Tag colour="red">Does not match</Tag>
+				</p>
+				<p>This Halo ID belongs to a different portal user, {mismatch.name}.</p>
+			</Sidebar>
+		);
+	}
+
 	if (!portal) {
 		return (
 			<Sidebar label="Portal user">
@@ -134,6 +171,17 @@ function PortalUserPanel({ detail: { halo, portal } }: { detail: UserDetail }) {
 			) : (
 				<p className="bcp-body-small">No role changes.</p>
 			)}
+			{impersonateHref ? (
+				<>
+					<h3>Impersonate</h3>
+					<p className="bcp-body-small">
+						See the portal as {halo.firstName} does, with their roles.
+					</p>
+					<Button variant="secondary" href={impersonateHref}>
+						Impersonate {halo.firstName}
+					</Button>
+				</>
+			) : null}
 		</Sidebar>
 	);
 }

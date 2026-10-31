@@ -22,7 +22,11 @@ const { callExternal, ExternalCallError, HttpStatusError } = await import(
 	"@/lib/clients/connection-log"
 );
 const { createMockEmailClient, mockOutbox } = await import("@/lib/clients/email");
-const { createMockHaloUsersClient } = await import("@/lib/clients/halo/users");
+const { createMockHaloUsersClient, sideBySideHaloUsersClient } = await import(
+	"@/lib/clients/halo/users"
+);
+const { MOCK_HALO_USERS } = await import("@/mocks/halo");
+const { mockWebhookPosts, SCHEMA_VERSION } = await import("@/lib/clients/power-automate");
 const { createMockLaptopHaloClient } = await import(
 	"@/services/replacements/laptops/lib/halo/mock"
 );
@@ -149,6 +153,30 @@ describe("mock clients", () => {
 		expect(logged[0]?.[0]).toBe("email_webhook");
 	});
 
+	it("posts an email as an event in the shared webhook envelope", async () => {
+		await createMockEmailClient().send(
+			{ ...message, data: { variables: { first_name: "Ellie" } } },
+			context,
+		);
+		const { connection, payload } = mockWebhookPosts().at(-1) ?? {};
+		expect(connection).toBe("email_webhook");
+		expect(payload).toMatchObject({
+			schema_version: SCHEMA_VERSION,
+			type: "email",
+			service: "laptop_replacements",
+			case: { reference: "LR-000128" },
+			email: {
+				template: "session_cancelled",
+				to: "ellie.ward@bcpcouncil.test",
+				html: "<p>Hi</p>",
+			},
+			data: { variables: { first_name: "Ellie" } },
+			triggered_by: { kind: "user", label: "Complete replacement", user_id: "user-1" },
+		});
+		expect(payload?.id).toMatch(/^[0-9a-f-]{36}$/);
+		expect(payload?.sent_at).toMatch(/Z$/);
+	});
+
 	it("fails a connection named in MOCK_FAILURES", async () => {
 		vi.stubEnv("MOCK_FAILURES", "halo, email_webhook");
 		await expect(createMockEmailClient().send(message, context)).rejects.toMatchObject({
@@ -187,7 +215,7 @@ describe("Halo staff details", () => {
 			context,
 		);
 		expect(value).toMatchObject({
-			haloUserId: 1002,
+			haloUserId: 9000002,
 			displayName: "Priya Hart",
 			jobTitle: "Planning Officer",
 		});
@@ -263,5 +291,33 @@ describe("externalFirst", () => {
 				},
 			}),
 		).rejects.toBeInstanceOf(SaveAfterCallError);
+	});
+});
+
+describe("mock and real Halo users side by side", () => {
+	const mock = createMockHaloUsersClient();
+	const realPerson = {
+		...MOCK_HALO_USERS[0],
+		haloUserId: 42,
+		email: "real.person@bcpcouncil.gov.uk",
+	};
+	const real = {
+		...mock,
+		get: vi.fn(async () => ({ value: realPerson, connection: "halo" })),
+		findByEmail: vi.fn(async () => ({ value: realPerson, connection: "halo" })),
+	};
+	const users = sideBySideHaloUsersClient(real, mock);
+
+	it("answers mock IDs and emails from the mocks, and everything else from Halo", async () => {
+		expect((await users.get(9000002, context)).value?.displayName).toBe("Priya Hart");
+		expect((await users.get(42, context)).value).toBe(realPerson);
+		expect(
+			(await users.findByEmail("priya.hart@bcpcouncil.test", context)).value?.haloUserId,
+		).toBe(9000002);
+		expect((await users.findByEmail("real.person@bcpcouncil.gov.uk", context)).value).toBe(
+			realPerson,
+		);
+		expect(real.get).toHaveBeenCalledTimes(1);
+		expect(real.findByEmail).toHaveBeenCalledTimes(1);
 	});
 });

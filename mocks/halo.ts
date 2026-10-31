@@ -6,6 +6,16 @@ import type {
 } from "@/services/replacements/laptops/lib/halo";
 
 /**
+ * Mock people's Halo user IDs start here, far above any real Halo ID, so mock
+ * and real people can sit side by side in one database while HALO_CLIENT=http
+ * (see sideBySideHaloUsersClient). Their emails end @bcpcouncil.test and
+ * their Entra object IDs start 10000000-0000-4000-8000-.
+ */
+export const MOCK_HALO_USER_ID_BASE = 9_000_000;
+export const MOCK_EMAIL_DOMAIN = "@bcpcouncil.test";
+export const MOCK_ENTRA_OBJECT_ID_PREFIX = "10000000-0000-4000-8000-";
+
+/**
  * Made-up Halo data for development, lining up with db/seed/dev.sql: the
  * report includes devices that already have cases (hidden on Import), one
  * replaced before the portal (29001) and new ones; the stock includes the
@@ -242,9 +252,9 @@ function person(
 ): HaloUser {
 	const username = displayName.toLowerCase().replace(" ", ".");
 	return {
-		haloUserId: 1000 + n,
-		entraObjectId: `10000000-0000-4000-8000-${String(n).padStart(12, "0")}`,
-		email: `${username}@bcpcouncil.test`,
+		haloUserId: MOCK_HALO_USER_ID_BASE + n,
+		entraObjectId: `${MOCK_ENTRA_OBJECT_ID_PREFIX}${String(n).padStart(12, "0")}`,
+		email: `${username}${MOCK_EMAIL_DOMAIN}`,
 		displayName,
 		firstName: displayName.split(" ")[0],
 		username,

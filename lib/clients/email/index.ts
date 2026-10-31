@@ -1,28 +1,28 @@
 import "server-only";
 
 import type { CallContext, CallResult } from "@/lib/clients/connection-log";
-import { callExternal, HttpStatusError } from "@/lib/clients/connection-log";
-import { clientMode, getConnectionUrl, mockShouldFail } from "@/lib/clients/connections";
-import { postJsonWebhook } from "@/lib/clients/webhook";
+import {
+	createHttpPowerAutomateClient,
+	createMockPowerAutomateClient,
+	getPowerAutomateClient,
+	mockWebhookPosts,
+	type PowerAutomateClient,
+	type WebhookEmail,
+} from "@/lib/clients/power-automate";
 
 /**
  * One email, rendered by the portal and posted to the Power Automate flow,
- * which only sends it. Field names are the flow's JSON schema.
+ * which only sends it. It goes as an "email" event in the shared webhook
+ * envelope (lib/clients/power-automate), with everything else the portal
+ * knows in `data`.
  */
-export type EmailMessage = {
-	/** The email's key, such as "session_cancelled". */
-	template: string;
+export type EmailMessage = WebhookEmail & {
 	/** Such as "laptop_replacements". */
 	service: string;
 	/** The case reference, such as "LR-000160", or null for a test email. */
 	case: string | null;
-	to: string;
-	from_name: string;
-	from: string;
-	subject: string;
-	preheader: string;
-	html: string;
-	text: string;
+	/** The variables it was filled with, and anything else worth passing on. */
+	data?: Record<string, unknown>;
 };
 
 export type EmailClient = {
@@ -31,37 +31,36 @@ export type EmailClient = {
 };
 
 const CONNECTION = "email_webhook";
-// Three attempts with backoff fit inside this.
-const TIMEOUT_MS = 30_000;
 
-/** Posts to the webhook URL in portal.connections (Settings › Connections). */
-export function createPowerAutomateEmailClient(fetchFn: typeof fetch = fetch): EmailClient {
+function emailClient(powerAutomate: () => PowerAutomateClient): EmailClient {
 	return {
-		async send(message, context) {
-			const url = await getConnectionUrl(CONNECTION);
-			return callExternal(
+		send({ service, case: reference, data, ...email }, context) {
+			return powerAutomate().post(
 				CONNECTION,
-				context,
-				async (signal) => {
-					const status = await postJsonWebhook(url, message, { signal, fetchFn });
-					return {
-						value: undefined,
-						statusCode: status,
-						summary: `${message.template} to ${message.to}`,
-					};
+				{
+					type: "email",
+					service,
+					case: reference ? { reference } : null,
+					email,
+					data,
 				},
-				{ timeoutMs: TIMEOUT_MS },
+				context,
 			);
 		},
 	};
 }
 
-const globalForOutbox = globalThis as unknown as { quayMockOutbox?: EmailMessage[] };
+/** Posts to the webhook URL in portal.connections (Settings › Connections). */
+export function createPowerAutomateEmailClient(fetchFn: typeof fetch = fetch): EmailClient {
+	const powerAutomate = createHttpPowerAutomateClient(fetchFn);
+	return emailClient(() => powerAutomate);
+}
 
 /** Emails the mock client has "sent" since the server started, newest last. */
-export function mockOutbox(): EmailMessage[] {
-	globalForOutbox.quayMockOutbox ??= [];
-	return globalForOutbox.quayMockOutbox;
+export function mockOutbox(): WebhookEmail[] {
+	return mockWebhookPosts().flatMap(({ connection, payload }) =>
+		connection === CONNECTION && payload.email ? [payload.email] : [],
+	);
 }
 
 /**
@@ -69,30 +68,14 @@ export function mockOutbox(): EmailMessage[] {
  * thing. Set MOCK_FAILURES=email_webhook to see a failure.
  */
 export function createMockEmailClient(): EmailClient {
-	return {
-		send(message, context) {
-			return callExternal(CONNECTION, context, async () => {
-				if (mockShouldFail(CONNECTION)) {
-					throw new HttpStatusError(502, "Power Automate returned 502 Bad Gateway");
-				}
-				mockOutbox().push(message);
-				return {
-					value: undefined,
-					statusCode: 202,
-					summary: `${message.template} to ${message.to}`,
-				};
-			});
-		},
-	};
+	const powerAutomate = createMockPowerAutomateClient();
+	return emailClient(() => powerAutomate);
 }
 
 let client: EmailClient | undefined;
 
-/** The email client: the mock unless EMAIL_CLIENT=http. */
+/** The email client: the shared Power Automate client, the mock unless EMAIL_CLIENT=http. */
 export function getEmailClient(): EmailClient {
-	client ??=
-		clientMode("EMAIL_CLIENT") === "http"
-			? createPowerAutomateEmailClient()
-			: createMockEmailClient();
+	client ??= emailClient(getPowerAutomateClient);
 	return client;
 }

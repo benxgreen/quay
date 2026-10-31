@@ -3,7 +3,7 @@ import { ColleagueLayout } from "@/components/layouts/colleague-layout";
 import { ColleaguePage } from "@/components/layouts/colleague-page";
 import { TeamLayout } from "@/components/layouts/team-layout";
 import { ActionList } from "@/components/patterns/action-list";
-import { LaptopsPage } from "@/components/service/replacements/laptops-page";
+import { LaptopsPageFrame as LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { TypeTag } from "@/components/service/replacements/type-tag";
 import { Button, ButtonGroup } from "@/components/ui/button";
 import { InsetText } from "@/components/ui/inset-text";
@@ -15,6 +15,7 @@ import { SearchBox } from "@/components/ui/search-box";
 import { Sidebar } from "@/components/ui/sidebar";
 import { SummaryList } from "@/components/ui/summary-list";
 import { Tag } from "@/components/ui/tag";
+import { describeRoles, STOP_IMPERSONATING_HREF } from "@/lib/portal/impersonation";
 import { menuGroups } from "@/lib/portal/navigation";
 import { MOCK_COLLEAGUE, MOCK_TEAM_USER } from "@/mocks/users";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
@@ -54,6 +55,45 @@ export const TeamListPageNotAdministrator: Story = {
 				<PageHeading title="Bookings" />
 			</LaptopsPage>
 		</TeamLayout>
+	),
+};
+
+/**
+ * While an Administrator impersonates someone, a banner above the header on
+ * every page says who, with which roles, and links to stop.
+ */
+export const TeamPageImpersonating: Story = {
+	render: () => (
+		<TeamLayout
+			menu={menuGroups(["laptops_team"])}
+			impersonation={{
+				name: "Sam Lee",
+				roles: describeRoles(["laptops_team"]),
+				stopHref: STOP_IMPERSONATING_HREF,
+			}}
+		>
+			<LaptopsPage section="bookings">
+				<PageHeading title="Bookings" />
+			</LaptopsPage>
+		</TeamLayout>
+	),
+};
+
+/** A colleague's page while impersonated: the banner says they have no role. */
+export const ColleaguePageImpersonating: Story = {
+	render: () => (
+		<ColleagueLayout
+			user={MOCK_COLLEAGUE}
+			impersonation={{
+				name: MOCK_COLLEAGUE.displayName,
+				roles: describeRoles(MOCK_COLLEAGUE.roles),
+				stopHref: STOP_IMPERSONATING_HREF,
+			}}
+		>
+			<ColleaguePage>
+				<PageHeading title={`Hello, ${MOCK_COLLEAGUE.firstName}`} />
+			</ColleaguePage>
+		</ColleagueLayout>
 	),
 };
 

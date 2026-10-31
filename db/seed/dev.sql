@@ -64,9 +64,10 @@ INSERT INTO portal.users (email, display_name, username, job_title, department, 
   ('sam.taylor@bcpcouncil.test',     'Sam Taylor',     'sam.taylor',     'Waste Services Officer',    'Waste Services',      'case', '00000000-0000-4000-8000-000000000001');
 
 -- Everyone is matched to their Halo user (mocks/halo.ts MOCK_HALO_USERS),
--- which is where staff details come from.
+-- which is where staff details come from. Mock Halo IDs start at 9000000
+-- (MOCK_HALO_USER_ID_BASE) so they never clash with the real Halo's.
 UPDATE portal.users u
-SET halo_user_id = 1000 + h.n,
+SET halo_user_id = 9000000 + h.n,
     entra_object_id = ('10000000-0000-4000-8000-' || lpad(h.n::text, 12, '0'))::uuid
 FROM (VALUES
   ('john.smith', 1), ('priya.hart', 2), ('alex.morgan', 3), ('amira.shah', 4), ('owen.price', 5),

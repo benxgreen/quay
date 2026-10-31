@@ -34,7 +34,7 @@ describe.skipIf(!hasDatabase)("import and queue against the local database", asy
 	};
 
 	beforeAll(async () => {
-		hadUser = Boolean(await queryOne("SELECT 1 FROM portal.users WHERE halo_user_id = 1023"));
+		hadUser = Boolean(await queryOne("SELECT 1 FROM portal.users WHERE halo_user_id = 9000023"));
 	});
 
 	afterAll(async () => {
@@ -44,7 +44,7 @@ describe.skipIf(!hasDatabase)("import and queue against the local database", asy
 				[ASSET, started],
 			);
 			await client.query("DELETE FROM lr.imports WHERE imported_at >= $1", [started]);
-			if (!hadUser) await client.query("DELETE FROM portal.users WHERE halo_user_id = 1023");
+			if (!hadUser) await client.query("DELETE FROM portal.users WHERE halo_user_id = 9000023");
 		});
 		await getPool().end();
 	});

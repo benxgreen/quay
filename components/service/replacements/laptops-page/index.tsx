@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { TeamPage } from "@/components/layouts/team-page";
 import type { Breadcrumb } from "@/components/ui/breadcrumbs";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { ACCESS, canAccess } from "@/lib/portal/access";
+import type { NavigationLink } from "@/lib/portal/navigation";
 import {
 	LAPTOPS_BREADCRUMBS,
 	LAPTOPS_NAVIGATION,
@@ -26,12 +29,23 @@ type LaptopsPageProps = {
 
 /**
  * A TeamPage for the laptop replacement service, with its breadcrumbs and
- * service navigation filled in.
+ * service navigation filled in. Settings is only in the navigation for
+ * someone who can open it (the laptops admin role).
  *
  * @example
  * <LaptopsPage section="cases" parents={[LAPTOPS_SECTIONS.cases]} sidebar={<Sidebar …>}>
  */
-export function LaptopsPage({
+export async function LaptopsPage(props: LaptopsPageProps) {
+	const user = await getCurrentUser();
+	const links = canAccess(user?.roles ?? [], ACCESS.laptopsSettings)
+		? LAPTOPS_NAVIGATION
+		: LAPTOPS_NAVIGATION.filter((link) => link.href !== LAPTOPS_SECTIONS.settings.href);
+	return <LaptopsPageFrame {...props} links={links} />;
+}
+
+/** LaptopsPage without reading who is signed in, for Storybook: pass the navigation links. */
+export function LaptopsPageFrame({
+	links = LAPTOPS_NAVIGATION,
 	section,
 	parents = [],
 	sidebar,
@@ -39,13 +53,13 @@ export function LaptopsPage({
 	sidebarHeader,
 	narrow,
 	children,
-}: LaptopsPageProps) {
+}: LaptopsPageProps & { links?: NavigationLink[] }) {
 	return (
 		<TeamPage
 			breadcrumbs={[...LAPTOPS_BREADCRUMBS, ...parents]}
 			serviceNavigation={{
 				label: LAPTOPS_SERVICE_NAME,
-				links: LAPTOPS_NAVIGATION,
+				links,
 				currentHref: LAPTOPS_SECTIONS[section].href,
 			}}
 			sidebar={sidebar}

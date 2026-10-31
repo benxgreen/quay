@@ -68,6 +68,8 @@ export async function sendEmail({
 				from: sender.sentFrom,
 				...rendered,
 				subject: `${subjectPrefix}${rendered.subject}`,
+				// The raw values too, so a flow can use them without parsing the email.
+				data: { mode, variables: values },
 			},
 			{ ...context, service: context.service ?? service },
 		);

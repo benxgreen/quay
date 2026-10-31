@@ -26,6 +26,7 @@ These are built behind mock clients and wait on details, not code.
 | Manager views of direct reports on `/my` | Needs the manager field from Halo. |
 | Error and not-found pages | No `app/error.tsx`, `app/global-error.tsx` or `app/not-found.tsx`, so errors show Next.js's defaults. Add GOV.UK-style "Sorry, there is a problem with the service" and "Page not found" pages, which also report to App Insights. |
 | Cookies page | Still a placeholder. Privacy and accessibility statement pages are not written. |
+| **Notification library** (to do) | One portal-wide `lib/notifications` that records what happened and tells Power Automate: e.g. when someone rebooks, `notify({ type: "booking.rebooked", service, case, person, data: { old, new } })` writes a notification row in the portal (a new `portal.notifications` table, shown to the team, with read/unread) and posts the event to the `notification_webhook` connection through `lib/clients/power-automate`, which already sends the shared envelope. Decide: which events notify (rebook, cancel, did not attend, availability request, flags…), who sees them in the portal, whether a failed post is retried or only logged (it shouldn't block the action, like the session-cancelled emails), and the event type names, which flows will key on. |
 | Smartphone replacements and new starters | Placeholder pages only; `sr.settings` is the only table. |
 
 ## 3. Tests and stories to catch up

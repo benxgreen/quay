@@ -166,6 +166,12 @@ export type RoleChange = {
 
 export type UserDetail = {
 	halo: HaloUser;
+	/**
+	 * A portal user has this Halo ID but a different email, so they are not
+	 * the same person (a reused Halo ID, or local data seeded from the mock
+	 * Halo while HALO_CLIENT=http). Their portal details are left off.
+	 */
+	mismatch: { name: string } | null;
 	portal: {
 		id: string;
 		createdAt: Date;
@@ -188,13 +194,15 @@ export async function getUserDetail(
 
 	const row = await queryOne<{
 		id: string;
+		display_name: string;
+		email: string;
 		created_at: Date;
 		created_via: "sign_in" | "case" | "role_granted";
 		created_by: string | null;
 		last_signed_in_at: Date | null;
 		roles: PortalRole[];
 	}>(
-		`SELECT u.id, u.created_at, u.created_via, cb.display_name AS created_by, u.last_signed_in_at,
+		`SELECT u.id, u.display_name, u.email, u.created_at, u.created_via, cb.display_name AS created_by, u.last_signed_in_at,
 		        coalesce(array_agg(r.role ORDER BY r.role) FILTER (WHERE r.role IS NOT NULL), '{}') AS roles
 		 FROM portal.users u
 		 LEFT JOIN portal.users cb ON cb.id = u.created_by
@@ -203,7 +211,10 @@ export async function getUserDetail(
 		 GROUP BY u.id, cb.display_name`,
 		[haloUserId],
 	);
-	if (!row) return { halo, portal: null };
+	if (!row) return { halo, portal: null, mismatch: null };
+	if (!sameEmail(row.email, halo.email)) {
+		return { halo, portal: null, mismatch: { name: row.display_name } };
+	}
 
 	const [cases, history] = await Promise.all([
 		query<{ reference: string; status: string }>(
@@ -226,6 +237,7 @@ export async function getUserDetail(
 
 	return {
 		halo,
+		mismatch: null,
 		portal: {
 			id: row.id,
 			createdAt: row.created_at,
@@ -274,21 +286,24 @@ export async function saveUserRoles(
 	actorId: string,
 	context: CallContext,
 ): Promise<SaveRolesResult> {
-	const existing = await queryOne<{ id: string; display_name: string }>(
-		"SELECT id, display_name FROM portal.users WHERE halo_user_id = $1",
+	const existing = await queryOne<{ id: string; display_name: string; email: string }>(
+		"SELECT id, display_name, email FROM portal.users WHERE halo_user_id = $1",
 		[haloUserId],
 	);
-	let halo: HaloUser | null = null;
-	if (!existing) {
-		({ value: halo } = await getHaloUsersClient().get(haloUserId, context));
-		if (!halo) return { ok: false, error: "This person is no longer in the staff directory" };
+	const { value: halo } = await getHaloUsersClient().get(haloUserId, context);
+	if (!halo) return { ok: false, error: "This person is no longer in the staff directory" };
+	if (existing && !sameEmail(existing.email, halo.email)) {
+		return {
+			ok: false,
+			error: `Roles cannot be saved: the portal user with this Halo ID is ${existing.display_name}, not ${halo.displayName}`,
+		};
 	}
 
 	return withTransaction(
 		async (tx) => {
 			const userId =
 				existing?.id ??
-				(await upsertUserFromHalo(tx, halo as HaloUser, {
+				(await upsertUserFromHalo(tx, halo, {
 					createdVia: "role_granted",
 					createdBy: actorId,
 				}));
@@ -352,4 +367,8 @@ export function describeChange({ added, removed, by }: RoleChange): string {
 		removed.length > 0 ? `${list(removed)} removed` : null,
 	].filter(Boolean);
 	return `${parts.join(" and ")}${by ? ` by ${by}` : ""}`;
+}
+
+function sameEmail(a: string | null, b: string | null): boolean {
+	return (a ?? "").trim().toLowerCase() === (b ?? "").trim().toLowerCase();
 }

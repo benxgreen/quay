@@ -8,7 +8,12 @@ import {
 	type HaloUserFieldMap,
 	readHaloField,
 } from "@/lib/clients/halo/settings";
-import { MOCK_HALO_USERS } from "@/mocks/halo";
+import {
+	MOCK_EMAIL_DOMAIN,
+	MOCK_ENTRA_OBJECT_ID_PREFIX,
+	MOCK_HALO_USER_ID_BASE,
+	MOCK_HALO_USERS,
+} from "@/mocks/halo";
 
 /**
  * A person in Halo. Entra ID is only for sign-in; its object ID pairs with
@@ -304,9 +309,65 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 	};
 }
 
+const isMockId = (haloUserId: number) => haloUserId > MOCK_HALO_USER_ID_BASE;
+const isMockEmail = (email: string) => email.trim().toLowerCase().endsWith(MOCK_EMAIL_DOMAIN);
+
+/**
+ * The real directory with the mock people alongside, for development and
+ * test against a real Halo: anyone with a mock Halo ID (above
+ * MOCK_HALO_USER_ID_BASE), a mock Entra object ID or an @bcpcouncil.test
+ * email is answered from the mocks, everyone else from Halo. Searches
+ * include both; the paged directory list is Halo's only. Never production.
+ */
+export function sideBySideHaloUsersClient(
+	real: HaloUsersClient,
+	mock: HaloUsersClient,
+): HaloUsersClient {
+	return {
+		findByEntraObjectId: (objectId, context) =>
+			(objectId.startsWith(MOCK_ENTRA_OBJECT_ID_PREFIX) ? mock : real).findByEntraObjectId(
+				objectId,
+				context,
+			),
+		findByEmail: (email, context) =>
+			(isMockEmail(email) ? mock : real).findByEmail(email, context),
+		async findByEmails(emails, context) {
+			const mockEmails = emails.filter(isMockEmail);
+			const realEmails = emails.filter((email) => !isMockEmail(email));
+			if (realEmails.length === 0) return mock.findByEmails(mockEmails, context);
+			const fromReal = await real.findByEmails(realEmails, context);
+			if (mockEmails.length === 0) return fromReal;
+			const fromMock = await mock.findByEmails(mockEmails, context);
+			return { ...fromReal, value: new Map([...fromReal.value, ...fromMock.value]) };
+		},
+		async search(text, context) {
+			const [fromReal, fromMock] = await Promise.all([
+				real.search(text, context),
+				mock.search(text, context),
+			]);
+			return { ...fromReal, value: [...fromReal.value, ...fromMock.value] };
+		},
+		list: (options, context) => real.list(options, context),
+		get: (haloUserId, context) => (isMockId(haloUserId) ? mock : real).get(haloUserId, context),
+	};
+}
+
 let client: HaloUsersClient | undefined;
 
+/**
+ * The mock unless HALO_CLIENT=http. Outside production the real client
+ * also answers for the mock people (sideBySideHaloUsersClient), so local
+ * data seeded from the mocks keeps working against the test Halo.
+ */
 export function getHaloUsersClient(): HaloUsersClient {
-	client ??= haloMode() === "http" ? createHttpHaloUsersClient() : createMockHaloUsersClient();
+	client ??=
+		haloMode() !== "http"
+			? createMockHaloUsersClient()
+			: process.env.NODE_ENV === "production"
+				? createHttpHaloUsersClient()
+				: sideBySideHaloUsersClient(
+						createHttpHaloUsersClient(),
+						createMockHaloUsersClient(),
+					);
 	return client;
 }
