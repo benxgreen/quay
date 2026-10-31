@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { DEV_USER_COOKIE, safeReturnTo } from "@/lib/auth/constants";
 import { finishSignIn } from "@/lib/auth/finish-sign-in";
 import { authMode } from "@/lib/auth/session";
+import { createMockHaloUsersClient } from "@/lib/clients/halo/users";
 import { MOCK_HALO_USERS } from "@/mocks/halo";
 
 /** The development sign-in: signs in as a mock Halo user and finishes as a real sign-in does. */
@@ -24,5 +25,6 @@ export async function devSignIn(formData: FormData) {
 		sameSite: "lax",
 		path: "/",
 	});
-	redirect(await finishSignIn(objectId, returnTo));
+	// The people listed here only exist in the mock Halo, even when HALO_CLIENT=http.
+	redirect(await finishSignIn(objectId, returnTo, createMockHaloUsersClient()));
 }
