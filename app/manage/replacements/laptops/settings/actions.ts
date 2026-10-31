@@ -103,7 +103,7 @@ export async function saveFaqAction(
 	if (!values.answer) errors.answer = "Enter the answer";
 	if (!shownFor.length) errors.shownFor = "Select who the question is shown to";
 	if (Object.keys(errors).length) return { values, errors };
-	await saveFaq(id, { question: values.question, answer: values.answer, shownFor }, user.id);
+	await saveFaq(id, { question: values.question, answer: values.answer, shownFor }, user.actorId);
 	done(id ? "faq-saved" : "faq-added", "faqs");
 }
 
@@ -120,7 +120,7 @@ export async function saveContentAction(
 	if (!values.body) return { values, errors: { body: "Enter the page content" } };
 	const unknown = unknownVariablesMessage(values.body, variableNames("page"));
 	if (unknown) return { values, errors: { body: unknown } };
-	await savePageContent(type, values.body, user.id);
+	await savePageContent(type, values.body, user.actorId);
 	done("content", "page");
 }
 
@@ -157,7 +157,7 @@ export async function saveDefaultsAction(
 			capacity: capacity.value,
 			location: values.location,
 		},
-		user.id,
+		user.actorId,
 	);
 	done("defaults", "defaults");
 }
@@ -179,7 +179,7 @@ export async function saveNumberSettingAction(
 		name: setting.title.toLowerCase(),
 	});
 	if ("error" in read) return { values, errors: { value: read.error } };
-	await saveServiceSettings({ [setting.key]: read.value }, user.id);
+	await saveServiceSettings({ [setting.key]: read.value }, user.actorId);
 	done("setting", "invites");
 }
 
@@ -197,7 +197,7 @@ export async function saveReminderAction(
 	if ("error" in days || !weekday) return { values, errors };
 	await saveServiceSettings(
 		{ firstReminderAfterDays: days.value, reminderWeekday: weekday },
-		user.id,
+		user.actorId,
 	);
 	done("setting", "invites");
 }
@@ -217,7 +217,7 @@ export async function saveReturnRemindersAction(
 	if (Object.keys(errors).length || !weekday) return { values, errors };
 	await saveServiceSettings(
 		{ returnRemindersEnabled: values.enabled === "yes", returnReminderWeekday: weekday },
-		user.id,
+		user.actorId,
 	);
 	done("setting", "invites");
 }

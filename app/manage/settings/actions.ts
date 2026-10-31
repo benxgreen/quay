@@ -19,7 +19,7 @@ export async function savePortalTemplateAction(
 	const html = String(formData.get("html") ?? "").replace(/\r\n/g, "\n");
 	const error = checkTemplateHtml(html);
 	if (error) return { values: { html }, errors: { html: error } };
-	await savePortalEmailTemplate(html, user.id);
+	await savePortalEmailTemplate(html, user.actorId);
 	redirect("/manage/settings?saved=template");
 }
 
@@ -47,7 +47,7 @@ export async function saveConnectionAction(
 	if (url?.protocol !== "https:") {
 		return { values, errors: { value: "Enter a full link that starts with https://" } };
 	}
-	if (!(await saveConnectionUrl(key, value, user.id))) redirect(returnTo);
+	if (!(await saveConnectionUrl(key, value, user.actorId))) redirect(returnTo);
 	redirect(`${returnTo}?saved=connection#${key === "halo" ? "halo" : "connections"}`);
 }
 
@@ -57,7 +57,7 @@ export async function testHaloConnectionAction() {
 	let result: string;
 	try {
 		const { value } = await testHaloConnection({
-			trigger: { kind: "user", label: "Test Halo connection", actorUserId: user.id },
+			trigger: { kind: "user", label: "Test Halo connection", actorUserId: user.actorId },
 		});
 		result = `ok&users=${value.users}`;
 	} catch (error) {
@@ -90,7 +90,7 @@ export async function saveHaloStaffFieldsAction(
 			managerEmailField: values.managerEmailField || null,
 			lastSignInField: values.lastSignInField || null,
 		},
-		user.id,
+		user.actorId,
 	);
 	redirect("/manage/settings?saved=staff-fields#halo");
 }

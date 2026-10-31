@@ -11,7 +11,7 @@ import { toTableRows, type UserTableRow } from "./rows";
 export async function loadMoreUsers(filters: UserFilters, offset: number): Promise<UserTableRow[]> {
 	const user = await requireRole(ACCESS.management);
 	const page = await listUsers(filters, offset, {
-		trigger: { kind: "user", label: "Users", actorUserId: user.id },
+		trigger: { kind: "user", label: "Users", actorUserId: user.actorId },
 	});
 	return toTableRows(page.rows);
 }
@@ -26,8 +26,8 @@ export async function saveRoles(
 ): Promise<SaveRolesState> {
 	const user = await requireRole(ACCESS.management);
 	const roles = formData.getAll("roles").map(String).filter(isPortalRole);
-	const result = await saveUserRoles(haloUserId, roles, user.id, {
-		trigger: { kind: "user", label: "Save roles", actorUserId: user.id },
+	const result = await saveUserRoles(haloUserId, roles, user.actorId, {
+		trigger: { kind: "user", label: "Save roles", actorUserId: user.actorId },
 	});
 	if (!result.ok) return { error: result.error };
 	redirect(`/manage/users/${haloUserId}?saved=1`);

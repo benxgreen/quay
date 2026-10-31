@@ -67,7 +67,7 @@ export default async function CasePage({ params, searchParams }: CasePageProps) 
 	const { done, noteError, step: stepDone, stepError, failed, message, at } = await searchParams;
 	const [stepData, devices] = await Promise.all([
 		getStepData(detail),
-		!detail.archived && detail.step === 1 ? availableDevices(user.id) : [],
+		!detail.archived && detail.step === 1 ? availableDevices(user.actorId) : [],
 	]);
 	const href = `${BASE}/${reference}`;
 	const actions = availableActions(detail).filter(

@@ -28,7 +28,7 @@ export async function addCaseNote(reference: string, formData: FormData) {
 	const note = String(formData.get("note") ?? "").trim();
 	if (!note) redirect(`${BASE}/${reference}?noteError=empty#journal`);
 	if (note.length > 2000) redirect(`${BASE}/${reference}?noteError=long#journal`);
-	await addNote(detail, note, user.id);
+	await addNote(detail, note, user.actorId);
 	redirect(`${BASE}/${reference}#journal`);
 }
 
@@ -55,13 +55,13 @@ export async function runCaseAction(
 	let result: ActionResult;
 	switch (action) {
 		case "resend-booking":
-			result = await resendBookingDetails(detail, user.id);
+			result = await resendBookingDetails(detail, user.actorId);
 			break;
 		case "resend-invitation":
-			result = await resendInvitation(detail, user.id);
+			result = await resendInvitation(detail, user.actorId);
 			break;
 		case "cancel-booking":
-			result = await cancelBooking(detail, user.id);
+			result = await cancelBooking(detail, user.actorId);
 			break;
 		case "did-not-attend": {
 			const outcome = text("outcome");
@@ -71,23 +71,28 @@ export async function runCaseAction(
 					field: "outcome",
 				};
 			}
-			result = await recordOutcome(detail, outcome, text("reason").slice(0, 500), user.id);
+			result = await recordOutcome(
+				detail,
+				outcome,
+				text("reason").slice(0, 500),
+				user.actorId,
+			);
 			break;
 		}
 		case "flag": {
 			const reason = text("reason");
 			if (!reason) return { error: "Enter why you are flagging this case", field: "reason" };
-			result = await flagCase(detail, reason.slice(0, 500), user.id);
+			result = await flagCase(detail, reason.slice(0, 500), user.actorId);
 			break;
 		}
 		case "clear-flag":
-			result = await clearFlag(detail, user.id);
+			result = await clearFlag(detail, user.actorId);
 			break;
 		case "change-type": {
 			const type = text("type");
 			if (type !== "collection" && type !== "session")
 				return { error: "Select a type", field: "type" };
-			result = await changeCaseType(detail, type, user.id);
+			result = await changeCaseType(detail, type, user.actorId);
 			break;
 		}
 		case "book-on-behalf":
@@ -99,7 +104,7 @@ export async function runCaseAction(
 		case "withdraw": {
 			const reason = text("reason");
 			if (!reason) return { error: "Enter the reason for withdrawing", field: "reason" };
-			result = await withdrawCase(detail, reason.slice(0, 500), user.id);
+			result = await withdrawCase(detail, reason.slice(0, 500), user.actorId);
 			break;
 		}
 	}

@@ -82,7 +82,7 @@ export async function confirmBooking(formData: FormData) {
 		sessionId,
 		cleanSoftware(chosen, [], await softwareList()),
 		{
-			userId: user.id,
+			userId: user.actorId,
 			onBehalf: false,
 		},
 	);
@@ -98,14 +98,14 @@ export async function chooseNewDate(formData: FormData) {
 	const choice = String(formData.get("session") ?? "");
 	if (!choice) redirect(`${LAPTOP_PAGE}/rebook${withCase(token, { error: "choose" })}`);
 	if (choice === "not-available") {
-		await notAvailable(found.id, user.id);
+		await notAvailable(found.id, user.actorId);
 		redirect(`/my${withCase(token)}`);
 	}
 	const session = await bookable(found.type, choice, found.booking?.sessionId);
 	if (!session || session.placesLeft <= 0) {
 		redirect(`${LAPTOP_PAGE}/rebook${withCase(token, { error: "full", session: choice })}`);
 	}
-	const result = await rebook(found.id, choice, { userId: user.id, onBehalf: false });
+	const result = await rebook(found.id, choice, { userId: user.actorId, onBehalf: false });
 	if (!result.ok && result.reason === "full") {
 		redirect(`${LAPTOP_PAGE}/rebook${withCase(token, { error: "full", session: choice })}`);
 	}
@@ -115,7 +115,7 @@ export async function chooseNewDate(formData: FormData) {
 export async function saveMySoftware(formData: FormData) {
 	const { user, found, token } = await mine(formData);
 	const result = await changeSoftware(found.id, await software(formData), {
-		userId: user.id,
+		userId: user.actorId,
 		onBehalf: false,
 	});
 	redirect(`${LAPTOP_PAGE}${withCase(token, result.ok ? { done: "software" } : {})}`);
@@ -141,7 +141,7 @@ export async function sendAvailability(formData: FormData) {
 	await requestAvailability(
 		found.id,
 		{ reason: reason as AvailabilityReason, availability, software: await software(formData) },
-		user.id,
+		user.actorId,
 	);
 	redirect(`${LAPTOP_PAGE}/availability/sent${withCase(token)}`);
 }

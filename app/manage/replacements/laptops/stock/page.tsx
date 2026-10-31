@@ -39,7 +39,7 @@ export default async function StockPage({ searchParams }: StockPageProps) {
 		location: params.location ?? "",
 		issued: params.issued === "1",
 	};
-	const { snapshot, failed } = await loadStock(user.id);
+	const { snapshot, failed } = await loadStock(user.actorId);
 	const rows = snapshot ? await listStock(snapshot, filters) : [];
 	// Blank values are left out: "" is already "All models" / "All locations".
 	const models = [...new Set(snapshot?.devices.map((device) => device.model))]

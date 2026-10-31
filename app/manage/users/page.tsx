@@ -21,7 +21,9 @@ type UsersPageProps = { searchParams: Promise<Record<string, string | undefined>
 export default async function UsersPage({ searchParams }: UsersPageProps) {
 	const user = await requireRole(ACCESS.management);
 	const filters = parseUserFilters(await searchParams);
-	const context = { trigger: { kind: "user" as const, label: "Users", actorUserId: user.id } };
+	const context = {
+		trigger: { kind: "user" as const, label: "Users", actorUserId: user.actorId },
+	};
 	const [page, counts] = await Promise.all([listUsers(filters, 0, context), countUsers(context)]);
 
 	return (

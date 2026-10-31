@@ -41,7 +41,7 @@ export async function saveHaloReportsAction(
 			stockReportId: readId(values.stock, { optional: true }) ?? null,
 			idsReportId: readId(values.ids, { optional: true }) ?? null,
 		},
-		user.id,
+		user.actorId,
 	);
 	done();
 }
@@ -81,7 +81,7 @@ export async function saveHaloLaptopsAction(
 	}
 	changes.fieldLastSync = readId(values.fieldLastSync, { optional: true }) ?? null;
 	if (Object.keys(errors).length) return { values, errors };
-	await saveLaptopHaloSettings(changes, user.id);
+	await saveLaptopHaloSettings(changes, user.actorId);
 	done();
 }
 
@@ -111,6 +111,6 @@ export async function saveHaloNotesAction(
 				`{${unknown[0]}} can't be used here. Open "Available variables" to see the ones that can`;
 	}
 	if (Object.keys(errors).length) return { values, errors };
-	await saveLaptopHaloSettings(values, user.id);
+	await saveLaptopHaloSettings(values, user.actorId);
 	done();
 }

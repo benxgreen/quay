@@ -17,7 +17,7 @@ const BASE = LAPTOPS_SECTIONS.stock.href;
 export async function refreshStockAction(formData: FormData) {
 	const user = await requireRole(ACCESS.laptops);
 	const back = safeReturnTo(String(formData.get("returnTo") ?? "")) ?? BASE;
-	const result = await refreshStock(user.id);
+	const result = await refreshStock(user.actorId);
 	if (!result.ok)
 		redirect(
 			`${back}?refreshFailed=${encodeURIComponent(result.failure.message.slice(0, 200))}`,
@@ -32,6 +32,6 @@ export async function addDeviceNoteAction(boxNumber: string, formData: FormData)
 	const back = `${BASE}/${encodeURIComponent(boxNumber)}`;
 	if (!note) redirect(`${back}?noteError=empty#journal`);
 	if (note.length > 2000) redirect(`${back}?noteError=long#journal`);
-	await addDeviceNote(boxNumber, note, user.id);
+	await addDeviceNote(boxNumber, note, user.actorId);
 	redirect(`${back}#journal`);
 }

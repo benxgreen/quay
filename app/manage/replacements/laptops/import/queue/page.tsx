@@ -41,7 +41,7 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
 	const user = await requireRole(ACCESS.laptops);
 	const params = await searchParams;
 	const search = (params.q ?? "").trim();
-	const [data, queue] = await Promise.all([loadImport(user.id), listQueue(search)]);
+	const [data, queue] = await Promise.all([loadImport(user.actorId), listQueue(search)]);
 
 	return (
 		<LaptopsPage section="import" parents={[LAPTOPS_SECTIONS.import]}>

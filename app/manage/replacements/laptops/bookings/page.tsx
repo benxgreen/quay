@@ -145,7 +145,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
 			) : filters.view === "all" ? (
 				<AllView filters={filters} today={today} />
 			) : (
-				<DayView filters={filters} today={today} userId={user.id} />
+				<DayView filters={filters} today={today} userId={user.actorId} />
 			)}
 		</LaptopsPage>
 	);

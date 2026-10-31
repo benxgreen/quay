@@ -23,7 +23,11 @@ export default async function StaffFieldsPage() {
 	try {
 		fields = (
 			await listHaloUserFields({
-				trigger: { kind: "user", label: "Staff fields settings", actorUserId: user.id },
+				trigger: {
+					kind: "user",
+					label: "Staff fields settings",
+					actorUserId: user.actorId,
+				},
 			})
 		).value;
 	} catch (error) {

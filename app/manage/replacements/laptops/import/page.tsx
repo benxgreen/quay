@@ -49,7 +49,7 @@ export default async function ImportPage({ searchParams }: ImportPageProps) {
 			? (one("error") as "select" | "type")
 			: undefined;
 
-	const data = await loadImport(user.id);
+	const data = await loadImport(user.actorId);
 	const view = data.view;
 	const [estimate, added] = await Promise.all([estimator(), addedCases(one("added"))]);
 

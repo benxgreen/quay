@@ -52,7 +52,7 @@ export async function saveSession(
 
 	if (sessionId) {
 		try {
-			await updateSession(sessionId, result.input, user.id);
+			await updateSession(sessionId, result.input, user.actorId);
 		} catch (error) {
 			const constraint = describeConstraintError(error);
 			if (constraint?.problem === "session_duplicate") {
@@ -64,7 +64,7 @@ export async function saveSession(
 	}
 	let id: string;
 	try {
-		id = await createSession(result.input, user.id);
+		id = await createSession(result.input, user.actorId);
 	} catch (error) {
 		const constraint = describeConstraintError(error);
 		if (constraint?.problem === "session_duplicate") {
@@ -81,6 +81,6 @@ export async function confirmCancelSession(sessionId: string, formData: FormData
 	const reason = String(formData.get("reason") ?? "")
 		.trim()
 		.slice(0, 500);
-	await cancelSession(sessionId, reason, user.id);
+	await cancelSession(sessionId, reason, user.actorId);
 	redirect(`${BASE}/${sessionId}?cancelled=1`);
 }

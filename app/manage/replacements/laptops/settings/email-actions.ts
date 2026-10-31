@@ -37,19 +37,21 @@ export async function saveEmailAction(
 		bodyMarkdown: values.body,
 	};
 	if (formData.get("intent") === "test") {
-		const sent = await sendTestEmail(key, template, user.email, user.id);
+		// While impersonating, the test goes to the Administrator, not the person.
+		const to = user.impersonator?.email ?? user.email;
+		const sent = await sendTestEmail(key, template, to, user.actorId);
 		return {
 			values,
 			errors: {},
 			test: sent.ok
 				? {
 						ok: true,
-						message: `A test has been sent to ${user.email}. It is not saved yet.`,
+						message: `A test has been sent to ${to}. It is not saved yet.`,
 					}
 				: { ok: false, message: `The test could not be sent: ${sent.message}` },
 		};
 	}
-	await saveEmailTemplate(key, template, user.id);
+	await saveEmailTemplate(key, template, user.actorId);
 	redirect(`${SETTINGS}?saved=email#emails`);
 }
 
@@ -66,7 +68,7 @@ export async function saveSenderAction(
 		if (!value) return { values, errors: { value: "Enter the team name" } };
 		if (value.length > 100)
 			return { values, errors: { value: "Team name must be 100 characters or fewer" } };
-		await saveEmailSender({ teamName: value }, user.id);
+		await saveEmailSender({ teamName: value }, user.actorId);
 	} else {
 		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
 			return {
@@ -76,7 +78,7 @@ export async function saveSenderAction(
 				},
 			};
 		}
-		await saveEmailSender({ sentFrom: value.toLowerCase() }, user.id);
+		await saveEmailSender({ sentFrom: value.toLowerCase() }, user.actorId);
 	}
 	redirect(`${SETTINGS}?saved=sender#emails`);
 }

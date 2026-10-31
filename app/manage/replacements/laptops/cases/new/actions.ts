@@ -73,7 +73,7 @@ export async function addCaseStep(state: AddCaseState, formData: FormData): Prom
 		if (!values.serial) {
 			errors.serial = "Enter the serial number of the laptop being replaced";
 		} else {
-			const found = await lookUpDevice(values.serial, user.id);
+			const found = await lookUpDevice(values.serial, user.actorId);
 			if (!found.found) errors.serial = found.message;
 			else {
 				device = {
@@ -107,7 +107,7 @@ export async function addCaseStep(state: AddCaseState, formData: FormData): Prom
 		else if (values.email === device?.assignedEmail) {
 			errors.email = "This is the assigned user. Choose ‘Yes’ instead";
 		} else {
-			const found = await lookUpPerson(values.email, user.id);
+			const found = await lookUpPerson(values.email, user.actorId);
 			if (!found) errors.email = "No one with this email address is in the staff directory";
 			else if (!found.active) errors.email = `${found.displayName}’s account is disabled`;
 			else {
@@ -133,9 +133,9 @@ export async function addCaseStep(state: AddCaseState, formData: FormData): Prom
 	}
 
 	// Look both people up again, so the case is built from Halo, not the form.
-	const fresh = await lookUpDevice(values.serial, user.id);
+	const fresh = await lookUpDevice(values.serial, user.actorId);
 	const assigned = fresh.found ? fresh.assignedUser : null;
-	const receiver = values.same === "no" ? await lookUpPerson(values.email, user.id) : null;
+	const receiver = values.same === "no" ? await lookUpPerson(values.email, user.actorId) : null;
 	if (!fresh.found || !assigned || (values.same === "no" && !receiver)) {
 		return {
 			values,
@@ -151,7 +151,7 @@ export async function addCaseStep(state: AddCaseState, formData: FormData): Prom
 			receiver,
 			type: values.type as "collection" | "session",
 		},
-		user.id,
+		user.actorId,
 	);
 	if (!result.ok) return { values, device, person, errors: { serial: result.error } };
 	if (values.next === "book") redirect(`${LAPTOPS_SECTIONS.cases.href}/${result.reference}/book`);

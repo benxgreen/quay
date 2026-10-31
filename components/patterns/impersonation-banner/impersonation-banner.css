@@ -1,0 +1,4 @@
+.bcp-impersonation-banner .bcp-phase-banner::before {
+	background-color: var(--bcp-colour-pale-yellow);
+	opacity: 1;
+}

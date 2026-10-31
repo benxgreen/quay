@@ -47,7 +47,7 @@ export async function runJobsNow(_state: RunJobsState, formData: FormData): Prom
 	if (errors.job || errors.date) return { values, errors };
 
 	const keys = values.job === "all" ? JOB_KEYS : [values.job as (typeof JOB_KEYS)[number]];
-	const results = await runJobs(keys, { day, asIf: !blank, userId: user.id });
+	const results = await runJobs(keys, { day, asIf: !blank, userId: user.actorId });
 	const ids = results.map((result) => result.runId).filter(Boolean);
 	redirect(`${LAPTOPS_SECTIONS.settings.href}/jobs?ran=${ids.join(",")}`);
 }

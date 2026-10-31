@@ -72,7 +72,7 @@ export default async function SessionPage({ params, searchParams }: SessionPageP
 			{session.cancelled ? (
 				<CancelledSession session={session} />
 			) : (
-				<OpenSession session={session} actorUserId={user.id} />
+				<OpenSession session={session} actorUserId={user.actorId} />
 			)}
 		</LaptopsPage>
 	);

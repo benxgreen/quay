@@ -38,7 +38,7 @@ async function run(
 	const user = await requireRole(ACCESS.laptops);
 	const detail = await getCase(reference);
 	if (!detail) notFound();
-	const result = await work(detail, user.id);
+	const result = await work(detail, user.actorId);
 	const back = `${LAPTOPS_SECTIONS.cases.href}/${reference}`;
 	if (result.ok) redirect(`${back}?step=${done}#steps`);
 	if ("failure" in result) {

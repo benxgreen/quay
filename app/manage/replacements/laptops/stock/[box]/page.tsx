@@ -38,7 +38,7 @@ type DevicePageProps = {
 export default async function DevicePage({ params, searchParams }: DevicePageProps) {
 	const user = await requireRole(ACCESS.laptops);
 	const box = decodeURIComponent((await params).box);
-	const { snapshot } = await loadStock(user.id);
+	const { snapshot } = await loadStock(user.actorId);
 	const detail = await getDevice(box, snapshot);
 	if (!detail) notFound();
 	const { noteError } = await searchParams;

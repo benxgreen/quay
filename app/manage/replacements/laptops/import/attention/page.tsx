@@ -22,7 +22,7 @@ type AttentionPageProps = { searchParams: Promise<{ refreshFailed?: string }> };
  */
 export default async function NeedsAttentionPage({ searchParams }: AttentionPageProps) {
 	const user = await requireRole(ACCESS.laptops);
-	const data = await loadImport(user.id);
+	const data = await loadImport(user.actorId);
 	const attention = data.view?.attention ?? [];
 	const { refreshFailed } = await searchParams;
 

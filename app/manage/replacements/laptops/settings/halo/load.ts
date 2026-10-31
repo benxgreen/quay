@@ -9,7 +9,7 @@ export async function haloSettingsPage(label: string): Promise<{ context: CallCo
 	const user = await requireRole(ACCESS.laptopsSettings);
 	return {
 		context: {
-			trigger: { kind: "user", label, actorUserId: user.id },
+			trigger: { kind: "user", label, actorUserId: user.actorId },
 			service: "laptop_replacements",
 		},
 	};

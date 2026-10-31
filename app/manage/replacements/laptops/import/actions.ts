@@ -24,7 +24,7 @@ const QUEUE = `${BASE}/queue`;
 export async function refreshFromHalo(formData: FormData) {
 	const user = await requireRole(ACCESS.laptops);
 	const back = safeReturnTo(String(formData.get("returnTo") ?? "")) ?? BASE;
-	const result = await refreshReport(user.id);
+	const result = await refreshReport(user.actorId);
 	if (!result.ok) {
 		redirect(
 			`${back}?refreshFailed=${encodeURIComponent(result.failure.message.slice(0, 200))}`,
@@ -41,7 +41,7 @@ export async function addSelectedToQueue(formData: FormData) {
 	if (assetIds.length === 0) redirect(`${BASE}?error=select`);
 	if (type !== "collection" && type !== "session") redirect(`${BASE}?error=type`);
 
-	const result = await addToQueue(assetIds, type, user.id);
+	const result = await addToQueue(assetIds, type, user.actorId);
 	if (!result.ok) redirect(`${BASE}?error=select`);
 	redirect(`${BASE}?added=${result.cases.map((c) => c.id).join(",")}`);
 }
@@ -49,12 +49,12 @@ export async function addSelectedToQueue(formData: FormData) {
 /** The user details dialog's data, read from Halo when it opens. */
 export async function loadUserDetails(email: string): Promise<UserDetails> {
 	const user = await requireRole(ACCESS.laptops);
-	return getUserDetails(email, user.id);
+	return getUserDetails(email, user.actorId);
 }
 
 export async function moveCaseToFront(caseId: string) {
 	const user = await requireRole(ACCESS.laptops);
-	const moved = await moveToFront(caseId, user.id);
+	const moved = await moveToFront(caseId, user.actorId);
 	redirect(moved ? `${QUEUE}?moved=${caseId}` : QUEUE);
 }
 
@@ -68,12 +68,12 @@ export async function changeCaseType(
 	const user = await requireRole(ACCESS.laptops);
 	const type = String(formData.get("type") ?? "");
 	if (type !== "collection" && type !== "session") return { error: "Select a type" };
-	const changed = await changeQueuedType(caseId, type, user.id);
+	const changed = await changeQueuedType(caseId, type, user.actorId);
 	redirect(changed ? `${QUEUE}?typeChanged=${caseId}` : QUEUE);
 }
 
 export async function removeCaseFromQueue(caseId: string) {
 	const user = await requireRole(ACCESS.laptops);
-	const removed = await removeFromQueue(caseId, user.id);
+	const removed = await removeFromQueue(caseId, user.actorId);
 	redirect(removed ? `${QUEUE}?removed=${caseId}` : QUEUE);
 }

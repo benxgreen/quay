@@ -48,7 +48,7 @@ export async function teamChooseDate(reference: string, formData: FormData) {
 	const session = String(formData.get("session") ?? "");
 	if (!session) redirect(`${back}/book?error=choose`);
 	if (detail.booking) {
-		const result = await rebook(detail.id, session, { userId: user.id, onBehalf: true });
+		const result = await rebook(detail.id, session, { userId: user.actorId, onBehalf: true });
 		if (!result.ok) redirect(bookError(back, result.reason, session));
 		redirect(`${back}?done=rebooked`);
 	}
@@ -72,7 +72,7 @@ export async function teamConfirmBooking(reference: string, formData: FormData) 
 		detail.id,
 		session,
 		software,
-		{ userId: user.id, onBehalf: true },
+		{ userId: user.actorId, onBehalf: true },
 		{ email },
 	);
 	if (!result.ok) redirect(bookError(back, result.reason, session));
@@ -83,7 +83,7 @@ export async function teamConfirmBooking(reference: string, formData: FormData) 
 export async function teamChangeSoftware(reference: string, formData: FormData) {
 	const { user, detail, back } = await load(reference);
 	const software = await chosenSoftware(formData);
-	await changeSoftware(detail.id, software, { userId: user.id, onBehalf: true });
+	await changeSoftware(detail.id, software, { userId: user.actorId, onBehalf: true });
 	redirect(`${back}?done=software`);
 }
 
@@ -118,7 +118,11 @@ export async function teamCustomAppointment(
 	}
 	const { date, time, location } = checked.input;
 	const note = values.note.trim().slice(0, 500);
-	const saved = await bookCustomAppointment(detail.id, { date, time, location, note }, user.id);
+	const saved = await bookCustomAppointment(
+		detail.id,
+		{ date, time, location, note },
+		user.actorId,
+	);
 	if (!saved)
 		return { errors: { date: "This case can’t have a custom appointment now" }, values };
 	redirect(`${back}?done=custom`);
