@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { TeamPage } from "@/components/layouts/team-page";
-import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/link";
 import { NotificationBanner } from "@/components/ui/notification-banner";
 import { PageHeading } from "@/components/ui/page-heading";
+import { PendingButton } from "@/components/ui/pending-button";
 import { Sidebar } from "@/components/ui/sidebar";
 import { SummaryList, SummaryListSecondary } from "@/components/ui/summary-list";
 import { formatFullDate, formatUpdatedAt } from "@/lib/dates/format";
@@ -121,9 +121,9 @@ export default async function PortalSettingsPage({
 					]}
 				/>
 				<form action={testHaloConnectionAction}>
-					<Button type="submit" variant="secondary">
+					<PendingButton variant="secondary" pendingText="Testing connection…">
 						Test connection
-					</Button>
+					</PendingButton>
 				</form>
 			</section>
 

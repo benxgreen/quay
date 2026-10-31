@@ -3,11 +3,11 @@ import { FilterGrid, FilterOptions, FilterPanel } from "@/components/patterns/fi
 import { ShowMoreTable } from "@/components/patterns/show-more-table";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { StockStatusTag } from "@/components/service/replacements/status-tag";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkboxes";
 import { Link } from "@/components/ui/link";
 import { NotificationBanner, NotificationBannerDetail } from "@/components/ui/notification-banner";
 import { PageHeading } from "@/components/ui/page-heading";
+import { PendingButton } from "@/components/ui/pending-button";
 import { Select } from "@/components/ui/select";
 import { TableSecondary } from "@/components/ui/table";
 import { requireRole } from "@/lib/auth/guards";
@@ -68,9 +68,9 @@ export default async function StockPage({ searchParams }: StockPageProps) {
 							: ""}
 					</p>
 					<form action={refreshStockAction}>
-						<Button type="submit" variant="secondary">
+						<PendingButton variant="secondary" pendingText="Refreshing from Halo…">
 							Refresh from Halo
-						</Button>
+						</PendingButton>
 					</form>
 				</div>
 			</PageHeading>

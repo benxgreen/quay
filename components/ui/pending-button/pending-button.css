@@ -1,0 +1,4 @@
+/* While submitting: the wait cursor, and the button keeps its width as the words change. */
+.bcp-pending-button--pending {
+	cursor: wait;
+}

@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { NotificationBanner, NotificationBannerDetail } from "@/components/ui/notification-banner";
 import { PageHeading } from "@/components/ui/page-heading";
+import { PendingButton } from "@/components/ui/pending-button";
 import { SecondaryNavigation } from "@/components/ui/secondary-navigation";
 import { formatUpdatedAt } from "@/lib/dates/format";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
@@ -47,9 +47,9 @@ export function ImportHeader({
 			<PageHeading title="Import">
 				<form action={refreshFromHalo}>
 					<input type="hidden" name="returnTo" value={TAB_HREFS[tab]} />
-					<Button type="submit" variant="secondary">
+					<PendingButton variant="secondary" pendingText="Refreshing from Halo…">
 						Refresh from Halo
-					</Button>
+					</PendingButton>
 				</form>
 			</PageHeading>
 			<p className="bcp-secondary-text">

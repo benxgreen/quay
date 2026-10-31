@@ -1,9 +1,9 @@
 "use client";
 
 import { useActionState } from "react";
-import { Button } from "@/components/ui/button";
 import { DateInput } from "@/components/ui/date-input";
 import { ErrorSummary } from "@/components/ui/error-summary";
+import { PendingButton } from "@/components/ui/pending-button";
 import { Select } from "@/components/ui/select";
 import { type RunJobsState, runJobsNow } from "./actions";
 
@@ -14,7 +14,7 @@ const INITIAL: RunJobsState = {
 
 /** Development only: run the jobs now, optionally as if today is another date. */
 export function RunForm({ jobs }: { jobs: { key: string; name: string }[] }) {
-	const [state, action, pending] = useActionState(runJobsNow, INITIAL);
+	const [state, action] = useActionState(runJobsNow, INITIAL);
 	const { values, errors } = state;
 	const summary = [
 		errors.job && { fieldId: "job", text: errors.job },
@@ -43,9 +43,9 @@ export function RunForm({ jobs }: { jobs: { key: string; name: string }[] }) {
 				error={errors.date}
 				value={{ day: values.day, month: values.month, year: values.year }}
 			/>
-			<Button type="submit" variant="secondary" aria-disabled={pending || undefined}>
+			<PendingButton variant="secondary" pendingText="Running jobs…">
 				Run jobs
-			</Button>
+			</PendingButton>
 		</form>
 	);
 }

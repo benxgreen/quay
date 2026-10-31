@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Button, ButtonGroup, InfoButton } from "@/components/ui/button";
 import { BackLink, Link, LinkButton } from "@/components/ui/link";
+import { PendingButton } from "@/components/ui/pending-button";
 import { PrintButton } from "@/components/ui/print-button";
 
 const meta = {
@@ -76,5 +77,24 @@ export const TextLinks: Story = {
 			</p>
 			<BackLink href="/my" />
 		</>
+	),
+};
+
+/**
+ * For slow actions such as Refresh from Halo: while the form submits, the
+ * words change to "Refreshing from Halo…" and further presses are ignored.
+ * Press it to see the pending state (the form waits three seconds).
+ */
+export const Pending: Story = {
+	render: () => (
+		<form
+			action={async () => {
+				await new Promise((resolve) => setTimeout(resolve, 3000));
+			}}
+		>
+			<PendingButton variant="secondary" pendingText="Refreshing from Halo…">
+				Refresh from Halo
+			</PendingButton>
+		</form>
 	),
 };
