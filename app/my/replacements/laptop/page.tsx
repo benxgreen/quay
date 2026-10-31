@@ -98,6 +98,8 @@ export default async function LaptopPage({ searchParams }: LaptopPageProps) {
 		booking: { date: booking.date, startTime: booking.time, location: booking.location },
 		bookingLink: null,
 		oldSerial: found.serial,
+		oldMake: found.make,
+		oldModel: found.model,
 		software: booking.software,
 		teamName: sender.teamName,
 	});

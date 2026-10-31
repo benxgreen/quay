@@ -115,6 +115,8 @@ async function loadEmailCase(
 		reference: string;
 		session_type: "collection" | "session";
 		old_serial: string | null;
+		old_make: string | null;
+		old_model: string | null;
 		display_name: string;
 		email: string;
 		day: string | null;
@@ -122,7 +124,7 @@ async function loadEmailCase(
 		location: string | null;
 		software: string[] | null;
 	}>(
-		`SELECT c.reference, c.session_type, c.old_serial, u.display_name, u.email,
+		`SELECT c.reference, c.session_type, c.old_serial, c.old_make, c.old_model, u.display_name, u.email,
 		        to_char(coalesce(s.starts_at, b.custom_starts_at) AT TIME ZONE 'Europe/London', 'YYYY-MM-DD') AS day,
 		        to_char(coalesce(s.starts_at, b.custom_starts_at) AT TIME ZONE 'Europe/London', 'HH24:MI') AS time,
 		        coalesce(s.location, b.custom_location) AS location,
@@ -151,6 +153,8 @@ async function loadEmailCase(
 					: null,
 			bookingLink: bookingLink(caseId),
 			oldSerial: row.old_serial,
+			oldMake: row.old_make,
+			oldModel: row.old_model,
 			software: [...(row.software ?? [])].sort((a, b) => a.localeCompare(b)),
 		},
 	};

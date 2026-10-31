@@ -43,6 +43,9 @@ export type AuditedUpdate = {
 	reference: string;
 	/** The serial of the laptop being replaced, for {old_serial}. */
 	oldSerial?: string | null;
+	/** Its make and model, for {old_make} and {old_model}. */
+	oldMake?: string | null;
+	oldModel?: string | null;
 	/** YYYY-MM-DD, London. */
 	date: string;
 };

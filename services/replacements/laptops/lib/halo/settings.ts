@@ -82,7 +82,13 @@ export async function saveLaptopHaloSettings(
 /** An audit note with the service's audit variables filled in ({full_name}, {case_reference}…). */
 export function fillNote(
 	note: string,
-	update: { personName: string; reference: string; oldSerial?: string | null },
+	update: {
+		personName: string;
+		reference: string;
+		oldSerial?: string | null;
+		oldMake?: string | null;
+		oldModel?: string | null;
+	},
 ): string {
 	return fillVariables(
 		note,
@@ -91,6 +97,8 @@ export function fillNote(
 			fullName: update.personName,
 			caseReference: update.reference,
 			oldSerial: update.oldSerial ?? null,
+			oldMake: update.oldMake ?? null,
+			oldModel: update.oldModel ?? null,
 			type: "collection",
 			booking: null,
 			bookingLink: null,

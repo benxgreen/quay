@@ -24,6 +24,9 @@ export type LaptopVariableContext = {
 	/** The signed link to book or change their booking. */
 	bookingLink: string | null;
 	oldSerial: string | null;
+	/** The laptop being replaced, such as Dell and Latitude 5410. */
+	oldMake?: string | null;
+	oldModel?: string | null;
 	/** Software they asked for, sorted alphabetically. */
 	software: readonly string[];
 	/** The service's team name (Settings › Emails). */
@@ -113,6 +116,20 @@ export const LAPTOP_VARIABLES: readonly LaptopVariable[] = [
 		example: "052318874406",
 		usedIn: ["emails", "audit"],
 		value: (c) => c.oldSerial ?? undefined,
+	},
+	{
+		name: "old_make",
+		description: "Make of the laptop being replaced",
+		example: "Dell",
+		usedIn: ALL,
+		value: (c) => c.oldMake ?? undefined,
+	},
+	{
+		name: "old_model",
+		description: "Model of the laptop being replaced",
+		example: "Latitude 5410",
+		usedIn: ALL,
+		value: (c) => c.oldModel ?? undefined,
 	},
 	{
 		name: "team_name",

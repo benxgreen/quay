@@ -230,7 +230,13 @@ export type CaseDetail = {
 	};
 	/** The device's assigned user in Halo, when someone else is receiving the laptop. */
 	assignedUser: string | null;
-	oldDevice: { assetId: string; serial: string | null; hostname: string | null };
+	oldDevice: {
+		assetId: string;
+		serial: string | null;
+		hostname: string | null;
+		make: string | null;
+		model: string | null;
+	};
 	boxNumber: string | null;
 	flag: { kind: string; reason: string | null; by: string | null; at: Date } | null;
 	invitedAt: Date | null;
@@ -273,6 +279,8 @@ export async function getCase(reference: string): Promise<CaseDetail | null> {
 		old_asset_id: string;
 		old_serial: string | null;
 		old_hostname: string | null;
+		old_make: string | null;
+		old_model: string | null;
 		box_number: string | null;
 		flag_kind: string | null;
 		flag_reason: string | null;
@@ -296,7 +304,7 @@ export async function getCase(reference: string): Promise<CaseDetail | null> {
 		`SELECT c.id, c.reference, c.status, c.session_type AS type, ${ARCHIVED} AS archived,
 		        u.display_name AS name, u.email, u.username, u.job_title, u.department,
 		        CASE WHEN c.halo_assigned_user_id IS DISTINCT FROM c.user_id THEN au.display_name END AS assigned_user,
-		        c.old_asset_id, c.old_serial, c.old_hostname, c.box_number,
+		        c.old_asset_id, c.old_serial, c.old_hostname, c.old_make, c.old_model, c.box_number,
 		        c.flag_kind, c.flag_reason, fb.display_name AS flagged_by, c.flagged_at, c.invited_at,
 		        a.allocated_at, ab.display_name AS allocated_by,
 		        c.device_prepared_at, dp.display_name AS device_prepared_by,
@@ -341,6 +349,8 @@ export async function getCase(reference: string): Promise<CaseDetail | null> {
 			assetId: row.old_asset_id,
 			serial: row.old_serial,
 			hostname: row.old_hostname,
+			make: row.old_make,
+			model: row.old_model,
 		},
 		boxNumber: row.box_number,
 		flag:

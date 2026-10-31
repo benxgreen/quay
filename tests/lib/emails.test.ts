@@ -115,6 +115,8 @@ describe("laptop email variables", () => {
 			"location",
 			"booking_link",
 			"old_serial",
+			"old_make",
+			"old_model",
 			"team_name",
 			"software_list",
 		]);
