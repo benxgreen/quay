@@ -20,6 +20,7 @@ import { listConnections } from "@/lib/portal/connections";
 import { plural } from "@/lib/utils/text";
 import { LAPTOP_EMAILS } from "@/services/replacements/laptops/lib/emails";
 import { emailsEachDay, getEmailSender } from "@/services/replacements/laptops/lib/emails/settings";
+import { getLaptopHaloSettings } from "@/services/replacements/laptops/lib/halo/settings";
 import {
 	CHECKLISTS,
 	type ChecklistItem,
@@ -50,7 +51,7 @@ const SECTIONS = [
 	{ id: "jobs", text: "Scheduled jobs" },
 ];
 
-/** Only Administrators see Connections. */
+/** Halo is in here for the laptops admin; the links in it are for Administrators. */
 const CONNECTIONS_SECTION = { id: "connections", text: "Connections" };
 
 /** Mockups: AdminSettings. */
@@ -63,19 +64,34 @@ export default async function SettingsPage({
 	const isAdministrator = canAccess(user.roles, ACCESS.management);
 	const { saved } = await searchParams;
 	const today = londonToday();
-	const [software, content, faqs, defaults, settings, prep, decom, sender, counts, connections] =
-		await Promise.all([
-			listSoftware(),
-			listContent(),
-			listFaqs(),
-			listDefaults(),
-			getServiceSettings(),
-			listChecklist("device_preparation"),
-			listChecklist("decommission"),
-			getEmailSender(),
-			emailsEachDay(today),
-			isAdministrator ? listConnections() : Promise.resolve([]),
-		]);
+	const [
+		software,
+		content,
+		faqs,
+		defaults,
+		settings,
+		prep,
+		decom,
+		sender,
+		counts,
+		connections,
+		halo,
+	] = await Promise.all([
+		listSoftware(),
+		listContent(),
+		listFaqs(),
+		listDefaults(),
+		getServiceSettings(),
+		listChecklist("device_preparation"),
+		listChecklist("decommission"),
+		getEmailSender(),
+		emailsEachDay(today),
+		// The Halo site is portal-wide, in portal Settings.
+		isAdministrator
+			? listConnections().then((all) => all.filter((c) => c.key !== "halo"))
+			: Promise.resolve([]),
+		getLaptopHaloSettings(),
+	]);
 	const message = saved ? SAVED_MESSAGES[saved] : undefined;
 
 	return (
@@ -91,13 +107,11 @@ export default async function SettingsPage({
 			sidebar={
 				<Sidebar label="On this page">
 					<ul className="bcp-list--plain bcp-list--spaced">
-						{(isAdministrator ? [...SECTIONS, CONNECTIONS_SECTION] : SECTIONS).map(
-							(section) => (
-								<li key={section.id}>
-									<Link href={`#${section.id}`}>{section.text}</Link>
-								</li>
-							),
-						)}
+						{[...SECTIONS, CONNECTIONS_SECTION].map((section) => (
+							<li key={section.id}>
+								<Link href={`#${section.id}`}>{section.text}</Link>
+							</li>
+						))}
 					</ul>
 				</Sidebar>
 			}
@@ -284,11 +298,11 @@ export default async function SettingsPage({
 						{
 							key: "Template",
 							value: isAdministrator ? (
-								<Link href="/manage/portal-settings/email-template">
+								<Link href="/manage/settings/email-template">
 									Portal email template
 								</Link>
 							) : (
-								"Portal email template, changed by Administrators in Portal settings"
+								"Portal email template, changed by Administrators in portal Settings"
 							),
 						},
 					]}
@@ -381,44 +395,125 @@ export default async function SettingsPage({
 				</p>
 			</Section>
 
-			{isAdministrator ? (
-				<Section id="connections" title="Connections">
-					<p className="bcp-secondary-text">
-						Only shown to Administrator users. Only the start of each link is shown;
-						passwords and keys are kept on the server, not here.
-					</p>
+			<Section id="connections" title="Connections">
+				<p className="bcp-secondary-text">
+					The systems laptop replacements connects to. Only the start of each link is
+					shown, and only Administrator users can see and change them; passwords and keys
+					are kept on the server, not here.
+				</p>
+				{isAdministrator ? (
+					<section
+						id="power-automate"
+						aria-labelledby="power-automate-heading"
+						className="bcp-subsection"
+					>
+						<h3 id="power-automate-heading">Power Automate</h3>
+						<SummaryList
+							rows={connections.map((connection) => ({
+								key: connection.label,
+								value: (
+									<>
+										<span className="bcp-break-all">
+											{connection.urlStart ?? "Not set"}
+										</span>
+										<SummaryListSecondary>
+											{connection.key === "notification_webhook"
+												? "Not used yet"
+												: connection.lastUsedAt
+													? `Last used ${formatUpdatedAt(connection.lastUsedAt)}`
+													: "Not used in the last 7 days"}
+										</SummaryListSecondary>
+									</>
+								),
+								actions: [
+									{
+										href: `${SETTINGS}/connections/${connection.key}`,
+										visuallyHiddenText: connection.label,
+									},
+								],
+							}))}
+						/>
+					</section>
+				) : null}
+				<section id="halo" aria-labelledby="halo-heading" className="bcp-subsection">
+					<h3 id="halo-heading">Halo</h3>
 					<SummaryList
-						rows={connections.map((connection) => ({
-							key: connection.label,
-							value: (
-								<>
-									<span className="bcp-break-all">
-										{connection.urlStart ?? "Not set"}
-									</span>
-									<SummaryListSecondary>
-										{connection.lastUsedAt
-											? `Last used ${formatUpdatedAt(connection.lastUsedAt)}`
-											: "Not used in the last 7 days"}
-									</SummaryListSecondary>
-								</>
-							),
-							actions: [
-								{
-									href: `${SETTINGS}/connections/${connection.key}`,
-									visuallyHiddenText: connection.label,
-								},
-							],
-						}))}
+						rows={[
+							{
+								key: "Reports",
+								value: (
+									<>
+										Eligible: report {halo.eligibleReportId}
+										<SummaryListSecondary>
+											Stock:{" "}
+											{halo.stockReportId
+												? `report ${halo.stockReportId}`
+												: "no report, every laptop at the in stock status"}
+											{halo.idsReportId
+												? `. IDs: report ${halo.idsReportId}`
+												: ""}
+										</SummaryListSecondary>
+									</>
+								),
+								actions: [
+									{
+										href: `${SETTINGS}/halo/reports`,
+										visuallyHiddenText: "Halo reports",
+									},
+								],
+							},
+							{
+								key: "Laptop fields and values",
+								value: (
+									<>
+										Asset type {halo.laptopTypeId}; statuses{" "}
+										{halo.statusInStock} in stock, {halo.statusInService} in
+										service, {halo.statusOutOfService} out of service
+										<SummaryListSecondary>
+											Fields: serial {halo.fieldSerial}, stock location{" "}
+											{halo.fieldStockLocation}, stock room{" "}
+											{halo.fieldStockRoom}, last audit date{" "}
+											{halo.fieldLastAuditDate}, audit details{" "}
+											{halo.fieldAuditDetails}
+											{halo.fieldLastSync
+												? `, last sync ${halo.fieldLastSync}`
+												: ""}
+										</SummaryListSecondary>
+									</>
+								),
+								actions: [
+									{
+										href: `${SETTINGS}/halo/laptops`,
+										visuallyHiddenText: "Halo laptop fields and values",
+									},
+								],
+							},
+							{
+								key: "Audit notes",
+								value: (
+									<>
+										{halo.collectedNote}
+										<SummaryListSecondary>
+											{halo.returnedNote}
+										</SummaryListSecondary>
+									</>
+								),
+								actions: [
+									{
+										href: `${SETTINGS}/halo/notes`,
+										visuallyHiddenText: "Halo audit notes",
+									},
+								],
+							},
+						]}
 					/>
-					<p>
+				</section>
+				{isAdministrator ? (
+					<p className="bcp-subsection">
 						<Link href={`${SETTINGS}/connection-log`}>Connection log</Link>
 					</p>
-					<p className="bcp-secondary-text">
-						Every call to Halo and Power Automate in the last 7 days, with what
-						triggered it and the case it was for.
-					</p>
-				</Section>
-			) : null}
+				) : null}
+			</Section>
 		</LaptopsPage>
 	);
 }

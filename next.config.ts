@@ -33,6 +33,16 @@ const nextConfig: NextConfig = {
 	poweredByHeader: false,
 	reactStrictMode: true,
 	devIndicators: false,
+	// Portal settings moved to /manage/settings on 31 Oct 2026; keep old links working.
+	async redirects() {
+		return [
+			{
+				source: "/manage/portal-settings/:path*",
+				destination: "/manage/settings/:path*",
+				permanent: true,
+			},
+		];
+	},
 	async headers() {
 		return [
 			{

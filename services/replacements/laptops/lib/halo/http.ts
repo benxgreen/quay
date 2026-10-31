@@ -9,45 +9,19 @@ import type {
 	HaloStockDevice,
 	LaptopHaloClient,
 } from "./index";
+import { fillNote, getLaptopHaloSettings, type LaptopHaloSettings } from "./settings";
 
 /**
- * Laptop replacements' requests to the real Halo (lib/clients/halo/TODO.md
- * has where each ID and field came from). Each method is one logged call;
- * its summary lists the requests made.
+ * Laptop replacements' requests to the real Halo. Every report, asset type,
+ * status, field and lookup ID comes from Settings › Halo
+ * (`getLaptopHaloSettings`), read at the start of each call; nothing about
+ * BCP's Halo is fixed here. Each method is one logged call; its summary
+ * lists the requests made.
  *
  * The portal's asset ID (and a replacement's box number) is Halo's asset
  * `id`, such as 26620. The serial number is the asset's `inventory_number`
  * (the same as its Serial Number field).
  */
-
-/** Halo's Laptop asset type. */
-const LAPTOP_TYPE = 1;
-
-/** Asset statuses (there is no status list endpoint). */
-const STATUS = { receivedInStock: 0, inService: 1, outOfService: 9 } as const;
-
-/** Laptop type fields, by Halo field ID. */
-const FIELD = {
-	serial: 117,
-	stockLocation: 144,
-	stockRoom: 217,
-	lastSync: 249,
-	lastAuditDate: 246,
-	auditDetails: 251,
-} as const;
-
-/** Lookup option IDs: Stock Location (lookup 518) and Stock Room (lookup 517). */
-const STOCK_LOCATION = { decommissioned: 8 } as const;
-const STOCK_ROOM = { room310: 5 } as const;
-
-/** The end-of-life report: ITP020 Devices Eligible for Replacement. */
-const END_OF_LIFE_REPORT = 566;
-
-/**
- * ITP022 All Provisioned Laptops with IDs: ID and Serial Number for every
- * laptop, read alongside report 566 until 566 has its own ID column.
- */
-const LAPTOP_IDS_REPORT = 571;
 
 /** Halo returns at most 50 records a page, whatever is asked for. */
 const PAGE_SIZE = 50;
@@ -112,9 +86,13 @@ async function allPages<T>(
 }
 
 /** The laptop with this serial (inventory number), or null. More than one match is an error, not a guess. */
-async function findBySerial(halo: HaloHttp, serial: string): Promise<HaloAssetListItem | null> {
+async function findBySerial(
+	halo: HaloHttp,
+	settings: LaptopHaloSettings,
+	serial: string,
+): Promise<HaloAssetListItem | null> {
 	const { assets } = await halo.get<{ assets: HaloAssetListItem[] }>("/Asset", {
-		assettype_id: LAPTOP_TYPE,
+		assettype_id: settings.laptopTypeId,
 		search: serial,
 		pageinate: true,
 		page_size: 5,
@@ -128,10 +106,14 @@ async function findBySerial(halo: HaloHttp, serial: string): Promise<HaloAssetLi
 }
 
 /** A laptop by its Halo asset ID; refuses anything that isn't a laptop, before any update. */
-async function getLaptop(halo: HaloHttp, assetId: string): Promise<HaloAsset> {
+async function getLaptop(
+	halo: HaloHttp,
+	settings: LaptopHaloSettings,
+	assetId: string,
+): Promise<HaloAsset> {
 	if (!/^\d+$/.test(assetId)) throw new Error(`${assetId} is not a Halo asset ID`);
 	const asset = await halo.get<HaloAsset & { assettype_id: number }>(`/Asset/${assetId}`);
-	if (asset.assettype_id !== LAPTOP_TYPE) {
+	if (asset.assettype_id !== settings.laptopTypeId) {
 		throw new Error(`Halo asset ${assetId} is not a laptop, so nothing was changed`);
 	}
 	return asset;
@@ -162,16 +144,16 @@ function toEndOfLife(row: ReportRow, assetId: string): HaloEndOfLifeDevice {
 	};
 }
 
-function assetToEndOfLife(asset: HaloAsset): HaloEndOfLifeDevice {
+function assetToEndOfLife(asset: HaloAsset, settings: LaptopHaloSettings): HaloEndOfLifeDevice {
 	const user = asset.users?.[0];
 	return {
 		assetId: String(asset.id),
-		serial: text(asset.inventory_number) || text(field(asset, FIELD.serial)?.value),
+		serial: text(asset.inventory_number) || text(field(asset, settings.fieldSerial)?.value),
 		hostname: text(asset.key_field),
 		make: text(asset.key_field2) || null,
 		model: text(asset.key_field3),
 		purchaseDate: isoDay(asset.supplier_purchasedate),
-		lastSeen: text(field(asset, FIELD.lastSync)?.value),
+		lastSeen: settings.fieldLastSync ? text(field(asset, settings.fieldLastSync)?.value) : "",
 		assignedUser: user?.emailaddress
 			? { name: text(user.name), email: text(user.emailaddress).toLowerCase() }
 			: null,
@@ -182,8 +164,9 @@ export function createHttpLaptopHaloClient(): LaptopHaloClient {
 	return {
 		listEndOfLifeDevices: (context) =>
 			callHalo(context, async (halo) => {
+				const settings = await getLaptopHaloSettings();
 				const report = await halo.get<{ report?: { rows?: ReportRow[] } }>(
-					`/Report/${END_OF_LIFE_REPORT}`,
+					`/Report/${settings.eligibleReportId}`,
 					{ loadreport: true },
 				);
 				const rows = (report.report?.rows ?? []).filter((row) =>
@@ -196,9 +179,9 @@ export function createHttpLaptopHaloClient(): LaptopHaloClient {
 					const id = text(row.ID ?? row["Asset ID"]);
 					if (id) ids.set(text(row["Serial Number"]), id);
 				}
-				if (ids.size < rows.length) {
+				if (ids.size < rows.length && settings.idsReportId) {
 					const all = await halo.get<{ report?: { rows?: ReportRow[] } }>(
-						`/Report/${LAPTOP_IDS_REPORT}`,
+						`/Report/${settings.idsReportId}`,
 						{ loadreport: true },
 					);
 					for (const row of all.report?.rows ?? []) {
@@ -211,7 +194,7 @@ export function createHttpLaptopHaloClient(): LaptopHaloClient {
 					const serial = text(row["Serial Number"]);
 					if (ids.get(serial)) continue;
 					lookedUp += 1;
-					const asset = await findBySerial(halo, serial);
+					const asset = await findBySerial(halo, settings, serial);
 					if (asset) ids.set(serial, String(asset.id));
 				}
 				const devices = rows
@@ -226,9 +209,13 @@ export function createHttpLaptopHaloClient(): LaptopHaloClient {
 
 		findDeviceBySerial: (serial, context) =>
 			callHalo(context, async (halo) => {
-				const match = await findBySerial(halo, serial);
+				const settings = await getLaptopHaloSettings();
+				const match = await findBySerial(halo, settings, serial);
 				if (!match) return { value: null, summary: "Serial lookup: not found" };
-				const device = assetToEndOfLife(await halo.get<HaloAsset>(`/Asset/${match.id}`));
+				const device = assetToEndOfLife(
+					await halo.get<HaloAsset>(`/Asset/${match.id}`),
+					settings,
+				);
 				return { value: device, summary: `Serial lookup: found asset ${device.assetId}` };
 			}),
 
@@ -258,12 +245,33 @@ export function createHttpLaptopHaloClient(): LaptopHaloClient {
 
 		listStock: (context) =>
 			callHalo(context, async (halo) => {
-				// Laptops at Received (in stock). The list has the key fields (Device
-				// Name, Manufacturer, Model) but not Stock Location or Room, which
-				// would need a request per laptop; see TODO.md.
+				const settings = await getLaptopHaloSettings();
+				if (settings.stockReportId) {
+					// The stock report: one request. It needs ID and Serial Number columns.
+					const body = await halo.get<{ report?: { rows?: ReportRow[] } }>(
+						`/Report/${settings.stockReportId}`,
+						{ loadreport: true },
+					);
+					const devices: HaloStockDevice[] = (body.report?.rows ?? [])
+						.filter((row) => text(row.ID ?? row["Asset ID"]))
+						.map((row) => ({
+							assetId: text(row.ID ?? row["Asset ID"]),
+							serial: text(row["Serial Number"]),
+							hostname: text(row["Device Name"] ?? row["Device Hostname"]),
+							model: [text(row.Manufacturer), text(row.Model)]
+								.filter(Boolean)
+								.join(" "),
+							stockLocation: text(row["Stock Location"]),
+							stockRoom: text(row["Stock Room"]),
+						}));
+					return { value: devices, summary: `Stock report: ${devices.length} laptops` };
+				}
+				// No stock report: every laptop at the in-stock status, 50 at a time.
+				// The list has the key fields (Device Name, Manufacturer, Model) but
+				// not Stock Location or Room.
 				const assets = await allPages<HaloAssetListItem>(halo, "/Asset", "assets", {
-					assettype_id: LAPTOP_TYPE,
-					assetstatuses: STATUS.receivedInStock,
+					assettype_id: settings.laptopTypeId,
+					assetstatuses: settings.statusInStock,
 				});
 				const devices: HaloStockDevice[] = assets
 					.filter((a) => text(a.inventory_number))
@@ -280,16 +288,17 @@ export function createHttpLaptopHaloClient(): LaptopHaloClient {
 
 		issueDevice: (device: AuditedUpdate, context) =>
 			callHalo(context, async (halo) => {
-				const asset = await getLaptop(halo, device.assetId);
+				const settings = await getLaptopHaloSettings();
+				const asset = await getLaptop(halo, settings, device.assetId);
 				await updateAsset(halo, asset, {
-					status_id: STATUS.inService,
+					status_id: settings.statusInService,
 					fields: [
-						{ id: FIELD.stockLocation, value: null },
-						{ id: FIELD.stockRoom, value: null },
-						{ id: FIELD.lastAuditDate, value: device.date },
+						{ id: settings.fieldStockLocation, value: null },
+						{ id: settings.fieldStockRoom, value: null },
+						{ id: settings.fieldLastAuditDate, value: device.date },
 						{
-							id: FIELD.auditDetails,
-							value: `Device collected by ${device.personName} - ${device.reference}`,
+							id: settings.fieldAuditDetails,
+							value: fillNote(settings.collectedNote, device),
 						},
 					],
 				});
@@ -298,31 +307,33 @@ export function createHttpLaptopHaloClient(): LaptopHaloClient {
 
 		markOldDeviceReturned: (device: AuditedUpdate, context) =>
 			callHalo(context, async (halo) => {
-				const asset = await getLaptop(halo, device.assetId);
+				const settings = await getLaptopHaloSettings();
+				const asset = await getLaptop(halo, settings, device.assetId);
 				await updateAsset(halo, asset, {
 					fields: [
-						{ id: FIELD.stockRoom, value: STOCK_ROOM.room310 },
-						{ id: FIELD.lastAuditDate, value: device.date },
+						{ id: settings.fieldStockRoom, value: settings.roomReturned },
+						{ id: settings.fieldLastAuditDate, value: device.date },
 						{
-							id: FIELD.auditDetails,
-							value: `Device returned by ${device.personName} - ${device.reference}`,
+							id: settings.fieldAuditDetails,
+							value: fillNote(settings.returnedNote, device),
 						},
 					],
 				});
 				return {
 					value: undefined,
-					summary: `Asset ${device.assetId} returned to Room 310`,
+					summary: `Asset ${device.assetId} returned`,
 				};
 			}),
 
 		decommissionDevice: (device, context) =>
 			callHalo(context, async (halo) => {
-				const asset = await getLaptop(halo, device.assetId);
+				const settings = await getLaptopHaloSettings();
+				const asset = await getLaptop(halo, settings, device.assetId);
 				await updateAsset(halo, asset, {
-					status_id: STATUS.outOfService,
+					status_id: settings.statusOutOfService,
 					fields: [
-						{ id: FIELD.stockLocation, value: STOCK_LOCATION.decommissioned },
-						{ id: FIELD.stockRoom, value: STOCK_ROOM.room310 },
+						{ id: settings.fieldStockLocation, value: settings.locationDecommissioned },
+						{ id: settings.fieldStockRoom, value: settings.roomReturned },
 					],
 				});
 				return { value: undefined, summary: `Asset ${device.assetId} decommissioned` };

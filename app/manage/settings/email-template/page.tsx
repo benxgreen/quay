@@ -8,14 +8,14 @@ import { savePortalTemplateAction } from "../actions";
 
 export const metadata: Metadata = { title: "Email template" };
 
-const PORTAL_SETTINGS = { text: "Portal settings", href: "/manage/portal-settings" };
+const PORTAL_SETTINGS = { text: "Settings", href: "/manage/settings" };
 
-/** Mockups: AdminEmailLayout. Administrator users only (the Portal settings layout checks). */
+/** Mockups: AdminEmailLayout. Administrator users only (the portal Settings layout checks). */
 export default async function EmailTemplatePage() {
 	const template = await getPortalEmailTemplate();
 	return (
 		<TeamPage breadcrumbs={[MANAGE_BREADCRUMB, PORTAL_SETTINGS]}>
-			<PageHeading caption="Portal settings · Emails" title="Email template" />
+			<PageHeading caption="Settings · Emails" title="Email template" />
 			<p>
 				The HTML used for every email the portal sends. Each email's content goes in place
 				of {"{content}"}.

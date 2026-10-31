@@ -54,7 +54,7 @@ export const HeaderWithMenu: Story = {
 					title: "Management",
 					links: [
 						{ text: "Users", href: "#users" },
-						{ text: "Portal settings", href: "#portal-settings" },
+						{ text: "Settings", href: "#settings" },
 					],
 				},
 			]}

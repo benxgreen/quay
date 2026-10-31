@@ -8,7 +8,7 @@ import { withTransaction } from "@/lib/db/transaction";
 import { PORTAL_ROLES, type PortalRole, ROLE_LABELS } from "@/lib/portal/roles";
 
 /**
- * The Users pages (spec, "Users and Portal settings"). Everyone in the staff
+ * The Users pages (spec, "Users and portal Settings"). Everyone in the staff
  * directory comes from Halo; a portal user exists only once something has
  * happened for them (sign-in, a case, a role).
  */

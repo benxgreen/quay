@@ -9,6 +9,15 @@ const logged: unknown[][] = [];
 vi.mock("@/lib/db/query", () => ({
 	queryOne: vi.fn(async (sql: string, params: unknown[]) => {
 		if (sql.includes("portal.connections")) return { url: "https://halo.example.test/api/" };
+		if (sql.includes("portal.halo_settings")) {
+			// The staff field mapping, matching the fake Halo users below.
+			return {
+				jobTitleField: "title",
+				departmentField: "department",
+				managerEmailField: null,
+				lastSignInField: "azure_last_login_date",
+			};
+		}
 		logged.push(params);
 		return { id: String(logged.length) };
 	}),
@@ -123,7 +132,7 @@ describe("Halo users over HTTP", () => {
 			email: "priya.hart@bcpcouncil.test",
 			displayName: "Priya Hart",
 			firstName: "Priya",
-			username: "priya.hart",
+			username: null,
 			jobTitle: "Planning Officer",
 			department: "Planning",
 			active: true,

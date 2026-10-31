@@ -41,6 +41,8 @@ export type AuditedUpdate = {
 	personName: string;
 	/** The case reference, such as "LR-000128". */
 	reference: string;
+	/** The serial of the laptop being replaced, for {old_serial}. */
+	oldSerial?: string | null;
 	/** YYYY-MM-DD, London. */
 	date: string;
 };

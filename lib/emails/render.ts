@@ -39,7 +39,7 @@ export function findUnknownVariables(text: string, known: readonly string[]): st
 	return [...unknown];
 }
 
-/** The portal email template's own placeholders (Portal settings). */
+/** The portal email template's own placeholders (portal Settings). */
 export const LAYOUT_PLACEHOLDERS = ["content", "preheader", "team_name"] as const;
 
 export type EmailTemplate = {

@@ -1,6 +1,10 @@
-import { formatLongDate, formatTime } from "@/lib/dates/format";
-import type { IsoDate } from "@/lib/dates/working-days";
 import type { EmailVariableValues } from "@/lib/emails/render";
+import {
+	type LaptopVariableContext,
+	variableNames,
+	variablesFor,
+	variableValues,
+} from "@/services/replacements/laptops/lib/variables";
 
 /**
  * The emails laptop replacements sends, in the order the Settings page lists
@@ -72,112 +76,17 @@ export const LAPTOP_EMAILS = [
 
 export type LaptopEmailKey = (typeof LAPTOP_EMAILS)[number]["key"];
 
-/** What the variables are filled from. The caller loads it from the case and its booking. */
-export type LaptopEmailCase = {
-	firstName: string;
-	fullName: string;
-	caseReference: string;
-	type: "collection" | "session";
-	/** The current booking, a session place or a custom appointment. */
-	booking: { date: IsoDate; startTime: string; location: string | null } | null;
-	/** The signed link to book or change their booking. */
-	bookingLink: string | null;
-	oldSerial: string | null;
-	/** Software they asked for, sorted alphabetically. */
-	software: readonly string[];
-};
+/** What an email's variables are filled from (the service's shared variable context). */
+export type LaptopEmailCase = Omit<LaptopVariableContext, "teamName" | "username">;
 
-type LaptopEmailVariable = {
-	name: string;
-	description: string;
-	example: string;
-	value: (emailCase: LaptopEmailCase, teamName: string) => string | undefined;
-};
+/** The variables an email can use: those in the service's list marked for emails. */
+export const LAPTOP_EMAIL_VARIABLES = variablesFor("emails");
 
-/**
- * Every variable a laptop replacement email can use, listed on each email's
- * page. Adding one here makes it appear on the page.
- */
-export const LAPTOP_EMAIL_VARIABLES: readonly LaptopEmailVariable[] = [
-	{
-		name: "first_name",
-		description: "First name of the person the case is for",
-		example: "Ellie",
-		value: (c) => c.firstName,
-	},
-	{
-		name: "full_name",
-		description: "Full name",
-		example: "Ellie Ward",
-		value: (c) => c.fullName,
-	},
-	{
-		name: "case_reference",
-		description: "Case reference",
-		example: "LR-000128",
-		value: (c) => c.caseReference,
-	},
-	{
-		name: "type",
-		description: "Collection or session",
-		example: "session",
-		value: (c) => c.type,
-	},
-	{
-		name: "date",
-		description: "Date of the booking",
-		example: "Tuesday 17 November",
-		value: (c) => (c.booking ? formatLongDate(c.booking.date) : undefined),
-	},
-	{
-		name: "time",
-		description: "Start time of the booking",
-		example: "10:00am",
-		value: (c) => (c.booking ? formatTime(c.booking.startTime) : undefined),
-	},
-	{
-		name: "location",
-		description: "Where to go",
-		example: "[Location], [Room]",
-		value: (c) => c.booking?.location ?? undefined,
-	},
-	{
-		name: "booking_link",
-		description: "Link to book or change their booking",
-		example: "Choose a new date",
-		value: (c) => c.bookingLink ?? undefined,
-	},
-	{
-		name: "old_serial",
-		description: "Serial number of the laptop being replaced",
-		example: "052318874406",
-		value: (c) => c.oldSerial ?? undefined,
-	},
-	{
-		name: "team_name",
-		description: "The team name for this service (set in Settings)",
-		example: "Desktop Infrastructure",
-		value: (_, teamName) => teamName,
-	},
-	{
-		name: "software_list",
-		description: "Software they asked for, as a bullet list",
-		example: "Adobe Acrobat Pro, Power BI",
-		value: (c) =>
-			c.software.length > 0 ? c.software.map((name) => `- ${name}`).join("\n") : undefined,
-	},
-];
-
-export const LAPTOP_EMAIL_VARIABLE_NAMES = LAPTOP_EMAIL_VARIABLES.map((variable) => variable.name);
+export const LAPTOP_EMAIL_VARIABLE_NAMES = variableNames("emails");
 
 export function laptopEmailValues(
 	emailCase: LaptopEmailCase,
 	teamName: string,
 ): EmailVariableValues {
-	return Object.fromEntries(
-		LAPTOP_EMAIL_VARIABLES.map((variable) => [
-			variable.name,
-			variable.value(emailCase, teamName),
-		]),
-	);
+	return variableValues("emails", { ...emailCase, teamName });
 }

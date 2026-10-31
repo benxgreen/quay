@@ -4,7 +4,7 @@ import { PORTAL_ROLES, type PortalRole } from "@/lib/portal/roles";
  * Who can open each area (spec, "Device portal platform"): a service's team
  * role works on its cases, sessions and stock, and its admin role adds that
  * service's Settings (an admin can also do everything the team can).
- * Administrator is portal-wide: Users, Portal settings and Connections.
+ * Administrator is portal-wide: Users, portal Settings and Connections.
  */
 export const ACCESS = {
 	/** Any team page under /manage. */

@@ -3,7 +3,7 @@ import "server-only";
 import { query, queryOne } from "@/lib/db/query";
 
 /**
- * The portal email template (Portal settings): the HTML every service's
+ * The portal email template (portal Settings): the HTML every service's
  * emails are placed in, at {content}, with {preheader} and {team_name}.
  */
 export type PortalEmailTemplate = {

@@ -2,9 +2,15 @@
 
 Revisit once we have API access to BCP's Halo (https://halohub.bcpcouncil.gov.uk, docs at `/apidoc`, swagger at `/api/swagger/v2/swagger.json`).
 
+## Where the settings live now (31 Oct 2026)
+
+Every ID below is now a setting, chosen from Halo's lists: the Halo site, connection test and staff fields in **portal Settings › Halo**, and laptop replacements' reports, asset type, statuses, fields, values and audit notes in **Settings › Halo**. The values below are what the settings started with.
+
 ## Found in the test Halo (30 Oct 2026, read-only probes)
 
 Sign-in with client credentials works (`HALO_SCOPE=all`). List pages return at most 50 records, whatever `page_size` asks for.
+
+**Users:** report 566's SQL reads `u.uother2 AS [Job Title]`, `u.uother5 AS [Department]` and `LOWER(u.uadmanager) AS [Manager Email Address]`, which the API returns as `other2`, `other5` and `admanager`; the field mapping uses those (migration 0023).
 
 **Users** (`GET /Users/{id}`): `azureoid` (finding a user by it with `advanced_search` works), `emailaddress`, `firstname`, `surname`, `name`, `inactive`, `login`, `samaccountname`, `admanager`, `departments` (array), `azure_last_login_date`, `site_name`. No job title field seen yet (the replacement report has a "Job Title" column, so it comes from somewhere). Custom fields: 1166 Login username, 1062 UPN, 1145 Users Manager Email, 1140 Team, 1141 Location.
 
@@ -23,8 +29,8 @@ Sign-in with client credentials works (`HALO_SCOPE=all`). List pages return at m
 - **The box number (and every asset ID in the portal) is Halo's asset `id`**, such as 26620. The serial number is the asset's `inventory_number`, the same as its Serial Number field (117); for example serial 000374724657 is asset 26620. The "Asset Tag" field (263) is a bug in Halo; don't use it.
 - **Report 566 has no ID column yet**, so the portal reads report 571 (All Provisioned Laptops with IDs) alongside it to get each laptop's ID, and looks up any serial 571 doesn't have.
 - **There is no stock report.** The API can list laptops at status 0 Received (in stock) (`GET /Asset?assettype_id=1&assetstatuses=0`, 958 in the test Halo, the same as report 765). Filtering on `status_id` is ignored; `assetstatuses` works.
-- **Completion update (new device issued):** status 1 In Service, Stock Location and Stock Room cleared, Last Audit Date (246) today, Audit Details (251) "Device collected by [user] - [case reference]", for example "Device collected by Ellie Ward - LR-000128".
-- **Old device returned** (step 5): Stock Room (217) 5 Room 310, Last Audit Date (246) the date it was returned, Audit Details (251) "Device returned by [user] - [case reference]", for example "Device returned by Ellie Ward - LR-000128". The status doesn't change yet.
+- **Completion update (new device issued):** status 1 In Service, Stock Location and Stock Room cleared, Last Audit Date (246) today, Audit Details (251) "Device collected by {full_name} - {case_reference}", for example "Device collected by Ellie Ward - LR-000128".
+- **Old device returned** (step 5): Stock Room (217) 5 Room 310, Last Audit Date (246) the date it was returned, Audit Details (251) "Device returned by {full_name} - {case_reference}", for example "Device returned by Ellie Ward - LR-000128". The status doesn't change yet.
 - **Old device decommissioned** (step 6): status 9 Out of Service, Stock Location (144) 8 Decommissioned, Stock Room (217) 5 Room 310.
 - **Asset field values that are lookups are sent as the option's ID:** Stock Location is lookup 518 (1 Warehouse, 2 Refurbished, 3 Chargeable - do not use, 4 Centralised - do not use, 6 Loans, 7 Lifecycle Managed Technology, 8 Decommissioned, 10 Customer Retained Stock, 11 Business as usual, 12 Hardware replacements, 13 Estates & Accomodation). Stock Room is lookup 517 (1 Vendor, 2 Room 2 Cage, 3 Room 411, 4 Room 2, 5 Room 310). Read with `GET /Lookup?lookupid=<id>`.
 - **Username** should be the domain form, such as `bcp\ben.green`. No Halo user field holds that: `samaccountname` and custom field 1166 Login username are `first.last`, `login` is the email address, and the on-premises directory path is the old `bbc` domain.
@@ -38,7 +44,7 @@ Sign-in with client credentials works (`HALO_SCOPE=all`). List pages return at m
 
 - [ ] Add these columns to report 566 ITP020 Devices Eligible for Replacement: Asset ID, Inventory Number (box number), the assigned user's Halo user ID and Entra object ID (`azureoid`), and whether their account is inactive. This saves two requests a laptop on every Import refresh.
 - [ ] **A stock report**, so the Stock page is one request instead of 20. Today the portal lists every laptop at status 0 Received (in stock) (958 in the test Halo, all pools), 50 at a time, because the list API can't filter on Stock Location and doesn't return it. Decide how replacement stock is found: every laptop at status 0 Received (in stock), or only those with Stock Location 12 Hardware replacements (or another pool). The list API doesn't return field values, so filtering 958 laptops on Stock Location needs one request each, over the 700-in-5-minutes limit. A report with Asset ID, Inventory Number, Serial Number, Device Name, Manufacturer, Model, Stock Location and Stock Room for the chosen pool would avoid that.
-- [ ] Confirm the domain prefix for usernames (`bcp\` for everyone?), so the portal can put it in front of `samaccountname`.
+- [x] Username: not from Halo, which has no domain prefix. It will come from Entra ID (decided 31 Oct 2026).
 
 ## Custom fields
 

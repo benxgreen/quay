@@ -19,7 +19,7 @@ export const SERVICES: GuardedLink[] = [
 
 export const MANAGEMENT: GuardedLink[] = [
 	{ text: "Users", href: "/manage/users", access: ACCESS.management },
-	{ text: "Portal settings", href: "/manage/portal-settings", access: ACCESS.management },
+	{ text: "Settings", href: "/manage/settings", access: ACCESS.management },
 ];
 
 /**

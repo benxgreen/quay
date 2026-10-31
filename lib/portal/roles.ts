@@ -10,7 +10,7 @@ export const PORTAL_ROLES = [
 
 export type PortalRole = (typeof PORTAL_ROLES)[number];
 
-/** How each role is named on the Users pages (spec, "Users and Portal settings"). */
+/** How each role is named on the Users pages (spec, "Users and portal Settings"). */
 export const ROLE_LABELS: Record<PortalRole, string> = {
 	administrator: "Administrator",
 	laptops_team: "Laptop replacements team",
@@ -22,7 +22,7 @@ export const ROLE_LABELS: Record<PortalRole, string> = {
 
 /** The hint under each role's checkbox on a user's page (mockups: AdminUser). */
 export const ROLE_DESCRIPTIONS: Record<PortalRole, string> = {
-	administrator: "Portal-wide. Can change Portal settings, Users and Connections.",
+	administrator: "Portal-wide. Can change the portal's Settings, Users and Connections.",
 	laptops_team:
 		"Desktop Infrastructure. Can work on laptop replacement cases, sessions and stock.",
 	laptops_admin: "Everything the laptop team can do, plus the service’s Settings.",

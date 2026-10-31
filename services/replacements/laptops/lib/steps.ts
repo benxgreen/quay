@@ -520,6 +520,7 @@ export async function completeReplacement(
 				{
 					assetId: box,
 					personName: detail.person.name,
+					oldSerial: detail.oldDevice.serial,
 					reference: detail.reference,
 					date: londonToday(),
 				},
@@ -620,6 +621,7 @@ export async function markReturned(
 				{
 					assetId: detail.oldDevice.assetId,
 					personName: detail.person.name,
+					oldSerial: detail.oldDevice.serial,
 					reference: detail.reference,
 					date,
 				},

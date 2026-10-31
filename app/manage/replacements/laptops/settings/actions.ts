@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import type { ReplacementType } from "@/components/service/replacements/type-tag";
 import { requireRole } from "@/lib/auth/guards";
+import { unknownVariablesMessage } from "@/lib/emails/validate";
 import { readFields, readWeekday, readWholeNumber } from "@/lib/forms/read";
 import type { FormState } from "@/lib/forms/state";
 import { ACCESS, canAccess } from "@/lib/portal/access";
@@ -21,6 +22,7 @@ import {
 	updateChecklistItem,
 	updateSoftware,
 } from "@/services/replacements/laptops/lib/settings";
+import { variableNames } from "@/services/replacements/laptops/lib/variables";
 import { isNumberSetting, NUMBER_SETTINGS, SETTINGS } from "./definitions";
 
 /** What a settings form gets back when something needs correcting. */
@@ -116,6 +118,8 @@ export async function saveContentAction(
 	const values = readFields(formData, ["body"]);
 	if (formData.get("intent") === "preview") return { values, errors: {}, preview: true };
 	if (!values.body) return { values, errors: { body: "Enter the page content" } };
+	const unknown = unknownVariablesMessage(values.body, variableNames("page"));
+	if (unknown) return { values, errors: { body: unknown } };
 	await savePageContent(type, values.body, user.id);
 	done("content", "page");
 }

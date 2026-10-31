@@ -5,13 +5,17 @@ import "./settings-form.css";
 import { type ReactNode, useActionState, useId } from "react";
 import { InlineForm } from "@/components/patterns/inline-form";
 import { Button, ButtonGroup } from "@/components/ui/button";
+import { Details } from "@/components/ui/details";
 import { ErrorSummary } from "@/components/ui/error-summary";
 import { InsetText } from "@/components/ui/inset-text";
 import { Link } from "@/components/ui/link";
 import { MarkdownText } from "@/components/ui/markdown";
 import { Preview } from "@/components/ui/preview";
+import { Select } from "@/components/ui/select";
+import { Table } from "@/components/ui/table";
 import { TextInput } from "@/components/ui/text-input";
 import { Textarea } from "@/components/ui/textarea";
+import { fillVariables } from "@/lib/emails/render";
 import type { FormState } from "@/lib/forms/state";
 
 /**
@@ -103,13 +107,46 @@ export function InlineAddForm({
 	);
 }
 
+export type FormVariable = { name: string; description: string; example: string };
+
+/** "Available variables": what can be typed in curly brackets, with examples. */
+export function VariablesList({ variables }: { variables: readonly FormVariable[] }) {
+	return (
+		<Details summary="Available variables">
+			<Table
+				caption="Variables"
+				captionHidden
+				columns={[
+					{ key: "variable", header: "Variable" },
+					{ key: "description", header: "Replaced with" },
+					{ key: "example", header: "Example" },
+				]}
+				rows={variables.map((variable) => ({
+					id: variable.name,
+					cells: {
+						variable: <code>{`{${variable.name}}`}</code>,
+						description: variable.description,
+						example: variable.example,
+					},
+				}))}
+			/>
+		</Details>
+	);
+}
+
+/**
+ * Markdown with a Preview button. Pass `variables` to list them under the
+ * box and fill their examples into the preview.
+ */
 export function MarkdownForm({
 	action,
 	initial,
+	variables = [],
 	cancelHref,
 }: {
 	action: SettingsAction;
 	initial: { body: string };
+	variables?: readonly FormVariable[];
 	cancelHref: string;
 }) {
 	const [state, formAction, pending] = useSettingsForm(action, initial);
@@ -122,12 +159,13 @@ export function MarkdownForm({
 					id="body"
 					name="body"
 					label="Content"
-					hint="Use Markdown: ## for headings, - for bullet points, **text** for bold and [text](link) for links. {username}, {date} and {location} are replaced with the colleague's details."
+					hint={`Use Markdown: ## for headings, - for bullet points, **text** for bold and [text](link) for links.${variables.length ? " Type a variable in curly brackets and it is replaced with the person's details." : ""}`}
 					rows={19}
 					monospace
 					defaultValue={values.body}
 					error={errors.body}
 				/>
+				{variables.length ? <VariablesList variables={variables} /> : null}
 				<SaveOrCancel cancelHref={cancelHref} pending={pending}>
 					<Button type="submit" name="intent" value="preview" variant="secondary">
 						Preview
@@ -138,13 +176,16 @@ export function MarkdownForm({
 				<section aria-labelledby="preview-heading">
 					<h2 id="preview-heading">Preview</h2>
 					<InsetText>
-						<p>
-							Not saved yet. The colleague's details are filled in when they see the
-							page.
-						</p>
+						<p>Not saved yet. Shown with example details.</p>
 					</InsetText>
 					<Preview label="Preview of the page content">
-						<MarkdownText markdown={values.body} />
+						<MarkdownText
+							markdown={fillVariables(
+								values.body,
+								Object.fromEntries(variables.map((v) => [v.name, v.example])),
+								"test",
+							)}
+						/>
 					</Preview>
 				</section>
 			) : null}
@@ -239,4 +280,77 @@ export function ValueForm({
 			<SaveOrCancel cancelHref={cancelHref} pending={pending} />
 		</form>
 	);
+}
+
+export type SelectsGroup = {
+	heading?: string;
+	hint?: string;
+	fields: {
+		key: string;
+		label: string;
+		hint?: string;
+		options: { value: string; label: string }[];
+		/** Adds a first option with this label and an empty value, such as "None". */
+		emptyLabel?: string;
+	}[];
+};
+
+/**
+ * Settings chosen from lists, such as which Halo report or field to use, in
+ * groups with headings. Nobody types an ID: the options come from the
+ * system being configured.
+ */
+export function SelectsForm({
+	action,
+	groups,
+	initial,
+	cancelHref,
+}: {
+	action: SettingsAction;
+	groups: SelectsGroup[];
+	initial: Record<string, string>;
+	cancelHref: string;
+}) {
+	const [state, formAction, pending] = useSettingsForm(action, initial);
+	const { values, errors } = state;
+	return (
+		<form action={formAction} key={JSON.stringify(values)}>
+			<FormErrors errors={errors} />
+			{groups.map((group) => (
+				<fieldset
+					key={group.heading ?? group.fields[0]?.key}
+					className="bcp-settings-form-group"
+				>
+					{group.heading ? (
+						<legend className="bcp-heading-md">{group.heading}</legend>
+					) : null}
+					{group.hint ? <p className="bcp-secondary-text">{group.hint}</p> : null}
+					{group.fields.map((field) => (
+						<Select
+							key={field.key}
+							id={field.key}
+							name={field.key}
+							label={field.label}
+							hint={field.hint}
+							defaultValue={values[field.key]}
+							error={errors[field.key]}
+							options={[
+								...(field.emptyLabel !== undefined
+									? [{ value: "", label: field.emptyLabel }]
+									: []),
+								...withCurrent(field.options, values[field.key]),
+							]}
+						/>
+					))}
+				</fieldset>
+			))}
+			<SaveOrCancel cancelHref={cancelHref} pending={pending} />
+		</form>
+	);
+}
+
+/** Keeps the saved value selectable even if the list no longer has it. */
+function withCurrent(options: { value: string; label: string }[], current: string | undefined) {
+	if (!current || options.some((option) => option.value === current)) return options;
+	return [...options, { value: current, label: `${current} (not found in the list)` }];
 }

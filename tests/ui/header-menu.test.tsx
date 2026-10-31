@@ -67,7 +67,7 @@ describe("HeaderMenu", () => {
 		);
 
 		await user.click(screen.getByRole("button", { name: "Menu" }));
-		screen.getByRole("link", { name: "Portal settings" }).focus();
+		screen.getByRole("link", { name: "Settings" }).focus();
 		await user.keyboard("{Escape}");
 
 		expect(screen.getByRole("button", { name: "Menu" })).toHaveFocus();

@@ -325,6 +325,11 @@ a:focus-visible {
 	word-break: break-all;
 }
 
+/* A part of a section with its own h3, such as Halo within Connections */
+.bcp-subsection {
+	margin-top: 40px;
+}
+
 /* Section break */
 .bcp-section-break {
 	margin: var(--bcp-space-7xl) 0;

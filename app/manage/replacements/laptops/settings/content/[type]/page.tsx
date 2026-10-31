@@ -4,6 +4,7 @@ import { MarkdownForm } from "@/components/patterns/settings-form";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { PageHeading } from "@/components/ui/page-heading";
 import { listContent } from "@/services/replacements/laptops/lib/settings";
+import { variableList } from "@/services/replacements/laptops/lib/variables";
 import { LAPTOPS_SECTIONS } from "@/services/replacements/laptops/navigation";
 import { saveContentAction } from "../../actions";
 import { SETTINGS } from "../../definitions";
@@ -26,6 +27,7 @@ export default async function ContentPage({ params }: { params: Promise<{ type: 
 			<MarkdownForm
 				action={saveContentAction.bind(null, type)}
 				initial={{ body: item?.body ?? "" }}
+				variables={variableList("page")}
 				cancelHref={`${SETTINGS}#page`}
 			/>
 		</LaptopsPage>

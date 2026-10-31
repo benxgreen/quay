@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { saveConnectionAction } from "@/app/manage/portal-settings/actions";
+import { saveConnectionAction } from "@/app/manage/settings/actions";
 import { ValueForm } from "@/components/patterns/settings-form";
 import { LaptopsPage } from "@/components/service/replacements/laptops-page";
 import { requireRole } from "@/lib/auth/guards";
@@ -17,7 +17,8 @@ export default async function ConnectionPage({ params }: { params: Promise<{ key
 	if (!canAccess(user.roles, ACCESS.management)) redirect(SETTINGS);
 	const { key } = await params;
 	const connection = (await listConnections()).find((item) => item.key === key);
-	if (!connection) notFound();
+	// The Halo site is portal-wide: changed in portal Settings.
+	if (!connection || key === "halo") notFound();
 	return (
 		<LaptopsPage section="settings" parents={[LAPTOPS_SECTIONS.settings]} narrow>
 			<ValueForm

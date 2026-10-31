@@ -39,7 +39,7 @@ export type MyCase = {
 		reason: "session_cancelled" | "not_available" | "team" | "did_not_attend";
 		date: IsoDate;
 	} | null;
-	person: { firstName: string; email: string; username: string | null };
+	person: { firstName: string; fullName: string; email: string; username: string | null };
 };
 
 export async function myCase(userId: string, token?: string): Promise<MyCase | null> {
@@ -128,7 +128,12 @@ export async function myCase(userId: string, token?: string): Promise<MyCase | n
 						date: last.date,
 					}
 				: null,
-		person: { firstName: row.name.split(" ")[0], email: row.email, username: row.username },
+		person: {
+			firstName: row.name.split(" ")[0],
+			fullName: row.name,
+			email: row.email,
+			username: row.username,
+		},
 	};
 }
 
@@ -142,7 +147,7 @@ export async function previousSoftware(caseId: string): Promise<string[]> {
 	return row?.software ?? [];
 }
 
-/** Portal content (Settings) for the type, with {username}, {date} and {location} filled. */
+/** Portal content (Settings) for the type. The page fills its variables from the service's list (variables.ts, "page"). */
 export async function pageContent(type: ReplacementType): Promise<string> {
 	const row = await queryOne<{ body: string }>(
 		"SELECT body_markdown AS body FROM lr.page_content WHERE session_type = $1",

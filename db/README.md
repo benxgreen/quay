@@ -23,6 +23,11 @@ PostgreSQL 16. The schema, connection rules and error mapping are in `docs/datab
 | 0019 | One session per type at any start time |
 | 0020 | The old device's make and model on each case |
 | 0021 | The job log and connection log move to `portal` with a `service` column, for every service's jobs and calls |
+| 0023 | Job title, department and manager's email read from `other2`, `other5` and `admanager`, the fields report 566 uses |
+| 0024 | The username mapping and prefix leave the Halo settings: the username will come from Entra ID |
+| 0025 | A `notification_webhook` connection for team notifications through Power Automate (not used yet); the email webhook is labelled "Email webhook" |
+| 0026 | Audit notes use the service's shared variable names: `{full_name}` and `{case_reference}` instead of `{person}` and `{reference}` |
+| 0022 | Halo settings: `portal.halo_settings` (staff field mapping) and `lr.halo_settings` (reports, asset type, statuses, fields, values and audit notes), started with the test Halo's values |
 
 ## Local database
 

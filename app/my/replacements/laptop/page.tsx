@@ -16,7 +16,9 @@ import {
 	softwareLocked,
 	splitSoftware,
 } from "@/services/replacements/laptops/lib/booking";
+import { getEmailSender } from "@/services/replacements/laptops/lib/emails/settings";
 import { faqs, myCase, pageContent } from "@/services/replacements/laptops/lib/my-laptop";
+import { variableValues } from "@/services/replacements/laptops/lib/variables";
 import { LAPTOP_PAGE, TYPE_WORDS, when, withCase } from "./wording";
 
 export const metadata: Metadata = { title: "Your laptop replacement" };
@@ -77,20 +79,28 @@ export default async function LaptopPage({ searchParams }: LaptopPageProps) {
 		);
 	}
 
-	const [settings, list, content, questions] = await Promise.all([
+	const [settings, list, content, questions, sender] = await Promise.all([
 		bookingSettings(),
 		softwareList(),
 		pageContent(found.type),
 		faqs(found.type),
+		getEmailSender(),
 	]);
 	const locked = softwareLocked(booking.date, settings);
 	const deadline = softwareChangeDeadline(booking.date, settings);
 	const { listed, other } = splitSoftware(booking.software, list);
-	const variables = {
-		username: found.person.username ?? undefined,
-		date: formatLongDate(booking.date),
-		location: booking.location,
-	};
+	const variables = variableValues("page", {
+		firstName: found.person.firstName,
+		fullName: found.person.fullName,
+		username: found.person.username,
+		caseReference: "",
+		type: found.type,
+		booking: { date: booking.date, startTime: booking.time, location: booking.location },
+		bookingLink: null,
+		oldSerial: found.serial,
+		software: booking.software,
+		teamName: sender.teamName,
+	});
 
 	return (
 		<ColleaguePage>

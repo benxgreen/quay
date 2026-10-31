@@ -80,4 +80,5 @@ export const SAVED_MESSAGES: Record<string, string> = {
 	"check-added": "Check added",
 	"check-saved": "Check saved",
 	"check-removed": "Check removed",
+	halo: "Halo settings saved",
 };

@@ -1,1 +1,8 @@
-/* Uses the shared form, button and preview styles; nothing of its own yet. */
+/* A group of settings chosen from lists, under its own heading. */
+.bcp-settings-form-group {
+	margin-bottom: 30px;
+}
+
+.bcp-settings-form-group > legend {
+	margin-bottom: 10px;
+}

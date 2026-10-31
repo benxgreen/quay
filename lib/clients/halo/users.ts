@@ -3,6 +3,11 @@ import "server-only";
 import { type CallContext, type CallResult, HttpStatusError } from "@/lib/clients/connection-log";
 import { callHalo, haloMode, mockHaloCall } from "@/lib/clients/halo";
 import type { HaloHttp } from "@/lib/clients/halo/http";
+import {
+	getHaloUserFieldMap,
+	type HaloUserFieldMap,
+	readHaloField,
+} from "@/lib/clients/halo/settings";
 import { MOCK_HALO_USERS } from "@/mocks/halo";
 
 /**
@@ -128,46 +133,44 @@ export function createMockHaloUsersClient(): HaloUsersClient {
 	};
 }
 
-/** The fields the portal reads from Halo's Users_List and Users records. */
-type HaloApiUser = {
+/** A Halo user record: the fixed fields the portal relies on, and whatever the settings map. */
+type HaloApiUser = Record<string, unknown> & {
 	id: number;
 	name: string;
 	firstname?: string;
 	emailaddress?: string;
-	login?: string;
-	title?: string;
-	department?: string;
 	inactive?: boolean;
 	azureoid?: string;
-	azure_last_login_date?: string;
+	customfields?: { id: number; value?: unknown; display?: unknown }[];
 };
 
 /**
- * Maps a Halo user to the portal's. OPEN QUESTIONS (TODO.md): which Halo
- * field holds the BCP username (login is used for now), whether `title` is
- * the job title, and whether azure_last_login_date is the last sign-in.
+ * Maps a Halo user to the portal's, reading the staff details from the
+ * fields chosen in portal Settings › Halo. The list endpoint has no custom
+ * fields, so those details are only filled in on a single user.
  */
-export function toHaloUser(user: HaloApiUser): HaloUser {
+export function toHaloUser(user: HaloApiUser, map: HaloUserFieldMap): HaloUser {
 	return {
 		haloUserId: user.id,
 		entraObjectId: user.azureoid || null,
 		email: (user.emailaddress ?? "").toLowerCase(),
 		displayName: user.name,
 		firstName: user.firstname || user.name.split(" ")[0],
-		username: user.login || null,
-		jobTitle: user.title || null,
-		department: user.department || null,
+		// From Entra ID once sign-in is live: Halo has no domain prefix.
+		username: null,
+		jobTitle: readHaloField(user, map.jobTitleField),
+		department: readHaloField(user, map.departmentField),
 		active: !user.inactive,
-		manager: null,
-		lastSignIn: user.azure_last_login_date || null,
+		manager: readHaloField(user, map.managerEmailField),
+		lastSignIn: readHaloField(user, map.lastSignInField),
 	};
 }
 
 const LIST = { includeactive: true, includeinactive: true } as const;
 
-async function fullUser(halo: HaloHttp, match: HaloApiUser | undefined) {
+async function fullUser(halo: HaloHttp, match: HaloApiUser | undefined, map: HaloUserFieldMap) {
 	if (!match) return { value: null, summary: "Staff details: not found" };
-	const user = toHaloUser(await halo.get<HaloApiUser>(`/Users/${match.id}`));
+	const user = toHaloUser(await halo.get<HaloApiUser>(`/Users/${match.id}`), map);
 	return { value: user, summary: `Staff details: found ${user.displayName}` };
 }
 
@@ -177,6 +180,7 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 			callHalo(
 				context,
 				async (halo) => {
+					const map = await getHaloUserFieldMap();
 					const { users } = await halo.get<{ users: HaloApiUser[] }>("/Users", {
 						...LIST,
 						count: 2,
@@ -185,7 +189,7 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 						]),
 					});
 					// More than one match would mean Halo's data is wrong; don't guess.
-					return fullUser(halo, users.length === 1 ? users[0] : undefined);
+					return fullUser(halo, users.length === 1 ? users[0] : undefined, map);
 				},
 				{ fetchFn },
 			),
@@ -194,6 +198,7 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 			callHalo(
 				context,
 				async (halo) => {
+					const map = await getHaloUserFieldMap();
 					const wanted = email.trim().toLowerCase();
 					const { users } = await halo.get<{ users: HaloApiUser[] }>("/Users", {
 						...LIST,
@@ -203,6 +208,7 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 					return fullUser(
 						halo,
 						users.find((user) => user.emailaddress?.toLowerCase() === wanted),
+						map,
 					);
 				},
 				{ fetchFn },
@@ -212,6 +218,7 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 			callHalo(
 				context,
 				async (halo) => {
+					const map = await getHaloUserFieldMap();
 					const found = new Map<string, HaloUser | null>();
 					for (const email of emails) {
 						const wanted = email.trim().toLowerCase();
@@ -223,7 +230,7 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 						const match = users.find(
 							(user) => user.emailaddress?.toLowerCase() === wanted,
 						);
-						found.set(wanted, (await fullUser(halo, match)).value);
+						found.set(wanted, (await fullUser(halo, match, map)).value);
 					}
 					return {
 						value: found,
@@ -237,13 +244,14 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 			callHalo(
 				context,
 				async (halo) => {
+					const map = await getHaloUserFieldMap();
 					const { users } = await halo.get<{ users: HaloApiUser[] }>("/Users", {
 						...LIST,
 						count: 50,
 						search: text.trim(),
 					});
 					return {
-						value: users.map(toHaloUser),
+						value: users.map((user) => toHaloUser(user, map)),
 						summary: `Staff search: ${users.length} people`,
 					};
 				},
@@ -254,6 +262,7 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 			callHalo(
 				context,
 				async (halo) => {
+					const map = await getHaloUserFieldMap();
 					const page = await halo.get<{ users: HaloApiUser[]; record_count: number }>(
 						"/Users",
 						{
@@ -266,7 +275,10 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 						},
 					);
 					return {
-						value: { users: page.users.map(toHaloUser), total: page.record_count },
+						value: {
+							users: page.users.map((user) => toHaloUser(user, map)),
+							total: page.record_count,
+						},
 						summary: `Staff list: page ${pageNo}, ${page.users.length} of ${page.record_count}`,
 					};
 				},
@@ -277,8 +289,9 @@ export function createHttpHaloUsersClient(fetchFn?: typeof fetch): HaloUsersClie
 			callHalo(
 				context,
 				async (halo) => {
+					const map = await getHaloUserFieldMap();
 					try {
-						return await fullUser(halo, { id: haloUserId, name: "" });
+						return await fullUser(halo, { id: haloUserId, name: "" }, map);
 					} catch (error) {
 						if (error instanceof HttpStatusError && error.statusCode === 404) {
 							return { value: null, summary: "Staff details: not found" };
