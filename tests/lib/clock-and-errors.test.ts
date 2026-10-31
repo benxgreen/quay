@@ -27,7 +27,7 @@ describe("describeConstraintError", () => {
 		expect(describeConstraintError({ constraint: "sessions_not_overbooked" })).toEqual({
 			constraint: "sessions_not_overbooked",
 			problem: "session_unavailable",
-			message: "That date has just filled up. Choose another.",
+			message: "This date is no longer available. Please choose another date.",
 		});
 	});
 

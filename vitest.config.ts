@@ -15,6 +15,9 @@ export default defineConfig({
 		globals: true,
 		css: false,
 		setupFiles: ["./vitest.setup.ts"],
+		// Tests always use the mock clients, whatever .env says: .env files never
+		// override variables that are already set.
+		env: { HALO_CLIENT: "mock", EMAIL_CLIENT: "mock" },
 		include: ["**/*.test.{ts,tsx}"],
 		exclude: ["node_modules/**", ".next/**", "storybook-static/**"],
 	},

@@ -61,6 +61,8 @@ describe("callExternal", () => {
 			"5 devices",
 			null,
 			expect.any(Number),
+			// The service: none was given in the context.
+			null,
 		]);
 	});
 

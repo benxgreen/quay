@@ -3,6 +3,7 @@ import "@/components/ui/bcp-design-system.css";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import type { ReactNode } from "react";
+import { portalUrl } from "@/lib/portal/url";
 
 const roboto = Roboto({
 	subsets: ["latin"],
@@ -12,6 +13,8 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
+	// The portal's own address, so the Open Graph image links aren't localhost in production.
+	metadataBase: new URL(portalUrl()),
 	title: {
 		template: "%s – Quay | BCP Council",
 		default: "- Quay | BCP Council",
